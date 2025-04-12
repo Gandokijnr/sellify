@@ -95,7 +95,6 @@
 <script setup>
 import { PlusIcon } from "@heroicons/vue/24/solid";
 
-import SellerNavbar from "@/components/common/isAuthenticatedNav/NavbarBar.vue";
 import DashboardCard from "@/components/dashboard/DashboardCard.vue";
 import ListingItem from "@/components/listings/ListingItem.vue";
 import MessageItem from "@/components/messages/MessageItem.vue";

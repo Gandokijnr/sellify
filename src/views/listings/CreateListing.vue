@@ -215,7 +215,6 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import SellerNavbar from "@/components/common/isAuthenticatedNav/NavbarBar.vue";
 
 const router = useRouter();
 
