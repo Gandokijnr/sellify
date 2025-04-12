@@ -111,7 +111,7 @@
               </router-link>
               <router-link
                 to="/register"
-                class="hidden md:inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-orange-700"
+                class="hidden md:inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-gray-700"
               >
                 Sign up
               </router-link>
