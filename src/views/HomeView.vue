@@ -1,83 +1,72 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-const isMenuOpen = ref(false);
-const searchQuery = ref("");
+const listings = ref([]);
+const loading = ref(true);
+const limit = ref(8);
+const page = ref(1);
+const totalCount = ref(0);
 
-const categories = [
-  { id: 1, name: "Phones", icon: "📱", count: 12500 },
-  { id: 2, name: "Laptops", icon: "💻", count: 8400 },
-  { id: 3, name: "Cars", icon: "🚗", count: 15600 },
-  { id: 4, name: "Property", icon: "🏠", count: 9200 },
-  { id: 5, name: "Fashion", icon: "👗", count: 18700 },
-  { id: 6, name: "Electronics", icon: "🔌", count: 11300 },
-];
+// Computed properties for pagination controls
+const totalPages = computed(() => Math.ceil(totalCount.value / limit.value));
+const isFirstPage = computed(() => page.value === 1);
+const isLastPage = computed(() => page.value >= totalPages.value);
 
-const listings = [
-  {
-    id: 1,
-    title: "iPhone 13 Pro Max 256GB",
-    price: "₦450,000",
-    location: "Lagos",
-    image: "/api/placeholder/300/200",
-    date: "2 hours ago",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "2018 Toyota Camry",
-    price: "₦12,500,000",
-    location: "Abuja",
-    image: "/api/placeholder/300/200",
-    date: "1 day ago",
-    featured: false,
-  },
-  {
-    id: 3,
-    title: "3-Bedroom Flat in Lekki",
-    price: "₦25,000,000",
-    location: "Lagos",
-    image: "/api/placeholder/300/200",
-    date: "3 days ago",
-    featured: true,
-  },
-  {
-    id: 4,
-    title: "Samsung Galaxy S22 Ultra",
-    price: "₦520,000",
-    location: "Port Harcourt",
-    image: "/api/placeholder/300/200",
-    date: "5 hours ago",
-    featured: false,
-  },
-  {
-    id: 5,
-    title: "MacBook Pro 2021",
-    price: "₦650,000",
-    location: "Ibadan",
-    image: "/api/placeholder/300/200",
-    date: "1 day ago",
-    featured: false,
-  },
-  {
-    id: 6,
-    title: "Canon EOS R5",
-    price: "₦850,000",
-    location: "Enugu",
-    image: "/api/placeholder/300/200",
-    date: "4 days ago",
-    featured: true,
-  },
-];
+const fetchProducts = async () => {
+  loading.value = true;
+  const offset = (page.value - 1) * limit.value;
 
+  try {
+    const response = await axios.get(
+      `${apiUrl}/?offset=${offset}&limit=${limit.value}`
+    );
+    listings.value = response.data;
+    totalCount.value = response.data.totalCount || 60;
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Pagination controls
+const nextPage = () => {
+  if (!isLastPage.value) {
+    page.value++;
+  }
+};
+
+const prevPage = () => {
+  if (!isFirstPage.value) {
+    page.value--;
+  }
+};
+
+const goToPage = (newPage) => {
+  if (newPage >= 1 && newPage <= totalPages.value) {
+    page.value = newPage;
+  }
+};
+
+onMounted(() => {
+  fetchProducts();
+});
+
+watch(page, () => {
+  fetchProducts();
+});
+
+// Utility functions
 function formatNumber(num) {
   return num.toLocaleString();
 }
 
-function callSeller(id) {
-  alert(`Calling seller for listing ${id}`);
+function callSeller(index) {
+  alert(`Calling seller for listing ${listings.value[index].title}`);
 }
 </script>
 
@@ -181,7 +170,12 @@ function callSeller(id) {
             </div>
           </div>
 
+          <div v-if="loading" class="text-center py-8">
+            <span class="text-gray-500 text-lg">Loading products...</span>
+          </div>
+
           <div
+            v-else
             class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
           >
             <div
@@ -191,7 +185,7 @@ function callSeller(id) {
             >
               <div class="relative">
                 <img
-                  :src="listing.image"
+                  :src="listing.images"
                   :alt="listing.title"
                   class="w-full h-40 sm:h-48 object-cover"
                 />
@@ -282,7 +276,46 @@ function callSeller(id) {
           </div>
         </div>
       </div>
+      <div class="flex justify-center items-center mt-8 space-x-2">
+        <button
+          @click="prevPage"
+          :disabled="isFirstPage"
+          :class="{
+            'bg-gray-200 cursor-not-allowed': isFirstPage,
+            'bg-green-500 hover:bg-green-600': !isFirstPage,
+          }"
+          class="text-white px-4 py-2 rounded transition-colors"
+        >
+          Previous
+        </button>
 
+        <div class="flex space-x-1">
+          <button
+            v-for="pageNum in totalPages"
+            :key="pageNum"
+            @click="goToPage(pageNum)"
+            :class="{
+              'bg-green-500 text-white': pageNum === page,
+              'bg-gray-200 hover:bg-gray-300': pageNum !== page,
+            }"
+            class="px-3 py-1 rounded transition-colors"
+          >
+            {{ pageNum }}
+          </button>
+        </div>
+
+        <button
+          @click="nextPage"
+          :disabled="isLastPage"
+          :class="{
+            'bg-gray-200 cursor-not-allowed': isLastPage,
+            'bg-green-500 hover:bg-green-600': !isLastPage,
+          }"
+          class="text-white px-4 py-2 rounded transition-colors"
+        >
+          Next
+        </button>
+      </div>
       <!-- How It Works -->
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
