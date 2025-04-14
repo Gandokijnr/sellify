@@ -7,25 +7,13 @@ const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const listings = ref([]);
 const loading = ref(true);
-const limit = ref(8);
-const page = ref(1);
-const totalCount = ref(0);
-
-// Computed properties for pagination controls
-const totalPages = computed(() => Math.ceil(totalCount.value / limit.value));
-const isFirstPage = computed(() => page.value === 1);
-const isLastPage = computed(() => page.value >= totalPages.value);
 
 const fetchProducts = async () => {
   loading.value = true;
-  const offset = (page.value - 1) * limit.value;
 
   try {
-    const response = await axios.get(
-      `${apiUrl}/?offset=${offset}&limit=${limit.value}`
-    );
+    const response = await axios.get(`${apiUrl}`);
     listings.value = response.data;
-    totalCount.value = response.data.totalCount || 60;
   } catch (error) {
     console.error("Failed to fetch products:", error);
   } finally {
@@ -33,30 +21,7 @@ const fetchProducts = async () => {
   }
 };
 
-// Pagination controls
-const nextPage = () => {
-  if (!isLastPage.value) {
-    page.value++;
-  }
-};
-
-const prevPage = () => {
-  if (!isFirstPage.value) {
-    page.value--;
-  }
-};
-
-const goToPage = (newPage) => {
-  if (newPage >= 1 && newPage <= totalPages.value) {
-    page.value = newPage;
-  }
-};
-
 onMounted(() => {
-  fetchProducts();
-});
-
-watch(page, () => {
   fetchProducts();
 });
 
@@ -76,7 +41,7 @@ function callSeller(index) {
 
     <main>
       <!-- Hero Section -->
-      <div class="bg-gradient-to-br from-green-600 to-green-700 text-white">
+      <div class="bg-green-700 text-white">
         <div class="container mx-auto px-4 py-16 md:py-24">
           <div class="max-w-3xl mx-auto text-center">
             <h1 class="text-4xl md:text-5xl font-bold mb-6">
@@ -111,7 +76,7 @@ function callSeller(index) {
                 </svg>
               </span>
               <button
-                class="absolute right-2 top-2 bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors shadow"
+                class="absolute right-2 top-2 bg-green-700 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors shadow"
               >
                 Search
               </button>
@@ -276,46 +241,7 @@ function callSeller(index) {
           </div>
         </div>
       </div>
-      <div class="flex justify-center items-center mt-8 space-x-2">
-        <button
-          @click="prevPage"
-          :disabled="isFirstPage"
-          :class="{
-            'bg-gray-200 cursor-not-allowed': isFirstPage,
-            'bg-green-500 hover:bg-green-600': !isFirstPage,
-          }"
-          class="text-white px-4 py-2 rounded transition-colors"
-        >
-          Previous
-        </button>
 
-        <div class="flex space-x-1">
-          <button
-            v-for="pageNum in totalPages"
-            :key="pageNum"
-            @click="goToPage(pageNum)"
-            :class="{
-              'bg-green-500 text-white': pageNum === page,
-              'bg-gray-200 hover:bg-gray-300': pageNum !== page,
-            }"
-            class="px-3 py-1 rounded transition-colors"
-          >
-            {{ pageNum }}
-          </button>
-        </div>
-
-        <button
-          @click="nextPage"
-          :disabled="isLastPage"
-          :class="{
-            'bg-gray-200 cursor-not-allowed': isLastPage,
-            'bg-green-500 hover:bg-green-600': !isLastPage,
-          }"
-          class="text-white px-4 py-2 rounded transition-colors"
-        >
-          Next
-        </button>
-      </div>
       <!-- How It Works -->
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
