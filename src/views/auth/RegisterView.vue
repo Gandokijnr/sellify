@@ -3,11 +3,13 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { auth } from "@/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { useAuthStore } from "@/stores/auth"; // Assuming you're using Pinia for state management
+import { useAuthStore } from "@/stores/auth";
 import Navbar from "@/components/common/Navbar.vue";
+import { useToast } from "vue-toastification";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const toast = useToast();
 
 const form = ref({
   firstName: "",
@@ -41,7 +43,6 @@ const handleEmailRegister = async () => {
       uid: userCredential.user.uid,
       email: userCredential.user.email,
       displayName: userCredential.user.displayName,
-      // Add any other user data you need
     });
 
     // Store user in localStorage for persistence
@@ -54,11 +55,22 @@ const handleEmailRegister = async () => {
       })
     );
 
+    // Show success toast
+    toast.success("Account created successfully!", {
+      timeout: 3000,
+    });
+
     // Redirect to dashboard or profile setup
     router.push("/");
   } catch (err) {
     console.error("Registration error:", err);
-    errorMessage.value = getErrorMessage(err.code);
+    const errorMsg = getErrorMessage(err.code);
+    errorMessage.value = errorMsg;
+
+    // Show error toast
+    toast.error(errorMsg, {
+      timeout: 4000,
+    });
   } finally {
     loading.value = false;
   }
@@ -82,7 +94,13 @@ const getErrorMessage = (code) => {
 
 // Google Sign-In handler (if you implement it later)
 const handleGoogleSignIn = async () => {
-  // You would implement Google sign-in here
+  try {
+    // Your Google sign-in implementation
+    // On success:
+    // toast.success("Signed in with Google successfully!");
+  } catch (error) {
+    toast.error("Google sign-in failed. Please try again.");
+  }
 };
 </script>
 

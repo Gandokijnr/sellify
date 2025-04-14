@@ -5,8 +5,26 @@ import router from "./router";
 import { auth } from "@/firebase";
 import "./assets/main.css";
 
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
 // Create the app
 const app = createApp(App);
+
+// Initialize Toast
+app.use(Toast, {
+  timeout: 10000,
+  closeOnClick: true,
+  pauseOnFocusLoss: true,
+  pauseOnHover: true,
+  draggable: true,
+  draggablePercent: 0.6,
+  showCloseButtonOnHover: false,
+  hideProgressBar: true,
+  closeButton: "button",
+  icon: true,
+  rtl: false,
+});
 
 // Initialize Pinia FIRST
 const pinia = createPinia();

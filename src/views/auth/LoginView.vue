@@ -94,8 +94,10 @@ import { useRouter } from "vue-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
+import { useToast } from "vue-toastification";
 
 const router = useRouter();
+const toast = useToast();
 
 const email = ref("");
 const password = ref("");
@@ -103,15 +105,45 @@ const rememberMe = ref(false);
 const loading = ref(false);
 const error = ref(null);
 
+const getErrorMessage = (code) => {
+  switch (code) {
+    case "auth/invalid-email":
+      return "Please enter a valid email address.";
+    case "auth/user-disabled":
+      return "This account has been disabled.";
+    case "auth/user-not-found":
+      return "No account found with this email.";
+    case "auth/wrong-password":
+      return "Incorrect password. Please try again.";
+    case "auth/too-many-requests":
+      return "Too many failed attempts. Account temporarily locked. Try again later or reset your password.";
+    default:
+      return "Login failed. Please try again.";
+  }
+};
+
 const handleSignIn = async () => {
   loading.value = true;
   error.value = null;
 
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value);
+
+    // Show success toast
+    toast.success("Logged in successfully!", {
+      timeout: 3000,
+    });
+
     router.push("/");
   } catch (err) {
-    error.value = err.message;
+    console.error("Login error:", err);
+    const errorMsg = getErrorMessage(err.code);
+    error.value = errorMsg;
+
+    // Show error toast
+    toast.error(errorMsg, {
+      timeout: 4000,
+    });
   } finally {
     loading.value = false;
   }

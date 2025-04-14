@@ -52,6 +52,24 @@ const listings = [
     date: "5 hours ago",
     featured: false,
   },
+  {
+    id: 5,
+    title: "MacBook Pro 2021",
+    price: "₦650,000",
+    location: "Ibadan",
+    image: "/api/placeholder/300/200",
+    date: "1 day ago",
+    featured: false,
+  },
+  {
+    id: 6,
+    title: "Canon EOS R5",
+    price: "₦850,000",
+    location: "Enugu",
+    image: "/api/placeholder/300/200",
+    date: "4 days ago",
+    featured: true,
+  },
 ];
 
 function formatNumber(num) {
@@ -59,8 +77,7 @@ function formatNumber(num) {
 }
 
 function callSeller(id) {
-  // In a real application, this would handle the call action
-  console.log(`Calling seller for listing ${id}`);
+  alert(`Calling seller for listing ${id}`);
 }
 </script>
 
@@ -119,14 +136,16 @@ function callSeller(id) {
         <div class="container mx-auto px-4">
           <h2 class="text-2xl font-bold mb-8">Popular Categories</h2>
 
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
             <div
               v-for="category in categories"
               :key="category.id"
-              class="bg-white rounded-xl p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer"
+              class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer"
             >
               <span class="text-3xl mb-2">{{ category.icon }}</span>
-              <h3 class="font-medium text-gray-800">{{ category.name }}</h3>
+              <h3 class="font-medium text-gray-800 text-center">
+                {{ category.name }}
+              </h3>
               <p class="text-sm text-gray-500 mt-1">
                 {{ formatNumber(category.count) }} ads
               </p>
@@ -163,7 +182,7 @@ function callSeller(id) {
           </div>
 
           <div
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+            class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
           >
             <div
               v-for="listing in listings"
@@ -174,7 +193,7 @@ function callSeller(id) {
                 <img
                   :src="listing.image"
                   :alt="listing.title"
-                  class="w-full h-48 object-cover"
+                  class="w-full h-40 sm:h-48 object-cover"
                 />
                 <button
                   class="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow-sm hover:bg-gray-100"
@@ -205,11 +224,13 @@ function callSeller(id) {
               </div>
               <div class="p-4">
                 <div class="flex justify-between mb-2">
-                  <h3 class="font-medium text-lg line-clamp-1">
+                  <h3 class="font-medium text-base sm:text-lg line-clamp-1">
                     {{ listing.title }}
                   </h3>
                 </div>
-                <div class="flex items-center mb-3 text-gray-500 text-sm">
+                <div
+                  class="flex items-center mb-3 text-gray-500 text-xs sm:text-sm"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="14"
@@ -230,11 +251,11 @@ function callSeller(id) {
                   <span>{{ listing.date }}</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <div class="font-bold text-green-600 text-lg">
+                  <div class="font-bold text-green-600 text-base sm:text-lg">
                     {{ listing.price }}
                   </div>
                   <button
-                    class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1.5 rounded-lg flex items-center transition-colors"
+                    class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 rounded-lg flex items-center transition-colors text-sm"
                     @click="callSeller(listing.id)"
                   >
                     <svg
@@ -253,7 +274,7 @@ function callSeller(id) {
                         d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
                       />
                     </svg>
-                    <span class="text-sm font-medium">Call</span>
+                    <span class="font-medium">Call</span>
                   </button>
                 </div>
               </div>
@@ -387,5 +408,13 @@ function callSeller(id) {
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Optional: Add responsive font sizes */
+@media (max-width: 640px) {
+  .text-base {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
 }
 </style>
