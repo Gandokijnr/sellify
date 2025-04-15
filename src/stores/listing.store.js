@@ -7,7 +7,7 @@ import {
   where,
   orderBy,
 } from "firebase/firestore";
-import { db, storage } from "@/firebase/config";
+import { db, storage } from "@/firebase";
 import {
   ref as storageRef,
   uploadBytes,
