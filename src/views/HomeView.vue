@@ -7,6 +7,15 @@ const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const listings = ref([]);
 const loading = ref(true);
+const searchQuery = ref("");
+const categories = ref([
+  { id: 1, name: "Electronics", icon: "📱", count: 12543 },
+  { id: 2, name: "Vehicles", icon: "🚗", count: 8765 },
+  { id: 3, name: "Property", icon: "🏠", count: 6543 },
+  { id: 4, name: "Fashion", icon: "👕", count: 9876 },
+  { id: 5, name: "Furniture", icon: "🛋️", count: 5432 },
+  { id: 6, name: "Jobs", icon: "💼", count: 7654 },
+]);
 
 const fetchProducts = async () => {
   loading.value = true;
@@ -23,6 +32,7 @@ const fetchProducts = async () => {
 
 onMounted(() => {
   fetchProducts();
+  initializeScrollAnimations();
 });
 
 // Utility functions
@@ -33,6 +43,28 @@ function formatNumber(num) {
 function callSeller(index) {
   alert(`Calling seller for listing ${listings.value[index].title}`);
 }
+
+// Scroll animation functions
+function initializeScrollAnimations() {
+  const animateElements = document.querySelectorAll('.animate-on-scroll');
+  
+  function checkIfInView() {
+    animateElements.forEach(element => {
+      const elementTop = element.getBoundingClientRect().top;
+      const elementVisible = 150;
+      
+      if (elementTop < window.innerHeight - elementVisible) {
+        element.classList.add('visible');
+      }
+    });
+  }
+  
+  // Initial check
+  checkIfInView();
+  
+  // Add scroll event listener
+  window.addEventListener('scroll', checkIfInView);
+}
 </script>
 
 <template>
@@ -40,14 +72,13 @@ function callSeller(index) {
     <Navbar />
 
     <main>
-      <!-- Hero Section -->
       <div class="bg-green-700 text-white">
         <div class="container mx-auto px-4 py-16 md:py-24">
           <div class="max-w-3xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 slide-in-top fade-in-fwd ">
               Buy & Sell Anything in Nigeria
             </h1>
-            <p class="text-xl mb-8 opacity-90">
+            <p class="text-xl mb-8 opacity-90 fade-in-fwd ">
               Discover the best deals across the country on Sellify
             </p>
 
@@ -88,13 +119,14 @@ function callSeller(index) {
       <!-- Categories -->
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
-          <h2 class="text-2xl font-bold mb-8">Popular Categories</h2>
+          <h2 class="text-2xl font-bold mb-8 animate-on-scroll">Popular Categories</h2>
 
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
             <div
-              v-for="category in categories"
+              v-for="(category, index) in categories"
               :key="category.id"
-              class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer"
+              class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer animate-on-scroll"
+              :class="`delay-${index % 3}`"
             >
               <span class="text-3xl mb-2">{{ category.icon }}</span>
               <h3 class="font-medium text-gray-800 text-center">
@@ -112,9 +144,9 @@ function callSeller(index) {
       <div class="py-12">
         <div class="container mx-auto px-4">
           <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold">Latest Listings</h2>
+            <h2 class="text-2xl font-bold animate-on-scroll">Latest Listings</h2>
             <div
-              class="flex items-center text-green-600 hover:text-green-700 cursor-pointer"
+              class="flex items-center text-green-600 hover:text-green-700 cursor-pointer animate-on-scroll delay-1"
             >
               <span class="font-medium">View all</span>
               <svg
@@ -135,7 +167,7 @@ function callSeller(index) {
             </div>
           </div>
 
-          <div v-if="loading" class="text-center py-8">
+          <div v-if="loading" class="text-center py-8 animate-on-scroll">
             <span class="text-gray-500 text-lg">Loading products...</span>
           </div>
 
@@ -144,7 +176,7 @@ function callSeller(index) {
             class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
           >
             <div
-              v-for="listing in listings"
+              v-for="(listing, index) in listings"
               :key="listing.id"
               class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100"
             >
@@ -245,12 +277,12 @@ function callSeller(index) {
       <!-- How It Works -->
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
-          <h2 class="text-2xl font-bold mb-12 text-center">
+          <h2 class="text-2xl font-bold mb-12 text-center animate-on-scroll">
             How Sellify Works
           </h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center">
+            <div class="text-center animate-on-scroll">
               <div
                 class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
@@ -277,7 +309,7 @@ function callSeller(index) {
               </p>
             </div>
 
-            <div class="text-center">
+            <div class="text-center animate-on-scroll delay-1">
               <div
                 class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
@@ -305,7 +337,7 @@ function callSeller(index) {
               </p>
             </div>
 
-            <div class="text-center">
+            <div class="text-center animate-on-scroll delay-2">
               <div
                 class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
@@ -339,16 +371,16 @@ function callSeller(index) {
       <div class="bg-green-50 py-12">
         <div class="container mx-auto px-4">
           <div class="max-w-3xl mx-auto text-center">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4">
+            <h2 class="text-2xl md:text-3xl font-bold mb-4 animate-on-scroll">
               Have Something to Sell?
             </h2>
-            <p class="text-gray-600 mb-8">
+            <p class="text-gray-600 mb-8 animate-on-scroll delay-1">
               List your items for free and reach millions of buyers across
               Nigeria
             </p>
             <router-link
               :to="{ name: 'create-listing' }"
-              class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-medium transition-colors shadow-sm"
+              class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-medium transition-colors shadow-sm animate-on-scroll delay-2"
             >
               Post Your Ad Now
             </router-link>
@@ -362,6 +394,53 @@ function callSeller(index) {
 </template>
 
 <style scoped>
+.fade-in-fwd {
+	-webkit-animation: fade-in-fwd 0.6s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+	animation: fade-in-fwd 0.6s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}
+
+ @-webkit-keyframes fade-in-fwd {
+  0% {
+    -webkit-transform: translateZ(-80px);
+            transform: translateZ(-80px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+    opacity: 1;
+  }
+}
+@keyframes fade-in-fwd {
+  0% {
+    -webkit-transform: translateZ(-80px);
+            transform: translateZ(-80px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+    opacity: 1;
+  }
+}
+
+
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-on-scroll.delay-1 { transition-delay: 0.2s; }
+.animate-on-scroll.delay-2 { transition-delay: 0.4s; }
+.animate-on-scroll.delay-3 { transition-delay: 0.6s; }
+
 .line-clamp-1 {
   display: -webkit-box;
   -webkit-line-clamp: 1;

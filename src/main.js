@@ -4,6 +4,7 @@ import App from "./App.vue";
 import router from "./router";
 import { auth } from "@/firebase";
 import "./assets/main.css";
+import 'animate.css';
 
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
