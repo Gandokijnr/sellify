@@ -1,211 +1,243 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <SellerNavbar />
+  <div class="min-h-screen bg-gray-50">
+    <Navbar />
 
-    <div class="py-10">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="md:flex md:items-center md:justify-between mb-8">
-          <div class="flex-1 min-w-0">
-            <h2
-              class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate"
-            >
-              Create New Listing
-            </h2>
+    <div class="py-8">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Form Header -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Create New Listing</h1>
+              <p class="mt-2 text-sm text-gray-500">All fields marked with * are required</p>
+            </div>
+            <div class="flex gap-3">
+              <button
+                @click="cancel"
+                class="inline-flex items-center px-5 py-2 border border-gray-300 
+         text-sm font-medium rounded-md text-gray-700 bg-white 
+         hover:bg-gray-50 focus:outline-none focus:ring-2 
+         focus:ring-offset-2 focus:ring-jiji-primary transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                @click="submitForm"
+                class="inline-flex items-center px-5 py-2 border border-transparent 
+         text-sm font-medium rounded-md text-white bg-jiji-primary 
+         hover:bg-orange-700 focus:outline-none focus:ring-2 
+         focus:ring-offset-2 focus:ring-jiji-primary transition-colors"
+              >
+                Publish Listing
+              </button>
+            </div>
           </div>
-          <div class="mt-4 flex md:mt-0 md:ml-4">
-            <button
-              type="button"
-              @click="cancel"
-              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              @click="submitForm"
-              class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-jiji-primary hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
-            >
-              Publish Listing
-            </button>
-          </div>
+          <hr class="mt-4 border-gray-200">
         </div>
 
-        <div class="bg-white shadow overflow-hidden rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div class="md:col-span-2 space-y-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Title</label
-                  >
-                  <input
-                    v-model="form.title"
-                    type="text"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm"
-                    placeholder="e.g. iPhone 13 Pro Max 256GB"
-                  />
-                </div>
+        <!-- Form Body -->
+        <div class="space-y-8">
+          <!-- Product Information Section -->
+          <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Product Information</h2>
+            
+            <!-- Title -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Product Title *
+                <span class="float-right text-sm font-normal text-gray-500">{{ form.title.length }}/60</span>
+              </label>
+              <input
+                v-model="form.title"
+                maxlength="60"
+                type="text"
+                class="mt-1 block p-4 w-full rounded-md border-gray-300 shadow-sm 
+         focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm
+         transition duration-200 ease-in-out"
+                placeholder="e.g. iPhone 13 Pro Max 256GB - Unlocked"
+              />
+            </div>
 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Description</label
-                  >
-                  <textarea
-                    v-model="form.description"
-                    rows="6"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm"
-                    placeholder="Provide detailed description of your item..."
-                  ></textarea>
-                </div>
+            <!-- Description -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+                <span class="float-right text-sm font-normal text-gray-500">{{ form.description.length }}/1200</span>
+              </label>
+              <textarea
+                v-model="form.description"
+                rows="5"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm 
+         focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm
+         transition duration-200 ease-in-out"
+                placeholder="Include key details like brand, model, specifications, condition, reason for selling..."
+              ></textarea>
+            </div>
 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Price (₦)</label
-                  >
-                  <div class="mt-1 relative rounded-md shadow-sm">
-                    <input
-                      v-model="form.price"
-                      type="number"
-                      class="block w-full pr-12 rounded-md border-gray-300 shadow-sm focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm"
-                      placeholder="0.00"
-                    />
-                    <div class="absolute inset-y-0 right-0 flex items-center">
-                      <label for="currency" class="sr-only">Currency</label>
-                      <span
-                        class="h-full py-2 pr-3 border-l border-gray-300 bg-gray-50 flex items-center text-gray-500 sm:text-sm"
-                      >
-                        NGN
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            <!-- Category & Condition -->
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                <select
+                  v-model="form.category"
+                  class="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm 
+         focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm
+         transition duration-200 ease-in-out"
+                >
+                  <option value="" disabled>Select product category</option>
+                  <option value="electronics">Electronics</option>
+                  <option value="phones">Phones & Tablets</option>
+                  <option value="computers">Computers</option>
+                  <option value="fashion">Fashion</option>
+                  <option value="home">Home & Garden</option>
+                  <option value="vehicles">Vehicles</option>
+                  <option value="property">Property</option>
+                </select>
               </div>
 
-              <div class="space-y-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Category</label
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <label
+                    :class="form.condition === 'new' 
+                      ? 'border-jiji-primary bg-orange-50' 
+                      : 'border-gray-200 hover:border-gray-300'"
+                    class="border rounded-md p-3 cursor-pointer transition-colors
+         flex items-center justify-center text-sm font-medium"
                   >
-                  <select
-                    v-model="form.category"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm"
+                    <input
+                      v-model="form.condition"
+                      type="radio"
+                      value="new"
+                      class="sr-only"
+                    />
+                    <span class="block text-center">New</span>
+                  </label>
+                  <label
+                    :class="form.condition === 'used' 
+                      ? 'border-jiji-primary bg-orange-50' 
+                      : 'border-gray-200 hover:border-gray-300'"
+                    class="border rounded-md p-3 cursor-pointer transition-colors
+         flex items-center justify-center text-sm font-medium"
                   >
-                    <option value="">Select a category</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="phones">Phones & Tablets</option>
-                    <option value="computers">Computers</option>
-                    <option value="fashion">Fashion</option>
-                    <option value="home">Home & Garden</option>
-                    <option value="vehicles">Vehicles</option>
-                    <option value="property">Property</option>
-                  </select>
+                    <input
+                      v-model="form.condition"
+                      type="radio"
+                      value="used"
+                      class="sr-only"
+                    />
+                    <span class="block text-center">Used</span>
+                  </label>
                 </div>
+              </div>
+            </div>
+          </section>
 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Condition</label
-                  >
-                  <div class="mt-2 space-y-2">
-                    <div class="flex items-center">
-                      <input
-                        v-model="form.condition"
-                        id="condition-new"
-                        name="condition"
-                        type="radio"
-                        value="new"
-                        class="h-4 w-4 text-jiji-primary focus:ring-jiji-primary"
-                      />
-                      <label
-                        for="condition-new"
-                        class="ml-3 block text-sm font-medium text-gray-700"
-                        >New</label
-                      >
-                    </div>
-                    <div class="flex items-center">
-                      <input
-                        v-model="form.condition"
-                        id="condition-used"
-                        name="condition"
-                        type="radio"
-                        value="used"
-                        class="h-4 w-4 text-jiji-primary focus:ring-jiji-primary"
-                      />
-                      <label
-                        for="condition-used"
-                        class="ml-3 block text-sm font-medium text-gray-700"
-                        >Used</label
-                      >
-                    </div>
-                  </div>
-                </div>
+          <!-- Pricing Section -->
+          <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Pricing</h2>
+            
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Price (₦) *</label>
+              <div class="relative">
+                <input
+                  v-model="form.price"
+                  type="number"
+                  min="0"
+                  class="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm 
+         focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm
+         transition duration-200 ease-in-out pl-7"
+                  placeholder="Enter amount"
+                />
+                <span class="absolute left-3 top-3 text-gray-500">₦</span>
+              </div>
+              <p class="mt-2 text-sm text-gray-500">Consider researching similar items for competitive pricing</p>
+            </div>
+          </section>
 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Location</label
-                  >
-                  <select
-                    v-model="form.location"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm"
-                  >
-                    <option value="">Select location</option>
-                    <option value="lagos">Lagos</option>
-                    <option value="abuja">Abuja</option>
-                    <option value="port-harcourt">Port Harcourt</option>
-                    <option value="kano">Kano</option>
-                    <option value="ibadan">Ibadan</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-700"
-                    >Images</label
-                  >
-                  <div
-                    class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
-                  >
-                    <div class="space-y-1 text-center">
-                      <div class="flex text-sm text-gray-600">
-                        <label
-                          for="file-upload"
-                          class="relative cursor-pointer bg-white rounded-md font-medium text-jiji-primary hover:text-orange-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-jiji-primary"
-                        >
-                          <span>Upload files</span>
-                          <input
-                            id="file-upload"
-                            name="file-upload"
-                            type="file"
-                            class="sr-only"
-                            multiple
-                            @change="handleImageUpload"
-                          />
-                        </label>
+          <!-- Media Section -->
+          <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Media</h2>
+            
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Upload Photos *
+                <span class="text-sm font-normal text-gray-500">(Up to 10 photos)</span>
+              </label>
+              
+              <div class="mt-2">
+                <div 
+                  class=" flex justify-center px-6 pt-8 pb-8 border-2 border-dashed 
+         border-gray-300 rounded-md hover:border-gray-400 transition-colors"
+                  @dragover.prevent="dragover"
+                  @drop.prevent="dropFiles"
+                >
+                  <input
+                    id="file-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    class="sr-only"
+                    @change="handleImageUpload"
+                  />
+                  <label for="file-upload" class="cursor-pointer">
+                    <div class="text-center">
+                      <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <div class="mt-2 flex text-sm text-gray-600">
+                        <span class="relative font-medium text-jiji-primary hover:text-orange-700">
+                          Click to upload
+                        </span>
                         <p class="pl-1">or drag and drop</p>
                       </div>
-                      <p class="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                      <p class="text-xs text-gray-500">PNG, JPG up to 5MB each</p>
                     </div>
-                  </div>
+                  </label>
+                </div>
+
+                <!-- Image Previews -->
+                <div v-if="previewImages.length" class="mt-4 grid grid-cols-3 md:grid-cols-5 gap-3">
                   <div
-                    v-if="previewImages.length"
-                    class="mt-2 flex flex-wrap gap-2"
+                    v-for="(img, index) in previewImages"
+                    :key="index"
+                    class="group relative aspect-square"
                   >
-                    <div
-                      v-for="(img, index) in previewImages"
-                      :key="index"
-                      class="relative"
+                    <img :src="img" class="w-full h-full object-cover rounded-lg border border-gray-200">
+                    <button
+                      @click="removeImage(index)"
+                      class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center hover:bg-red-600 transition-colors"
                     >
-                      <img :src="img" class="h-20 w-20 object-cover rounded" />
-                      <button
-                        @click="removeImage(index)"
-                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center hover:bg-red-600"
-                      >
-                        &times;
-                      </button>
-                    </div>
+                      &times;
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
+
+          <!-- Location Section -->
+          <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Location</h2>
+            
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+              <select
+                v-model="form.location"
+                class="mt-1 p-4 block w-full rounded-md border-gray-300 shadow-sm 
+         focus:border-jiji-primary focus:ring-jiji-primary sm:text-sm
+         transition duration-200 ease-in-out"
+              >
+                <option value="" disabled>Select your city</option>
+                <option value="lagos">Lagos</option>
+                <option value="abuja">Abuja</option>
+                <option value="port-harcourt">Port Harcourt</option>
+                <option value="kano">Kano</option>
+                <option value="ibadan">Ibadan</option>
+              </select>
+              <p class="mt-2 text-sm text-gray-500">Buyers will see this location in your listing</p>
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -215,6 +247,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import Navbar from "@/components/common/Navbar.vue";
 
 const router = useRouter();
 
@@ -249,11 +282,24 @@ const removeImage = (index) => {
 
 const submitForm = () => {
   console.log("Form submitted:", form.value);
-  // In a real app, you would submit to API here
   router.push("/seller/dashboard");
 };
 
 const cancel = () => {
   router.push("/seller/dashboard");
 };
+
+const dragover = (e) => {
+  e.currentTarget.classList.add('border-jiji-primary', 'bg-orange-50');
+};
+
+const dropFiles = (e) => {
+  e.currentTarget.classList.remove('border-jiji-primary', 'bg-orange-50');
+  const files = e.dataTransfer.files;
+  handleImageUpload({ target: { files } });
+};
 </script>
+
+<style scoped>
+
+</style>

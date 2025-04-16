@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        "jiji-primary": "#1E40AF", // replace with your actual color
+        "jiji-primary": "#1E40AF",
       },
     },
   },
