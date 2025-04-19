@@ -427,6 +427,13 @@ function initializeScrollAnimations() {
 </template>
 
 <style scoped>
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: "";
+}
+
 .animate-on-scroll {
   opacity: 0;
   transform: translateY(20px);

@@ -1,13 +1,17 @@
 <script setup>
-import { onMounted, ref, watch, computed } from "vue";
+import { onMounted, ref } from "vue";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/firebase"; // Make sure you have your Firebase initialized and exported
+import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const listings = ref([]);
 const loading = ref(true);
 const searchQuery = ref("");
+const favorites = ref([]);
+
 const categories = ref([
   { id: 1, name: "Electronics", icon: "📱", count: 12543 },
   { id: 2, name: "Vehicles", icon: "🚗", count: 8765 },
@@ -32,18 +36,38 @@ const fetchProducts = async () => {
   }
 };
 
+const callSeller = (phoneNumber) => {
+  window.location.href = `tel:${phoneNumber}`;
+};
+
+const toggleFavorite = (listingId) => {
+  const index = favorites.value.indexOf(listingId);
+  if (index === -1) {
+    favorites.value.push(listingId);
+  } else {
+    favorites.value.splice(index, 1);
+  }
+  // You might want to save favorites to localStorage or your backend
+  localStorage.setItem("favorites", JSON.stringify(favorites.value));
+};
+
+const isFavorite = (listingId) => {
+  return favorites.value.includes(listingId);
+};
+
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
+  // Load favorites from localStorage
+  const savedFavorites = localStorage.getItem("favorites");
+  if (savedFavorites) {
+    favorites.value = JSON.parse(savedFavorites);
+  }
 });
 
 // Utility functions
 function formatNumber(num) {
   return num.toLocaleString();
-}
-
-function callSeller(index) {
-  alert(`Calling seller for listing ${listings.value.title}`);
 }
 
 // Scroll animation functions
@@ -181,13 +205,15 @@ function initializeScrollAnimations() {
             <span class="text-gray-500 text-lg">Loading products...</span>
           </div>
 
+          <!-- In your template section, replace the listings grid with this: -->
           <div
             v-else
             class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
           >
-            <div
-              v-for="(listing, index) in listings"
+            <router-link
+              v-for="listing in listings"
               :key="listing.id"
+              :to="{ name: 'listing-details', params: { id: listing.id } }"
               class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100"
             >
               <div class="relative">
@@ -198,6 +224,7 @@ function initializeScrollAnimations() {
                 />
                 <button
                   class="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow-sm hover:bg-gray-100"
+                  @click.prevent.stop="toggleFavorite(listing.id)"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -210,6 +237,9 @@ function initializeScrollAnimations() {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     class="lucide lucide-heart text-gray-500"
+                    :class="{
+                      'fill-red-500 text-red-500': isFavorite(listing.id),
+                    }"
                   >
                     <path
                       d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
@@ -257,7 +287,7 @@ function initializeScrollAnimations() {
                   </div>
                   <button
                     class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 rounded-lg flex items-center transition-colors text-sm"
-                    @click="callSeller(listing.id)"
+                    @click.prevent.stop="callSeller(listing.phone)"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -279,7 +309,7 @@ function initializeScrollAnimations() {
                   </button>
                 </div>
               </div>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
