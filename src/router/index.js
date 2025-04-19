@@ -23,19 +23,19 @@ const routes = [
     path: "/seller/dashboard",
     name: "seller-dashboard",
     component: () => import("@/views/dashboard/SellerDashboard.vue"),
-    meta: { requiresAuth: true, role: "seller" },
+    meta: { requiresAuth: true },
   },
   {
     path: "/seller/listings/create",
     name: "create-listing",
     component: () => import("@/views/listings/CreateListing.vue"),
-    meta: { requiresAuth: true, role: "seller" },
+    meta: { requiresAuth: true },
   },
   {
     path: "/buyer/dashboard",
     name: "buyer-dashboard",
     component: () => import("@/views/dashboard/BuyerDashboard.vue"),
-    meta: { requiresAuth: true, role: "buyer" },
+    meta: { requiresAuth: true },
   },
 ];
 
@@ -44,22 +44,24 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   const authStore = useAuthStore();
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const isAuthenticated = !!authStore.token;
 
-//   if (to.meta.requiresAuth && !authStore.token) {
-//     next("/login");
-//   } else if (to.meta.guest && authStore.token) {
-//     next(
-//       authStore.user.role === "seller"
-//         ? "/seller/dashboard"
-//         : "/buyer/dashboard"
-//     );
-//   } else if (to.meta.role && authStore.user?.role !== to.meta.role) {
-//     next("/");
-//   } else {
-//     next();
-//   }
-// });
+  // Redirect authenticated users away from guest-only pages
+  if (to.meta.guestOnly && isAuthenticated) {
+    next("/seller/dashboard");
+    return;
+  }
+
+  // Redirect unauthenticated users away from protected pages
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next("/login");
+    return;
+  }
+
+  // Allow navigation in all other cases
+  next();
+});
 
 export default router;
