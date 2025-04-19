@@ -153,7 +153,9 @@ function initializeScrollAnimations() {
             <h2 class="text-2xl font-bold animate-on-scroll">
               Latest Listings
             </h2>
-            <div
+
+            <router-link
+              :to="{ name: 'listings' }"
               class="flex items-center text-green-600 hover:text-green-700 cursor-pointer animate-on-scroll delay-1"
             >
               <span class="font-medium">View all</span>
@@ -172,7 +174,7 @@ function initializeScrollAnimations() {
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
               </svg>
-            </div>
+            </router-link>
           </div>
 
           <div v-if="loading" class="text-center py-8 animate-on-scroll">

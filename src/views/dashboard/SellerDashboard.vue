@@ -8,7 +8,7 @@
           <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
           <router-link
             to="/seller/listings/create"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-jiji-primary hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-700 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
           >
             <PlusIcon class="-ml-1 mr-2 h-5 w-5" />
             New Listing

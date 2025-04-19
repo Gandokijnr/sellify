@@ -20,6 +20,11 @@ const routes = [
     meta: { guest: true },
   },
   {
+    path: "/listings",
+    name: "listings",
+    component: () => import("@/views/listings/AllListings.vue"),
+  },
+  {
     path: "/seller/dashboard",
     name: "seller-dashboard",
     component: () => import("@/views/dashboard/SellerDashboard.vue"),
