@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
         <div>
-          <h3 class="font-bold text-xl mb-4 text-green-600">Sellify</h3>
+          <h3 class="font-bold text-xl mb-4 text-green-600">Selify</h3>
           <p class="text-gray-600">
             The largest marketplace in Nigeria where buying and selling is made
             easy.
@@ -16,7 +16,7 @@
           <ul class="space-y-2">
             <li>
               <a href="#" class="text-gray-600 hover:text-green-600"
-                >About Sellify</a
+                >About Selify</a
               >
             </li>
             <li>
@@ -80,7 +80,7 @@
 
       <div class="border-t border-gray-100 pt-6 text-center">
         <p class="text-gray-500 text-sm">
-          © 2025 Sellify.ng - All Rights Reserved
+          © 2025 Selify.ng - All Rights Reserved
         </p>
       </div>
     </div>

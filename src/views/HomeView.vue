@@ -83,7 +83,7 @@ function initializeScrollAnimations() {
               Buy & Sell Anything in Nigeria
             </h1>
             <p class="text-xl mb-8 opacity-90 fade-in-fwd">
-              Discover the best deals across the country on Sellify
+              Discover the best deals across the country on Selify
             </p>
 
             <div class="relative max-w-xl mx-auto">
@@ -286,7 +286,7 @@ function initializeScrollAnimations() {
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
           <h2 class="text-2xl font-bold mb-12 text-center animate-on-scroll">
-            How Sellify Works
+            How Selify Works
           </h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
