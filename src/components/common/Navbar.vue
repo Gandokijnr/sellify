@@ -19,8 +19,16 @@
       <div class="flex justify-between items-center h-16">
         <!-- Logo and Categories -->
         <div class="flex items-center space-x-8">
-          <router-link to="/" class="flex-shrink-0">
-            <span class="text-2xl font-bold text-green-600">SELLIFY</span>
+          <router-link
+            :to="authStore.isAuthenticated ? '/dashboard' : '/'"
+            class="hover:opacity-90 transition-opacity"
+            aria-label="Selify Home"
+          >
+            <img
+              src="https://res.cloudinary.com/dqqycsgmn/image/upload/v1745073438/selify-high-resolution-logo-transparent_yixuim.png"
+              alt="Selify Logo"
+              class="h-4 md:h-7 w-auto object-contain"
+            />
           </router-link>
         </div>
 
