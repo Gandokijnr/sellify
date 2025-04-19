@@ -5,7 +5,9 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-8">
           <div class="flex space-x-4">
-            <a href="#" class="hover:text-gray-200">Sell on SELLIFY</a>
+            <routerLink to="/seller/listings/create" class="hover:text-gray-200"
+              >Sell on Selify</routerLink
+            >
             <a href="#" class="hover:text-gray-200">Customer Care</a>
           </div>
         </div>
