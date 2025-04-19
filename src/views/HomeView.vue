@@ -43,7 +43,7 @@ function formatNumber(num) {
 }
 
 function callSeller(index) {
-  alert(`Calling seller for listing ${listings.value[index].title}`);
+  alert(`Calling seller for listing ${listings.value.title}`);
 }
 
 // Scroll animation functions

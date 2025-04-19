@@ -1,7 +1,7 @@
 <template>
   <header class="bg-white shadow-sm sticky top-0 z-50">
     <!-- Top Bar -->
-    <div class="bg-green-600 text-white text-sm">
+    <div class="bg-green-600 text-white text-sm tilt-in">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-8">
           <div class="flex space-x-4">
@@ -27,7 +27,7 @@
             <img
               src="https://res.cloudinary.com/dqqycsgmn/image/upload/v1745073438/selify-high-resolution-logo-transparent_yixuim.png"
               alt="Selify Logo"
-              class="h-4 md:h-7 w-auto object-contain"
+              class="h-5 md:h-7 w-auto object-contain"
             />
           </router-link>
         </div>
@@ -71,16 +71,17 @@
                       }}
                     </span>
                     <svg
-                      class="w-4 h-4"
+                      xmlns="http://www.w3.org/2000/svg"
                       fill="none"
-                      stroke="currentColor"
                       viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-6"
                     >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 9l-7 7-7-7"
+                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                       />
                     </svg>
                   </button>
@@ -134,16 +135,17 @@
             class="md:hidden text-gray-500 hover:text-green-600 focus:outline-none"
           >
             <svg
-              class="w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
               fill="none"
-              stroke="currentColor"
               viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-8"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"
+                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
               />
             </svg>
           </button>
@@ -155,11 +157,17 @@
     <div
       v-if="mobileMenuOpen"
       class="md:hidden bg-white border-t border-gray-200"
+      :class="[
+        mobileMenuOpen
+          ? 'block absolute z-50 w-full rounded-b-lg shadow-lg animate-tilt-in'
+          : 'hidden',
+        'bg-white transition-all duration-300 ease-in-out transform ',
+      ]"
     >
       <div class="px-2 pt-2 pb-3 space-y-1">
         <template v-if="authStore.isAuthenticated && authStore.user">
           <router-link
-            to="/dashboard"
+            to="/seller/dashboard"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
             >Dashboard</router-link
           >
@@ -214,4 +222,19 @@ const toggleMobileMenu = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@keyframes tilt-in {
+  0% {
+    transform: rotateY(20deg) translateY(-30px) skewY(-5deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateY(0) translateY(0) skewY(0);
+    opacity: 1;
+  }
+}
+
+.animate-tilt-in {
+  animation: tilt-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+</style>
