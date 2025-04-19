@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-gray-100">
-    <SellerNavbar />
+    <Navbar />
 
     <div class="py-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center mb-6">
-          <h1 class="text-2xl font-bold text-gray-900">Seller Dashboard</h1>
+          <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
           <router-link
             to="/seller/listings/create"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-jiji-primary hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
@@ -94,6 +94,7 @@
 
 <script setup>
 import { PlusIcon } from "@heroicons/vue/24/solid";
+import Navbar from "@/components/common/Navbar.vue";
 
 import DashboardCard from "@/components/dashboard/DashboardCard.vue";
 import ListingItem from "@/components/listings/ListingItem.vue";
