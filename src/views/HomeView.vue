@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, ref, watch, computed } from "vue";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebase"; // Make sure you have your Firebase initialized and exported
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
-import axios from "axios";
-const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const listings = ref([]);
 const loading = ref(true);
@@ -19,10 +19,12 @@ const categories = ref([
 
 const fetchProducts = async () => {
   loading.value = true;
-
   try {
-    const response = await axios.get(`${apiUrl}`);
-    listings.value = response.data;
+    const querySnapshot = await getDocs(collection(db, "listings"));
+    listings.value = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
   } catch (error) {
     console.error("Failed to fetch products:", error);
   } finally {
@@ -46,24 +48,24 @@ function callSeller(index) {
 
 // Scroll animation functions
 function initializeScrollAnimations() {
-  const animateElements = document.querySelectorAll('.animate-on-scroll');
-  
+  const animateElements = document.querySelectorAll(".animate-on-scroll");
+
   function checkIfInView() {
-    animateElements.forEach(element => {
+    animateElements.forEach((element) => {
       const elementTop = element.getBoundingClientRect().top;
       const elementVisible = 150;
-      
+
       if (elementTop < window.innerHeight - elementVisible) {
-        element.classList.add('visible');
+        element.classList.add("visible");
       }
     });
   }
-  
+
   // Initial check
   checkIfInView();
-  
+
   // Add scroll event listener
-  window.addEventListener('scroll', checkIfInView);
+  window.addEventListener("scroll", checkIfInView);
 }
 </script>
 
@@ -75,10 +77,12 @@ function initializeScrollAnimations() {
       <div class="bg-green-700 text-white">
         <div class="container mx-auto px-4 py-16 md:py-24">
           <div class="max-w-3xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-6 slide-in-top fade-in-fwd ">
+            <h1
+              class="text-4xl md:text-5xl font-bold mb-6 slide-in-top fade-in-fwd"
+            >
               Buy & Sell Anything in Nigeria
             </h1>
-            <p class="text-xl mb-8 opacity-90 fade-in-fwd ">
+            <p class="text-xl mb-8 opacity-90 fade-in-fwd">
               Discover the best deals across the country on Sellify
             </p>
 
@@ -119,7 +123,9 @@ function initializeScrollAnimations() {
       <!-- Categories -->
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
-          <h2 class="text-2xl font-bold mb-8 animate-on-scroll">Popular Categories</h2>
+          <h2 class="text-2xl font-bold mb-8 animate-on-scroll">
+            Popular Categories
+          </h2>
 
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
             <div
@@ -144,7 +150,9 @@ function initializeScrollAnimations() {
       <div class="py-12">
         <div class="container mx-auto px-4">
           <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold animate-on-scroll">Latest Listings</h2>
+            <h2 class="text-2xl font-bold animate-on-scroll">
+              Latest Listings
+            </h2>
             <div
               class="flex items-center text-green-600 hover:text-green-700 cursor-pointer animate-on-scroll delay-1"
             >
@@ -182,7 +190,7 @@ function initializeScrollAnimations() {
             >
               <div class="relative">
                 <img
-                  :src="listing.images"
+                  :src="listing.images[0]"
                   :alt="listing.title"
                   class="w-full h-40 sm:h-48 object-cover"
                 />
@@ -395,36 +403,34 @@ function initializeScrollAnimations() {
 
 <style scoped>
 .fade-in-fwd {
-	-webkit-animation: fade-in-fwd 0.6s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
-	animation: fade-in-fwd 0.6s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+  -webkit-animation: fade-in-fwd 0.6s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+  animation: fade-in-fwd 0.6s cubic-bezier(0.39, 0.575, 0.565, 1) both;
 }
 
- @-webkit-keyframes fade-in-fwd {
+@-webkit-keyframes fade-in-fwd {
   0% {
     -webkit-transform: translateZ(-80px);
-            transform: translateZ(-80px);
+    transform: translateZ(-80px);
     opacity: 0;
   }
   100% {
     -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+    transform: translateZ(0);
     opacity: 1;
   }
 }
 @keyframes fade-in-fwd {
   0% {
     -webkit-transform: translateZ(-80px);
-            transform: translateZ(-80px);
+    transform: translateZ(-80px);
     opacity: 0;
   }
   100% {
     -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+    transform: translateZ(0);
     opacity: 1;
   }
 }
-
-
 
 .animate-on-scroll {
   opacity: 0;
@@ -437,9 +443,15 @@ function initializeScrollAnimations() {
   transform: translateY(0);
 }
 
-.animate-on-scroll.delay-1 { transition-delay: 0.2s; }
-.animate-on-scroll.delay-2 { transition-delay: 0.4s; }
-.animate-on-scroll.delay-3 { transition-delay: 0.6s; }
+.animate-on-scroll.delay-1 {
+  transition-delay: 0.2s;
+}
+.animate-on-scroll.delay-2 {
+  transition-delay: 0.4s;
+}
+.animate-on-scroll.delay-3 {
+  transition-delay: 0.6s;
+}
 
 .line-clamp-1 {
   display: -webkit-box;
