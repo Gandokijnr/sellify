@@ -20,7 +20,7 @@
         <!-- Logo and Categories -->
         <div class="flex items-center space-x-8">
           <router-link
-            :to="authStore.isAuthenticated ? '/dashboard' : '/'"
+            :to="authStore.isAuthenticated ? '/' : '/'"
             class="hover:opacity-90 transition-opacity"
             aria-label="Selify Home"
           >
