@@ -98,11 +98,11 @@
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >My Profile</router-link
                     >
-                    <router-link
+                    <!-- <router-link
                       to="/my-ads"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >My Ads</router-link
-                    >
+                    > -->
                     <button
                       @click="authStore.logout"
                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

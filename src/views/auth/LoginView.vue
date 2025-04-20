@@ -1,7 +1,7 @@
 <template>
   <Navbar />
   <div
-    class="lex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+    class="flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
   >
     <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
       <div class="text-center">
@@ -12,7 +12,7 @@
           Or
           <router-link
             to="/register"
-            class="font-medium text-indigo-600 hover:text-indigo-500"
+            class="font-medium text-green-600 hover:text-green-500"
           >
             create a new account
           </router-link>

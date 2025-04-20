@@ -17,12 +17,45 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
+// Helper functions for localStorage
+const persistAuthState = (userData, token) => {
+  localStorage.setItem(
+    "auth",
+    JSON.stringify({
+      user: userData,
+      token,
+      timestamp: Date.now(),
+    })
+  );
+};
+
+const clearAuthState = () => {
+  localStorage.removeItem("auth");
+};
+
+const getPersistedAuthState = () => {
+  const authData = localStorage.getItem("auth");
+  return authData ? JSON.parse(authData) : null;
+};
+
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(null);
   const token = ref(null);
   const isLoading = ref(true);
   const error = ref(null);
   let authUnsubscribe = null;
+
+  // Initialize with persisted data if available
+  const initFromLocalStorage = () => {
+    const persistedAuth = getPersistedAuthState();
+    if (persistedAuth) {
+      user.value = persistedAuth.user;
+      token.value = persistedAuth.token;
+    }
+  };
+
+  // Run initial check for persisted data
+  initFromLocalStorage();
 
   // Clean up listener when store is destroyed
   const cleanup = () => {
@@ -79,9 +112,11 @@ export const useAuthStore = defineStore("auth", () => {
               };
 
               token.value = await firebaseUser.getIdToken();
+              persistAuthState(user.value, token.value); // Persist to localStorage
             } else {
               user.value = null;
               token.value = null;
+              clearAuthState(); // Clear localStorage on logout
             }
           } catch (err) {
             console.error("Auth error:", err);
@@ -92,6 +127,7 @@ export const useAuthStore = defineStore("auth", () => {
             }
             user.value = null;
             token.value = null;
+            clearAuthState();
           } finally {
             isLoading.value = false;
             resolve();
@@ -151,8 +187,9 @@ export const useAuthStore = defineStore("auth", () => {
         lastName,
       };
 
-      // 5. Get new token
+      // 5. Get new token and persist
       token.value = await firebaseUser.getIdToken();
+      persistAuthState(user.value, token.value);
 
       return true;
     } catch (err) {
@@ -182,6 +219,7 @@ export const useAuthStore = defineStore("auth", () => {
       await firebaseSignOut(auth);
       user.value = null;
       token.value = null;
+      clearAuthState();
     } catch (err) {
       console.error("Logout error:", err);
       error.value = err.message;

@@ -11,13 +11,11 @@ const routes = [
     path: "/login",
     name: "login",
     component: () => import("@/views/auth/LoginView.vue"),
-    meta: { guest: true },
   },
   {
     path: "/register",
     name: "register",
     component: () => import("@/views/auth/RegisterView.vue"),
-    meta: { guest: true },
   },
   {
     path: "/listings",
@@ -49,6 +47,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/profile",
+    name: "profile",
+    component: () => import("@/views/userprofile/Profile.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/buyer/dashboard",
     name: "buyer-dashboard",
     component: () => import("@/views/dashboard/BuyerDashboard.vue"),
@@ -73,7 +77,7 @@ router.beforeEach((to, from, next) => {
 
   // Redirect unauthenticated users away from protected pages
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next("/login");
+    next("/");
     return;
   }
 

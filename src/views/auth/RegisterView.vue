@@ -96,6 +96,7 @@ const handleEmailRegister = async () => {
   loading.value = true;
 
   try {
+    // Call the register action from auth store
     await authStore.register({
       email: form.value.email,
       password: form.value.password,
@@ -103,12 +104,25 @@ const handleEmailRegister = async () => {
       lastName: form.value.lastName,
     });
 
-    toast.success("Welcome to selify");
-    window.location.href = "/";
+    // Show success message
+    toast.success("Welcome to selify!");
+
+    // Redirect to home page using router
+    router.push("/");
   } catch (error) {
-    toast.error(error.message || "Registration failed. Please try again.");
+    // Handle specific error cases
+    let errorMessage = "Registration failed. Please try again.";
+
+    if (error.code === "auth/email-already-in-use") {
+      errorMessage = "This email is already registered.";
+    } else if (error.code === "auth/weak-password") {
+      errorMessage = "Password should be at least 6 characters.";
+    }
+
+    toast.error(errorMessage);
+    console.error("Registration error:", error);
   } finally {
-    loading.value = true;
+    loading.value = false; // Fixed: Changed from true to false
   }
 };
 
