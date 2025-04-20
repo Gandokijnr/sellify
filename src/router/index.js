@@ -41,6 +41,13 @@ const routes = [
     component: () => import("@/views/listings/CreateListing.vue"),
     meta: { requiresAuth: true },
   },
+  // edit listing from dashboard
+  {
+    path: "/seller/listings/edit/:id",
+    name: "edit-listing",
+    component: () => import("@/views/listings/EditListing.vue"),
+    meta: { requiresAuth: true },
+  },
   {
     path: "/buyer/dashboard",
     name: "buyer-dashboard",
