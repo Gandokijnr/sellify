@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import Navbar from "@/components/common/Navbar.vue";
@@ -9,6 +9,7 @@ import { validateEmail, validatePassword } from "@/utils/validators";
 const router = useRouter();
 const authStore = useAuthStore();
 const toast = useToast();
+const googleLoading = ref(false);
 
 const form = ref({
   firstName: "",
@@ -96,7 +97,6 @@ const handleEmailRegister = async () => {
   loading.value = true;
 
   try {
-    // Call the register action from auth store
     await authStore.register({
       email: form.value.email,
       password: form.value.password,
@@ -122,9 +122,48 @@ const handleEmailRegister = async () => {
     toast.error(errorMessage);
     console.error("Registration error:", error);
   } finally {
-    loading.value = false; // Fixed: Changed from true to false
+    loading.value = false;
   }
 };
+
+// Simply call the authStore method instead of reimplementing
+const handleGoogleSignIn = async () => {
+  googleLoading.value = true;
+  try {
+    // Use the existing authStore method
+    await authStore.handleGoogleSignIn();
+    toast.success("Welcome to selify!");
+    router.push("/");
+  } catch (error) {
+    let errorMessage = "Google sign-in failed. Please try again.";
+
+    if (error.code === "auth/account-exists-with-different-credential") {
+      errorMessage = "This email is already registered with another method.";
+    } else if (error.code === "auth/popup-closed-by-user") {
+      errorMessage = "Sign-in popup was closed before completing.";
+    } else if (error.code === "auth/cancelled-popup-request") {
+      // User cancelled the popup, no need to show error
+      return;
+    }
+
+    toast.error(errorMessage);
+    console.error("Google sign-in error:", error);
+  } finally {
+    googleLoading.value = false;
+  }
+};
+
+// Check for redirect results on component mount
+onMounted(async () => {
+  try {
+    // If your authStore has handleGoogleRedirectResult method
+    if (authStore.handleGoogleRedirectResult) {
+      await authStore.handleGoogleRedirectResult();
+    }
+  } catch (error) {
+    console.error("Error handling redirect result:", error);
+  }
+});
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
@@ -155,7 +194,6 @@ const togglePasswordVisibility = () => {
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div class="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
-        <!-- Email/Password Registration Form -->
         <form class="mb-0 space-y-6" @submit.prevent="handleEmailRegister">
           <div class="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-2">
             <!-- First Name -->
@@ -348,7 +386,7 @@ const togglePasswordVisibility = () => {
                 'bg-green-600 hover:bg-green-700': !loading,
                 'bg-gray-400 cursor-not-allowed': loading,
               }"
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+              class="w-full flex item-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
             >
               <span v-if="loading">
                 <svg

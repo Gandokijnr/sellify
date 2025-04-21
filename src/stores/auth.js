@@ -5,6 +5,10 @@ import {
   getAuth,
   signOut as firebaseSignOut,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  getRedirectResult,
+  signInWithPopup,
+  signInWithRedirect,
   createUserWithEmailAndPassword,
   updateProfile,
   deleteUser,
@@ -211,6 +215,109 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  // Google Sign-In handler
+  const handleGoogleSignIn = async (useRedirect = false) => {
+    const auth = getAuth();
+    const db = getFirestore();
+    const provider = new GoogleAuthProvider();
+
+    // Add any additional scopes you might need
+    // provider.addScope('profile');
+    // provider.addScope('email');
+
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      let result;
+
+      if (useRedirect) {
+        // Handle redirect flow (better for mobile)
+        await signInWithRedirect(auth, provider);
+        return; // Early return - the rest will be handled by initAuth
+      } else {
+        // Handle popup flow (better for desktop)
+        result = await signInWithPopup(auth, provider);
+      }
+
+      // Check if user is new or existing
+      const isNewUser = result._tokenResponse?.isNewUser || false;
+      const firebaseUser = result.user;
+
+      if (isNewUser) {
+        // Create user document in Firestore for new users
+        const displayName = firebaseUser.displayName || "Google User";
+        const firstName = displayName.split(" ")[0] || "";
+        const lastName = displayName.split(" ")[1] || "";
+
+        await setDoc(doc(db, "users", firebaseUser.uid), {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          firstName,
+          lastName,
+          displayName,
+          photoURL: firebaseUser.photoURL,
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+          role: "user",
+          provider: "google",
+        });
+      } else {
+        // Update last login for existing users
+        await setDoc(
+          doc(db, "users", firebaseUser.uid),
+          { lastLogin: serverTimestamp() },
+          { merge: true }
+        );
+      }
+
+      // Get the user document
+      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+
+      if (!userDoc.exists()) {
+        throw new Error("User document not found in Firestore");
+      }
+
+      // Update local state
+      user.value = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
+        ...userDoc.data(),
+      };
+
+      // Get and store token
+      token.value = await firebaseUser.getIdToken();
+      persistAuthState(user.value, token.value);
+
+      return true;
+    } catch (err) {
+      console.error("Google Sign-In error:", err);
+      error.value = err.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  // Handle redirect result (call this after initialization)
+  const handleGoogleRedirectResult = async () => {
+    const auth = getAuth();
+    try {
+      const result = await getRedirectResult(auth);
+      if (result) {
+        // The initAuth listener will handle the state update
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("Google Redirect error:", err);
+      error.value = err.message;
+      throw err;
+    }
+  };
+
   // Sign out user
   const logout = async () => {
     const auth = getAuth();
@@ -243,6 +350,8 @@ export const useAuthStore = defineStore("auth", () => {
     // Actions
     initAuth,
     register,
+    handleGoogleSignIn,
+    handleGoogleRedirectResult,
     logout,
     cleanup,
   };
