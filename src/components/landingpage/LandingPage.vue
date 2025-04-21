@@ -5,12 +5,14 @@ import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
 const listings = ref([]);
 const loading = ref(true);
 const searchQuery = ref("");
 const favorites = ref([]);
+const authStore = useAuthStore();
 
 const categories = ref([
   { id: 1, name: "Electronics", icon: "📱", count: 12543 },
