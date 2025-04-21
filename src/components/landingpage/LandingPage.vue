@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import { collection, getDocs } from "firebase/firestore";
+import { onMounted, onUnmounted, ref } from "vue";
+import { collection, onSnapshot } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
 
 import { db } from "@/firebase";
@@ -15,6 +15,7 @@ const loading = ref(true);
 const searchQuery = ref("");
 const favorites = ref([]);
 const authStore = useAuthStore();
+let unsubscribe = null;
 
 const categories = ref([
   { id: 1, name: "Electronics", icon: "📱", count: 12543 },
@@ -25,47 +26,59 @@ const categories = ref([
   { id: 6, name: "Jobs", icon: "💼", count: 7654 },
 ]);
 
-const fetchProducts = async () => {
+const fetchProducts = () => {
   loading.value = true;
   try {
-    const querySnapshot = await getDocs(collection(db, "listings"));
-    listings.value = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    unsubscribe = onSnapshot(collection(db, "listings"), (querySnapshot) => {
+      listings.value = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log("Listings updated in real-time");
+    });
   } catch (error) {
-    console.error("Failed to fetch products:", error);
+    console.error("Failed to set up real-time listener:", error);
   } finally {
     loading.value = false;
   }
+};
+
+const viewListing = (listingId) => {
+  router.push({ name: "listing-details", params: { id: listingId } });
 };
 
 const callSeller = (phoneNumber) => {
   window.location.href = `tel:${phoneNumber}`;
 };
 
-const toggleFavorite = (listingId) => {
-  const index = favorites.value.indexOf(listingId);
-  if (index === -1) {
-    favorites.value.push(listingId);
-  } else {
-    favorites.value.splice(index, 1);
-  }
-  // You might want to save favorites to localStorage or your backend
-  localStorage.setItem("favorites", JSON.stringify(favorites.value));
-};
+// const toggleFavorite = (listingId) => {
+//   const index = favorites.value.indexOf(listingId);
+//   if (index === -1) {
+//     favorites.value.push(listingId);
+//   } else {
+//     favorites.value.splice(index, 1);
+//   }
+//   // You might want to save favorites to localStorage or your backend
+//   localStorage.setItem("favorites", JSON.stringify(favorites.value));
+// };
 
-const isFavorite = (listingId) => {
-  return favorites.value.includes(listingId);
-};
+// const isFavorite = (listingId) => {
+//   return favorites.value.includes(listingId);
+// };
 
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
   // Load favorites from localStorage
-  const savedFavorites = localStorage.getItem("favorites");
-  if (savedFavorites) {
-    favorites.value = JSON.parse(savedFavorites);
+  //   const savedFavorites = localStorage.getItem("favorites");
+  //   if (savedFavorites) {
+  //     favorites.value = JSON.parse(savedFavorites);
+  //   }
+});
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe();
   }
 });
 
@@ -205,11 +218,10 @@ function initializeScrollAnimations() {
             </router-link>
           </div>
 
+          <!-- Listings Grid -->
           <ListingsGrid
             :listings="listings || []"
             :loading="loading"
-            v-model:searchQuery="searchQuery"
-            v-model:selectedCategory="selectedCategory"
             @viewListing="viewListing"
             @callSeller="callSeller"
             :showHeader="false"
