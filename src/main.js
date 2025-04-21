@@ -4,7 +4,8 @@ import App from "./App.vue";
 import router from "./router";
 import { auth } from "@/firebase";
 import "./assets/main.css";
-import 'animate.css';
+import "animate.css";
+import SelifyLoader from "@/components/common/SelifyLoader.vue"; // Adjust path as needed
 
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
@@ -38,6 +39,7 @@ authStore.initAuth();
 
 // Register router
 app.use(router);
+app.component("SelifyLoader", SelifyLoader);
 
 // Mount the app
 app.mount("#app");
