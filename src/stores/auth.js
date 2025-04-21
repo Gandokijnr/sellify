@@ -9,6 +9,10 @@ import {
   getRedirectResult,
   signInWithPopup,
   signInWithRedirect,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  confirmPasswordReset,
+  verifyPasswordResetCode,
   createUserWithEmailAndPassword,
   updateProfile,
   deleteUser,
@@ -327,6 +331,8 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = null;
       token.value = null;
       clearAuthState();
+      // redirect to home login page
+      window.location.href = "/login";
     } catch (err) {
       console.error("Logout error:", err);
       error.value = err.message;
