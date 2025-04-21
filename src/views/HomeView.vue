@@ -9,7 +9,6 @@ import { ref } from "vue";
     :autoStart="true"
     @complete="handleLoadComplete"
   >
-    <template #logo-text>selify</template>
     <LandingPage />
   </SelifyLoader>
 </template>
