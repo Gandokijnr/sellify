@@ -5,7 +5,11 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-8">
           <div class="flex space-x-4">
-            <routerLink to="/seller/listings/create" class="hover:text-gray-200"
+            <routerLink
+              :to="
+                authStore.isAuthenticated ? '/seller/listings/create' : '/login'
+              "
+              class="hover:text-gray-200"
               >Sell on Selify</routerLink
             >
             <a href="#" class="hover:text-gray-200">Customer Care</a>
@@ -176,11 +180,11 @@
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
             >Profile</router-link
           >
-          <router-link
+          <!-- <router-link
             to="/my-ads"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
             >My Ads</router-link
-          >
+          > -->
           <router-link
             to="/saved"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
