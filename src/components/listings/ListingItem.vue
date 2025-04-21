@@ -1,6 +1,6 @@
 <template>
   <div class="px-4 py-4 sm:px-6">
-    <div class="flex items-center justify-between">
+    <div class="block md:flex items-center justify-between">
       <div class="flex items-center space-x-4">
         <div class="flex-shrink-0 h-16 w-16">
           <img
@@ -24,7 +24,9 @@
           </div>
         </div>
       </div>
-      <div class="ml-2 flex flex-shrink-0 space-x-4">
+      <div
+        class="ml-2 flex flex-shrink-0 space-x-4 py-4 gap-4 md:gap-0 md:py-0"
+      >
         <span
           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize"
           :class="statusClasses"
@@ -33,15 +35,17 @@
         </span>
         <button
           @click="$emit('edit', listing.id)"
-          class="text-jiji-primary hover:text-orange-700"
+          class="text-jiji-primary hover:text-orange-700 flex"
         >
           <PencilIcon class="h-5 w-5" />
+          Edit
         </button>
         <button
           @click="$emit('delete', listing.id)"
-          class="text-red-600 hover:text-red-900"
+          class="text-red-600 hover:text-red-900 flex"
         >
           <TrashIcon class="h-5 w-5" />
+          Delete
         </button>
       </div>
     </div>
