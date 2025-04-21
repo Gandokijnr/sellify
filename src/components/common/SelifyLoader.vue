@@ -5,7 +5,7 @@
     :class="containerClass"
   >
     <!-- Background -->
-    <div class="absolute inset-0 bg-white"></div>
+    <div class="absolute inset-0"></div>
 
     <!-- Main loader container -->
     <div class="relative flex flex-col items-center">
