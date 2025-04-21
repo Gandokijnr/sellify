@@ -29,7 +29,7 @@
         <!-- Pulsing center -->
         <div class="absolute inset-0 flex items-center justify-center">
           <div
-            class="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-green-600 animate-pulse flex items-center justify-center"
+            class="w-20 h-20 rounded-full bg-gradient-to-br bg-green-600 animate-pulse flex items-center justify-center"
           >
             <div class="text-2xl font-bold text-white">
               <slot name="logo-text">Selify</slot>
@@ -41,7 +41,7 @@
       <!-- Progress bar -->
       <div class="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
         <div
-          class="h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-50"
+          class="h-full bg-gradient-to-r bg-green-600 transition-all duration-50"
           :style="{ width: `${progress}%` }"
         ></div>
       </div>
