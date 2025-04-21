@@ -240,7 +240,7 @@ export const useAuthStore = defineStore("auth", () => {
 
       if (isMobile || useRedirect) {
         // Handle redirect flow (better for mobile)
-        await signInWithRedirect(auth, provider);
+        await signInWithPopup(auth, provider);
         return; // Early return - the rest will be handled by initAuth
       } else {
         // Handle popup flow (better for desktop)
