@@ -125,7 +125,7 @@
           </div>
 
           <!-- Recent Listings -->
-          <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="bg-white shadow rounded-lg overflow-auto">
             <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
                 Your Recent Listings
@@ -157,7 +157,7 @@
               class="px-4 py-4 sm:px-6 bg-gray-50 text-right"
             >
               <router-link
-                to="/seller/listings"
+                to="/listings"
                 class="text-sm font-medium text-jiji-primary hover:text-orange-700"
               >
                 View all listings →

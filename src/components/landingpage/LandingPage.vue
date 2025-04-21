@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { collection, getDocs } from "firebase/firestore";
+import ListingsGrid from "../listings/ListingsGrid.vue";
+
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
@@ -203,116 +205,15 @@ function initializeScrollAnimations() {
             </router-link>
           </div>
 
-          <div v-if="loading" class="text-center py-8 animate-on-scroll">
-            <span class="text-gray-500 text-lg">Loading products...</span>
-          </div>
-
-          <!-- In your template section, replace the listings grid with this: -->
-          <div
-            v-else
-            class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
-          >
-            <router-link
-              v-for="listing in listings"
-              :key="listing.id"
-              :to="{ name: 'listing-details', params: { id: listing.id } }"
-              class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100"
-            >
-              <div class="relative">
-                <img
-                  :src="listing.images[0]"
-                  :alt="listing.title"
-                  class="w-full h-40 sm:h-48 object-cover"
-                />
-                <button
-                  class="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow-sm hover:bg-gray-100"
-                  @click.prevent.stop="toggleFavorite(listing.id)"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-heart text-gray-500"
-                    :class="{
-                      'fill-red-500 text-red-500': isFavorite(listing.id),
-                    }"
-                  >
-                    <path
-                      d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-                    />
-                  </svg>
-                </button>
-                <div
-                  v-if="listing.featured"
-                  class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded"
-                >
-                  Featured
-                </div>
-              </div>
-              <div class="p-4">
-                <div class="flex justify-between mb-2">
-                  <h3 class="font-medium text-base sm:text-lg line-clamp-1">
-                    {{ listing.title }}
-                  </h3>
-                </div>
-                <div
-                  class="flex items-center mb-3 text-gray-500 text-xs sm:text-sm"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-map-pin mr-1"
-                  >
-                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                  <span>{{ listing.location }}</span>
-                  <span class="mx-2">•</span>
-                  <span>{{ listing.date }}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <div class="font-bold text-green-600 text-base sm:text-lg">
-                    {{ listing.price }}
-                  </div>
-                  <button
-                    class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 rounded-lg flex items-center transition-colors text-sm"
-                    @click.prevent.stop="callSeller(listing.phone)"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-phone mr-1"
-                    >
-                      <path
-                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-                      />
-                    </svg>
-                    <span class="font-medium">Call</span>
-                  </button>
-                </div>
-              </div>
-            </router-link>
-          </div>
+          <ListingsGrid
+            :listings="listings || []"
+            :loading="loading"
+            v-model:searchQuery="searchQuery"
+            v-model:selectedCategory="selectedCategory"
+            @viewListing="viewListing"
+            @callSeller="callSeller"
+            :showHeader="false"
+          />
         </div>
       </div>
 

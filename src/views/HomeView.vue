@@ -1,6 +1,5 @@
 <script setup>
 import LandingPage from "@/components/landingpage/LandingPage.vue";
-import { ref } from "vue";
 </script>
 
 <template>
