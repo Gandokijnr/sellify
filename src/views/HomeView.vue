@@ -1,11 +1,14 @@
 <script setup>
 import LandingPage from "@/components/landingpage/LandingPage.vue";
-import SelifyLoader from "@/components/common/SelifyLoader.vue"; // Adjust path as needed
 import { ref } from "vue";
 </script>
 
 <template>
-  <SelifyLoader>
+  <SelifyLoader
+    :initialShow="true"
+    :autoStart="true"
+    @complete="handleLoadComplete"
+  >
     <template #logo-text>selify</template>
     <LandingPage />
   </SelifyLoader>
