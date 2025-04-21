@@ -231,11 +231,14 @@ export const useAuthStore = defineStore("auth", () => {
 
     isLoading.value = true;
     error.value = null;
-
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
     try {
       let result;
 
-      if (useRedirect) {
+      if (isMobile || useRedirect) {
         // Handle redirect flow (better for mobile)
         await signInWithRedirect(auth, provider);
         return; // Early return - the rest will be handled by initAuth
@@ -305,13 +308,11 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
-  // Handle redirect result (call this after initialization)
   const handleGoogleRedirectResult = async () => {
     const auth = getAuth();
     try {
       const result = await getRedirectResult(auth);
       if (result) {
-        // The initAuth listener will handle the state update
         return true;
       }
       return false;
