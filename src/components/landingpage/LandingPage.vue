@@ -43,9 +43,9 @@ const fetchProducts = () => {
   }
 };
 
-const viewListing = (listingId) => {
-  router.push({ name: "listing-details", params: { id: listingId } });
-};
+function viewListing(id) {
+  router.push({ name: "listing-details", params: { id } });
+}
 
 const callSeller = (phoneNumber) => {
   window.location.href = `tel:${phoneNumber}`;
@@ -222,9 +222,10 @@ function initializeScrollAnimations() {
           <ListingsGrid
             :listings="listings || []"
             :loading="loading"
+            v-model:searchQuery="searchQuery"
+            v-model:selectedCategory="selectedCategory"
             @viewListing="viewListing"
             @callSeller="callSeller"
-            :showHeader="false"
           />
         </div>
       </div>
