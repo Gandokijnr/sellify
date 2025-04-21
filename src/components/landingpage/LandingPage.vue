@@ -419,7 +419,9 @@ function initializeScrollAnimations() {
               Nigeria
             </p>
             <router-link
-              :to="{ name: 'create-listing' }"
+              :to="
+                authStore.isAuthenticated ? '/seller/listings/create' : '/login'
+              "
               class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-medium transition-colors shadow-sm animate-on-scroll delay-2"
             >
               Post Your Ad Now
