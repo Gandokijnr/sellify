@@ -226,6 +226,8 @@ function initializeScrollAnimations() {
             v-model:selectedCategory="selectedCategory"
             @viewListing="viewListing"
             @callSeller="callSeller"
+            :showSort="false"
+            :showHeader="false"
           />
         </div>
       </div>
