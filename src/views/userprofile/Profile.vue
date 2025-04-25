@@ -513,6 +513,7 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/firebase";
 import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
 import Navbar from "@/components/common/Navbar.vue";
+import axios from "axios";
 import {
   updateProfile,
   updatePassword,
