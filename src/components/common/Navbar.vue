@@ -22,11 +22,14 @@ onMounted(async () => {
         userProfile.value = userDoc.data();
 
         if (!userProfile.value.phoneNumber) {
-          toast.warning("Please verify your account by adding a phone number", {
-            timeout: false,
-            closeOnClick: false,
-            pauseOnFocusLoss: true,
-          });
+          toast.warning(
+            "Please verify your account by completing your profile",
+            {
+              timeout: false,
+              closeOnClick: false,
+              pauseOnFocusLoss: true,
+            }
+          );
         }
       }
     } catch (error) {
