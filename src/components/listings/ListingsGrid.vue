@@ -30,6 +30,11 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  showCallSeller: {
+    // New prop to control visibility of call seller button
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits([
@@ -246,6 +251,7 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
               {{ listing.price }}
             </div>
             <button
+              v-if="showCallSeller"
               class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
               @click.stop="emit('callSeller', listing.phone)"
             >

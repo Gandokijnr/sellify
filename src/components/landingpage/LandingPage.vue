@@ -82,9 +82,9 @@ function viewListing(id) {
   router.push({ name: "listing-details", params: { id } });
 }
 
-const callSeller = (phoneNumber) => {
-  window.location.href = `tel:${phoneNumber}`;
-};
+// const callSeller = (phoneNumber) => {
+//   window.location.href = `tel:${phoneNumber}`;
+// };
 
 // Load favorites from localStorage when component mounts
 const loadFavorites = () => {
@@ -293,9 +293,9 @@ function initializeScrollAnimations() {
             v-model:searchQuery="searchQuery"
             v-model:selectedCategory="selectedCategory"
             @viewListing="viewListing"
-            @callSeller="callSeller"
             :showSort="false"
             :showHeader="false"
+            :showCallSeller="false"
           />
         </div>
       </div>
