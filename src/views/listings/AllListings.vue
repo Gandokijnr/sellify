@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, computed, onUnmounted } from "vue";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
@@ -8,12 +8,17 @@ import { useRouter } from "vue-router";
 import ListingsGrid from "@/components/listings/ListingsGrid.vue";
 import CategoriesFilter from "@/components/listings/CategoriesFilter.vue";
 import SearchHeader from "@/components/listings/SearchHeader.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useToast } from "vue-toastification";
 
 const router = useRouter();
+const toast = useToast();
+const authStore = useAuthStore();
 const listings = ref([]);
 const loading = ref(true);
 const searchQuery = ref("");
 const selectedCategory = ref("All");
+const userProfile = ref(null);
 
 // Store the unsubscribe function for cleanup
 let unsubscribe = null;
@@ -28,6 +33,27 @@ const categories = ref([
   { id: 7, name: "Jobs", icon: "💼" },
 ]);
 
+const fetchUserProfile = async () => {
+  try {
+    if (authStore.user?.uid) {
+      const userDoc = await getDoc(doc(db, "users", authStore.user.uid));
+      if (userDoc.exists()) {
+        userProfile.value = userDoc.data();
+        if (!userProfile.value.phoneNumber) {
+          toast.warning("Please update your phone number in your profile", {
+            timeout: false, // Doesn't auto-close
+            closeOnClick: false,
+            pauseOnFocusLoss: true,
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    toast.error("Failed to load user profile");
+  }
+};
+
 const fetchProducts = () => {
   loading.value = true;
   try {
@@ -40,12 +66,14 @@ const fetchProducts = () => {
     });
   } catch (error) {
     console.error("Failed to set up real-time listener:", error);
+    toast.error("Failed to load listings");
   } finally {
     loading.value = false;
   }
 };
 
 onMounted(() => {
+  fetchUserProfile();
   fetchProducts();
   initializeScrollAnimations();
 });
@@ -82,6 +110,15 @@ function formatNumber(num) {
 }
 
 function callSeller(phone) {
+  if (!userProfile.value?.phoneNumber) {
+    toast.error("Please update your phone number in your profile first", {
+      timeout: 5000,
+      closeOnClick: false,
+      pauseOnFocusLoss: true,
+    });
+    router.push("/profile");
+    return;
+  }
   window.location.href = `tel:${phone}`;
 }
 
@@ -103,10 +140,7 @@ function initializeScrollAnimations() {
     });
   }
 
-  // Initial check
   checkIfInView();
-
-  // Add scroll event listener
   window.addEventListener("scroll", checkIfInView);
 }
 </script>

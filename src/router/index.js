@@ -72,7 +72,7 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const isAuthenticated = !!authStore.token;
 
@@ -84,6 +84,14 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !isAuthenticated) {
     next("/");
     return;
+  }
+
+  if (to.meta.requiresPhoneNumber) {
+    const userDoc = await getDoc(doc(db, "users", authStore.user.uid));
+    if (!userDoc.data()?.phoneNumber) {
+      next("/profile");
+      return;
+    }
   }
 
   // Allow navigation in all other cases

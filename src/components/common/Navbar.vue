@@ -1,3 +1,42 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import { useToast } from "vue-toastification";
+
+const authStore = useAuthStore();
+const toast = useToast();
+const mobileMenuOpen = ref(false);
+const userProfile = ref(null);
+
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+};
+
+onMounted(async () => {
+  if (authStore.isAuthenticated && authStore.user?.uid) {
+    try {
+      const userDoc = await getDoc(doc(db, "users", authStore.user.uid));
+      if (userDoc.exists()) {
+        userProfile.value = userDoc.data();
+
+        if (!userProfile.value.phoneNumber) {
+          toast.warning("Please verify your account by adding a phone number", {
+            timeout: false,
+            closeOnClick: false,
+            pauseOnFocusLoss: true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      toast.error("Failed to load user profile");
+    }
+  }
+});
+</script>
+
 <template>
   <header class="bg-white shadow-sm sticky top-0 z-50">
     <!-- Top Bar -->
@@ -10,8 +49,19 @@
                 authStore.isAuthenticated ? '/seller/listings/create' : '/login'
               "
               class="hover:text-gray-200"
-              >Sell on Selify</routerLink
             >
+              Sell on Selify
+              <span
+                v-if="
+                  authStore.isAuthenticated &&
+                  (!userProfile || !userProfile.phoneNumber)
+                "
+                class="ml-1 text-yellow-300 text-xs"
+                title="Complete your profile to sell"
+              >
+                (!)
+              </span>
+            </routerLink>
             <a href="#" class="hover:text-gray-200">Customer Care</a>
           </div>
         </div>
@@ -24,7 +74,7 @@
         <!-- Logo and Categories -->
         <div class="flex items-center space-x-8">
           <router-link
-            :to="authStore.isAuthenticated ? '/' : '/'"
+            to="/"
             class="hover:opacity-90 transition-opacity"
             aria-label="Selify Home"
           >
@@ -73,18 +123,35 @@
                         authStore.user.displayName ||
                         authStore.user.email.split("@")[0]
                       }}
+                      <span
+                        v-if="userProfile && !userProfile.phoneNumber"
+                        class="text-yellow-500 text-xs ml-1"
+                        title="Profile incomplete"
+                      >
+                        (!)
+                      </span>
                     </span>
-                    <!-- Profile Picture or Fallback Icon -->
+                    <!-- Profile Picture with Verification Badge -->
                     <div class="relative">
                       <img
                         v-if="authStore.user.photoURL"
                         :src="authStore.user.photoURL"
                         alt="Profile"
-                        class="w-8 h-8 rounded-full object-cover border-2 border-green-100"
+                        class="w-8 h-8 rounded-full object-cover border-2"
+                        :class="
+                          userProfile?.phoneNumber
+                            ? 'border-green-100'
+                            : 'border-yellow-100'
+                        "
                       />
                       <div
                         v-else
-                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2 border-green-100"
+                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2"
+                        :class="
+                          userProfile?.phoneNumber
+                            ? 'border-green-100'
+                            : 'border-yellow-100'
+                        "
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -101,6 +168,45 @@
                           />
                         </svg>
                       </div>
+
+                      <!-- Verification Badge -->
+                      <div
+                        v-if="userProfile?.phoneNumber"
+                        class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm"
+                        title="Phone number verified"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 text-green-500"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <!-- Warning indicator for incomplete profile -->
+                      <div
+                        v-else
+                        class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm"
+                        title="Profile incomplete - add phone number"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 text-yellow-500"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </button>
                   <div
@@ -114,13 +220,15 @@
                     <router-link
                       to="/profile"
                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >My Profile</router-link
                     >
-                    <!-- <router-link
-                      to="/my-ads"
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >My Ads</router-link
-                    > -->
+                      My Profile
+                      <span
+                        v-if="!userProfile?.phoneNumber"
+                        class="ml-1 text-yellow-500 text-xs"
+                      >
+                        (!)
+                      </span>
+                    </router-link>
                     <button
                       @click="authStore.logout"
                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -157,11 +265,21 @@
                 v-if="authStore.isAuthenticated && authStore.user?.photoURL"
                 :src="authStore.user.photoURL"
                 alt="Profile"
-                class="w-8 h-8 rounded-full object-cover border-2 border-green-100"
+                class="w-8 h-8 rounded-full object-cover border-2"
+                :class="
+                  userProfile?.phoneNumber
+                    ? 'border-green-100'
+                    : 'border-yellow-100'
+                "
               />
               <div
                 v-else
-                class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center"
+                class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2"
+                :class="
+                  userProfile?.phoneNumber
+                    ? 'border-green-100'
+                    : 'border-yellow-100'
+                "
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -175,6 +293,41 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                  />
+                </svg>
+              </div>
+              <!-- Mobile verification indicator -->
+              <div
+                v-if="userProfile?.phoneNumber"
+                class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3 w-3 text-green-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div
+                v-else-if="authStore.isAuthenticated"
+                class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3 w-3 text-yellow-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
                   />
                 </svg>
               </div>
@@ -241,18 +394,6 @@
   </header>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
-
-const authStore = useAuthStore();
-const mobileMenuOpen = ref(false);
-
-const toggleMobileMenu = () => {
-  mobileMenuOpen.value = !mobileMenuOpen.value;
-};
-</script>
-
 <style scoped>
 @keyframes tilt-in {
   0% {
@@ -267,5 +408,21 @@ const toggleMobileMenu = () => {
 
 .animate-tilt-in {
   animation: tilt-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.attention-indicator {
+  animation: pulse 2s infinite;
 }
 </style>
