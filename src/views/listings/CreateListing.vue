@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Navbar from "@/components/common/Navbar.vue";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -7,11 +8,13 @@ import { db } from "@/firebase";
 import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
+import { useToast } from "vue-toastification";
 
 const router = useRouter();
 const isLoading = ref(false);
 const errorMessage = ref("");
 const authStore = useAuthStore();
+const toast = useToast();
 
 const form = ref({
   title: "",
@@ -98,11 +101,22 @@ const uploadImages = async () => {
 
 const submitForm = async () => {
   // if (!validateForm()) return;
+  if (!authStore.user?.phoneNumber) {
+    toast.error(
+      "Please update your phone number in your profile before creating listings",
+      {
+        timeout: 5000,
+        closeOnClick: false,
+        pauseOnFocusLoss: true,
+      }
+    );
+    router.push("/profile");
+    return;
+  }
 
   try {
     isLoading.value = true;
 
-    // 1. Upload images to Cloudinary
     const imageUrls = await uploadImages();
 
     if (!imageUrls || imageUrls.length === 0) {
@@ -133,12 +147,18 @@ const submitForm = async () => {
     });
 
     const docRef = await addDoc(collection(db, "listings"), listingData);
-    console.log("Listing created with ID: ", docRef.id);
-
+    toast.success("Listing created successfully!", {
+      timeout: 3000,
+    });
     // 3. Redirect to dashboard
     router.push("/seller/dashboard");
   } catch (error) {
     console.error("Error creating listing:", error);
+    toast.error("Failed to create listing. Please try again.", {
+      timeout: 5000,
+      closeOnClick: false,
+      pauseOnFocusLoss: true,
+    });
     alert("Failed to create listing. Please try again.");
   } finally {
     isLoading.value = false;
@@ -165,6 +185,20 @@ const dropFiles = (e) => {
   const files = e.dataTransfer.files;
   handleImageUpload({ target: { files } });
 };
+
+onMounted(() => {
+  if (!authStore.user?.phoneNumber) {
+    toast.warning(
+      "Please complete your profile information before creating listings",
+      {
+        timeout: 5000,
+        closeOnClick: false,
+        pauseOnFocusLoss: true,
+      }
+    );
+    router.push("/profile");
+  }
+});
 </script>
 
 <template>
