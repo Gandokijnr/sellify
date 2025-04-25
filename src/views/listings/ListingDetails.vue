@@ -42,7 +42,7 @@ const fetchListing = async () => {
           sellerInfo.value = userDoc.data();
         }
       }
-      console.log("Seller info:", sellerInfo.value);
+      console.log("Seller info:", sellerInfo.value.phoneNumber);
     } else {
       router.push({ name: "not-found" });
     }
@@ -73,7 +73,7 @@ const fetchRelatedListings = async () => {
 };
 
 const callSeller = () => {
-  window.location.href = `tel:${listing.value.phone}`;
+  window.location.href = `tel:${sellerInfo.value.phoneNumber}`;
 };
 
 const startChat = () => {
