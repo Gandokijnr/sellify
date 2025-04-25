@@ -130,7 +130,6 @@ const handleEmailRegister = async () => {
 const handleGoogleSignIn = async () => {
   googleLoading.value = true;
   try {
-    // Use the existing authStore method
     await authStore.handleGoogleSignIn();
     toast.success("Welcome to selify!");
     router.push("/");

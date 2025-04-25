@@ -37,7 +37,6 @@ const fetchListing = async () => {
       console.log("Listing data:", listing.value);
       if (listing.value.userId) {
         const userDoc = await getDoc(doc(db, "users", listing.value.userId));
-        console.log("Seller userdoc:", userDoc);
 
         if (userDoc.exists()) {
           sellerInfo.value = userDoc.data();

@@ -18,12 +18,26 @@ const authStore = useAuthStore();
 let unsubscribe = null;
 
 const categories = ref([
-  { id: 1, name: "Electronics", icon: "📱", count: 12543 },
-  { id: 2, name: "Vehicles", icon: "🚗", count: 8765 },
-  { id: 3, name: "Property", icon: "🏠", count: 6543 },
-  { id: 4, name: "Fashion", icon: "👕", count: 9876 },
-  { id: 5, name: "Furniture", icon: "🛋️", count: 5432 },
-  { id: 6, name: "Jobs", icon: "💼", count: 7654 },
+  {
+    id: 1,
+    name: "Electronics",
+    icon: "📱",
+    count: 12543,
+    isValid: true,
+    url: "/listings",
+  },
+  { id: 2, name: "Vehicles", icon: "🚗", count: 8765, isValid: false, url: "" },
+  { id: 3, name: "Property", icon: "🏠", count: 6543, isValid: false, url: "" },
+  { id: 4, name: "Fashion", icon: "👕", count: 9876, isValid: false, url: "" },
+  {
+    id: 5,
+    name: "Furniture",
+    icon: "🛋️",
+    count: 5432,
+    isValid: false,
+    url: "",
+  },
+  { id: 6, name: "Jobs", icon: "💼", count: 7654, isValid: false, url: "" },
 ]);
 
 const fetchProducts = () => {
@@ -162,6 +176,7 @@ function initializeScrollAnimations() {
       </div>
 
       <!-- Categories -->
+      <!-- Categories -->
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
           <h2 class="text-2xl font-bold mb-8 animate-on-scroll">
@@ -172,8 +187,9 @@ function initializeScrollAnimations() {
             <div
               v-for="(category, index) in categories"
               :key="category.id"
-              class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer animate-on-scroll"
+              class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer animate-on-scroll relative"
               :class="`delay-${index % 3}`"
+              @click="category.isValid ? $router.push(category.url) : null"
             >
               <span class="text-3xl mb-2">{{ category.icon }}</span>
               <h3 class="font-medium text-gray-800 text-center">
@@ -182,6 +198,12 @@ function initializeScrollAnimations() {
               <p class="text-sm text-gray-500 mt-1">
                 {{ formatNumber(category.count) }} ads
               </p>
+              <div
+                v-if="!category.isValid"
+                class="absolute opacity-90 top-0 left-0 right-0 bg-amber-100 text-amber-800 text-xs font-medium text-center py-1 rounded-t-xl"
+              >
+                Coming Soon
+              </div>
             </div>
           </div>
         </div>
