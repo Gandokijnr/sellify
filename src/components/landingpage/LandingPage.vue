@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from "vue";
-import { collection, onSnapshot } from "firebase/firestore";
+import { onMounted, onUnmounted, ref, watch } from "vue";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
 
 import { db } from "@/firebase";
@@ -16,13 +16,14 @@ const searchQuery = ref("");
 const favorites = ref([]);
 const authStore = useAuthStore();
 let unsubscribe = null;
+let electronicsUnsubscribe = null; // For the electronics count listener
 
 const categories = ref([
   {
     id: 1,
     name: "Electronics",
     icon: "📱",
-    count: 12543,
+    count: 0,
     isValid: true,
     url: "/listings",
   },
@@ -39,6 +40,26 @@ const categories = ref([
   },
   { id: 6, name: "Jobs", icon: "💼", count: 7654, isValid: false, url: "" },
 ]);
+
+// Function to fetch electronics count
+const fetchElectronicsCount = () => {
+  try {
+    const q = query(
+      collection(db, "listings"),
+      where("category", "==", "electronics")
+    );
+
+    electronicsUnsubscribe = onSnapshot(q, (querySnapshot) => {
+      const count = querySnapshot.size;
+      // Update the electronics category count
+      categories.value = categories.value.map((cat) =>
+        cat.id === 1 ? { ...cat, count } : cat
+      );
+    });
+  } catch (error) {
+    console.error("Error fetching electronics count:", error);
+  }
+};
 
 const fetchProducts = () => {
   loading.value = true;
@@ -65,24 +86,46 @@ const callSeller = (phoneNumber) => {
   window.location.href = `tel:${phoneNumber}`;
 };
 
-// const toggleFavorite = (listingId) => {
-//   const index = favorites.value.indexOf(listingId);
-//   if (index === -1) {
-//     favorites.value.push(listingId);
-//   } else {
-//     favorites.value.splice(index, 1);
-//   }
-//   // You might want to save favorites to localStorage or your backend
-//   localStorage.setItem("favorites", JSON.stringify(favorites.value));
-// };
+// Load favorites from localStorage when component mounts
+const loadFavorites = () => {
+  const savedFavorites = localStorage.getItem("favorites");
+  if (savedFavorites) {
+    favorites.value = JSON.parse(savedFavorites);
+  }
+};
 
-// const isFavorite = (listingId) => {
-//   return favorites.value.includes(listingId);
-// };
+// Toggle favorite status
+const toggleFavorite = (listingId) => {
+  const index = favorites.value.indexOf(listingId);
+  if (index === -1) {
+    favorites.value.push(listingId);
+  } else {
+    favorites.value.splice(index, 1);
+  }
+  // Save to localStorage
+  localStorage.setItem("favorites", JSON.stringify(favorites.value));
+};
+
+// Check if listing is favorite
+const isFavorite = (listingId) => {
+  return favorites.value.includes(listingId);
+};
+
+// Watch for changes in favorites and save to localStorage
+watch(
+  favorites,
+  (newVal) => {
+    localStorage.setItem("favorites", JSON.stringify(newVal));
+  },
+  { deep: true }
+);
 
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
+  fetchElectronicsCount();
+  loadFavorites();
+
   // Load favorites from localStorage
   //   const savedFavorites = localStorage.getItem("favorites");
   //   if (savedFavorites) {
@@ -93,6 +136,9 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubscribe) {
     unsubscribe();
+  }
+  if (electronicsUnsubscribe) {
+    electronicsUnsubscribe();
   }
 });
 

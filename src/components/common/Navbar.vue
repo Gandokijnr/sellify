@@ -39,7 +39,7 @@
         <!-- User Actions -->
         <div class="flex items-center space-x-4">
           <router-link
-            to="/saved"
+            to="/"
             class="hidden md:flex flex-col items-center text-gray-600 hover:text-green-600"
           >
             <svg

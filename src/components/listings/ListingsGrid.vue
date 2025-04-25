@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 const props = defineProps({
   listings: {
@@ -26,7 +26,52 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  favorites: {
+    type: Array,
+    default: () => [],
+  },
 });
+
+const emit = defineEmits([
+  "update:searchQuery",
+  "update:selectedCategory",
+  "viewListing",
+  "callSeller",
+  "toggleFavorite",
+]);
+
+const localFavorites = ref([]);
+
+onMounted(() => {
+  const savedFavorites = localStorage.getItem("favorites");
+  if (savedFavorites) {
+    localFavorites.value = JSON.parse(savedFavorites);
+  }
+});
+
+// Check if listing is favorite
+const isFavorite = (listingId) => {
+  return (
+    localFavorites.value.includes(listingId) ||
+    props.favorites.includes(listingId)
+  );
+};
+
+// Toggle favorite status
+const toggleFavorite = (listingId, event) => {
+  event.stopPropagation();
+  let updatedFavorites;
+
+  if (isFavorite(listingId)) {
+    updatedFavorites = localFavorites.value.filter((id) => id !== listingId);
+  } else {
+    updatedFavorites = [...localFavorites.value, listingId];
+  }
+
+  localFavorites.value = updatedFavorites;
+  localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+  emit("toggleFavorite", listingId);
+};
 
 const filteredListings = computed(() => {
   let result = props.listings;
@@ -42,13 +87,6 @@ const filteredListings = computed(() => {
   }
   return result;
 });
-
-const emit = defineEmits([
-  "update:searchQuery",
-  "update:selectedCategory",
-  "viewListing",
-  "callSeller",
-]);
 
 const formatNumber = (num) => num?.toLocaleString() || "0";
 </script>
@@ -139,7 +177,12 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
 
           <button
             class="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow-sm hover:bg-gray-100"
-            @click.stop
+            @click.stop="toggleFavorite(listing.id, $event)"
+            :title="
+              isFavorite(listing.id)
+                ? 'Remove from favorites'
+                : 'Add to favorites'
+            "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -151,7 +194,11 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="lucide lucide-heart text-gray-500"
+              class="lucide lucide-heart"
+              :class="{
+                'fill-red-500 text-red-500': isFavorite(listing.id),
+                'text-gray-500': !isFavorite(listing.id),
+              }"
             >
               <path
                 d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
