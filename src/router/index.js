@@ -58,6 +58,21 @@ const routes = [
     component: () => import("@/views/dashboard/BuyerDashboard.vue"),
     meta: { requiresAuth: true },
   },
+  //buyers requests form
+  {
+    path: "/buyer/requests",
+    name: "buyer-requests",
+    component: () =>
+      import("@/views/listings/buyerrequestform/BuyerRequestForm.vue"),
+    meta: { requiresAuth: true },
+  },
+  //buyers requests list
+  {
+    path: "/buyer/requests/list",
+    name: "buyer-requests-list",
+    component: () =>
+      import("@/views/listings/buyerrequestform/BuyerRequestsList.vue"),
+  },
 ];
 
 const router = createRouter({

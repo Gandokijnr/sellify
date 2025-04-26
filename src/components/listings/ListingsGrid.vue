@@ -31,7 +31,6 @@ const props = defineProps({
     default: () => [],
   },
   showCallSeller: {
-    // New prop to control visibility of call seller button
     type: Boolean,
     default: true,
   },

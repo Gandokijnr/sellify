@@ -232,6 +232,18 @@ onMounted(async () => {
                         (!)
                       </span>
                     </router-link>
+                    <router-link
+                      to="/buyer/requests"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Submit Product Request
+                    </router-link>
+                    <router-link
+                      to="/buyer/requests/list"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      View buyer requests
+                    </router-link>
                     <button
                       @click="authStore.logout"
                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
