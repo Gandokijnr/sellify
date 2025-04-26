@@ -377,13 +377,13 @@ onMounted(async () => {
           >
           <router-link
             to="/buyer/requests"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
           >
             Submit Product Request
           </router-link>
           <router-link
             to="/buyer/requests/list"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
           >
             View buyer requests
           </router-link>
