@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Navbar from "@/components/common/Navbar.vue";
@@ -9,12 +9,56 @@ import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "vue-toastification";
+import nigeriaLocations from "@/stores/location";
 
 const router = useRouter();
 const isLoading = ref(false);
 const errorMessage = ref("");
 const authStore = useAuthStore();
 const toast = useToast();
+
+// Location-related refs
+const selectedState = ref("");
+const selectedLGA = ref("");
+const selectedLocation = ref("");
+
+// Available options for dropdowns
+const availableStates = ref(Object.keys(nigeriaLocations));
+const availableLGAs = computed(() => {
+  if (!selectedState.value) return [];
+  return Object.keys(nigeriaLocations[selectedState.value] || {});
+});
+const availableLocations = computed(() => {
+  if (!selectedState.value || !selectedLGA.value) return [];
+  return nigeriaLocations[selectedState.value]?.[selectedLGA.value] || [];
+});
+
+// Reset dependent dropdowns when parent selection changes
+watch(selectedState, () => {
+  selectedLGA.value = "";
+  selectedLocation.value = "";
+});
+
+watch(selectedLGA, () => {
+  selectedLocation.value = "";
+});
+
+// Computed property to get full location string
+const fullLocation = computed(() => {
+  if (!selectedState.value) return "";
+
+  let locationParts = [selectedState.value];
+
+  if (selectedLGA.value) {
+    locationParts.push(selectedLGA.value);
+
+    if (selectedLocation.value) {
+      locationParts.push(selectedLocation.value);
+    }
+  }
+
+  return locationParts.join(", ");
+});
 
 const form = ref({
   title: "",
@@ -24,6 +68,11 @@ const form = ref({
   condition: "used",
   location: "",
   images: [],
+});
+
+// Update form location when any location selection changes
+watch(fullLocation, (newLocation) => {
+  form.value.location = newLocation;
 });
 
 const previewImages = ref([]);
@@ -100,7 +149,14 @@ const uploadImages = async () => {
 };
 
 const submitForm = async () => {
-  // if (!validateForm()) return;
+  // Validate that a state is selected
+  if (!selectedState.value) {
+    toast.error("Please select a state", {
+      timeout: 3000,
+    });
+    return;
+  }
+
   if (!authStore.user?.phoneNumber) {
     toast.error(
       "Please update your phone number in your profile before creating listings",
@@ -311,19 +367,79 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Location -->
+          <!-- Location (Nigeria) -->
           <div class="mb-4">
-            <label for="location" class="block text-gray-700 font-medium mb-2"
-              >Location*</label
+            <label class="block text-gray-700 font-medium mb-2"
+              >Location (Nigeria)*</label
             >
-            <input
-              type="text"
-              id="location"
-              v-model="form.location"
-              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-              placeholder="City, State"
-              required
-            />
+
+            <!-- State Dropdown -->
+            <div class="mb-3">
+              <label for="state" class="block text-gray-600 text-sm mb-1"
+                >State*</label
+              >
+              <select
+                id="state"
+                v-model="selectedState"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+                required
+              >
+                <option value="" disabled selected>Select State</option>
+                <option
+                  v-for="state in availableStates"
+                  :key="state"
+                  :value="state"
+                >
+                  {{ state }}
+                </option>
+              </select>
+            </div>
+
+            <!-- LGA Dropdown (only shows if state is selected) -->
+            <div class="mb-3" v-if="selectedState">
+              <label for="lga" class="block text-gray-600 text-sm mb-1"
+                >Local Government Area</label
+              >
+              <select
+                id="lga"
+                v-model="selectedLGA"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+              >
+                <option value="" disabled selected>Select LGA</option>
+                <option v-for="lga in availableLGAs" :key="lga" :value="lga">
+                  {{ lga }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Location Dropdown (only shows if LGA is selected) -->
+            <div class="mb-3" v-if="selectedLGA">
+              <label
+                for="specific-location"
+                class="block text-gray-600 text-sm mb-1"
+                >Area/Location</label
+              >
+              <select
+                id="specific-location"
+                v-model="selectedLocation"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+              >
+                <option value="" disabled selected>Select Location</option>
+                <option
+                  v-for="location in availableLocations"
+                  :key="location"
+                  :value="location"
+                >
+                  {{ location }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Display full location path -->
+            <div v-if="form.location" class="mt-2 text-sm text-gray-600">
+              Selected location:
+              <span class="font-medium">{{ form.location }}</span>
+            </div>
           </div>
 
           <!-- Images -->
@@ -355,7 +471,7 @@ onMounted(() => {
                 <label
                   class="px-4 py-2 bg-jiji-primary text-white rounded-lg cursor-pointer hover:bg-jiji-primary-dark transition-colors"
                 >
-                  <span class="text-gray-400">Select Files</span>
+                  <span>Select Files</span>
                   <input
                     type="file"
                     multiple

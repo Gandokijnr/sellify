@@ -276,28 +276,87 @@
                   </div>
                 </div>
 
-                <!-- Country -->
-                <div>
-                  <label
-                    for="country"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >Country</label
+                <!-- Location (Nigeria) -->
+                <div class="mb-4">
+                  <label class="block text-gray-700 font-medium mb-2"
+                    >Location (Nigeria)*</label
                   >
-                  <select
-                    v-if="editMode"
-                    id="country"
-                    v-model="profileData.country"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+
+                  <!-- State Dropdown -->
+                  <div class="mb-3">
+                    <label for="state" class="block text-gray-600 text-sm mb-1"
+                      >State*</label
+                    >
+                    <select
+                      id="state"
+                      v-model="selectedState"
+                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+                      required
+                    >
+                      <option value="" disabled selected>Select State</option>
+                      <option
+                        v-for="state in availableStates"
+                        :key="state"
+                        :value="state"
+                      >
+                        {{ state }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- LGA Dropdown (only shows if state is selected) -->
+                  <div class="mb-3" v-if="selectedState">
+                    <label for="lga" class="block text-gray-600 text-sm mb-1"
+                      >Local Government Area</label
+                    >
+                    <select
+                      id="lga"
+                      v-model="selectedLGA"
+                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+                    >
+                      <option value="" disabled selected>Select LGA</option>
+                      <option
+                        v-for="lga in availableLGAs"
+                        :key="lga"
+                        :value="lga"
+                      >
+                        {{ lga }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Location Dropdown (only shows if LGA is selected) -->
+                  <div class="mb-3" v-if="selectedLGA">
+                    <label
+                      for="specific-location"
+                      class="block text-gray-600 text-sm mb-1"
+                      >Area/Location</label
+                    >
+                    <select
+                      id="specific-location"
+                      v-model="selectedLocation"
+                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+                    >
+                      <option value="" disabled selected>
+                        Select Location
+                      </option>
+                      <option
+                        v-for="location in availableLocations"
+                        :key="location"
+                        :value="location"
+                      >
+                        {{ location }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <!-- Display full location path -->
+                  <div
+                    v-if="profileData.location"
+                    class="mt-2 text-sm text-gray-600"
                   >
-                    <option value="">Select a country</option>
-                    <option value="USA">United States</option>
-                    <option value="CAN">Canada</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="AUS">Australia</option>
-                    <!-- Add more countries as needed -->
-                  </select>
-                  <div v-else class="text-gray-900">
-                    {{ profileData.country || "Not set" }}
+                    Selected location:
+                    <span class="font-medium">{{ profileData.location }}</span>
                   </div>
                 </div>
               </div>
@@ -507,13 +566,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, onBeforeMount, computed } from "vue";
+import { ref, reactive, onBeforeMount, computed, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/firebase";
 import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
 import Navbar from "@/components/common/Navbar.vue";
 import axios from "axios";
+import nigeriaLocations from "@/stores/location";
+
 import {
   updateProfile,
   updatePassword,
@@ -527,6 +588,11 @@ const editMode = ref(false);
 const showChangePasswordModal = ref(false);
 const previewImage = ref(null);
 
+// Location-related refs
+const selectedState = ref("");
+const selectedLGA = ref("");
+const selectedLocation = ref("");
+
 const profileData = reactive({
   displayName: "",
   phoneNumber: "",
@@ -534,11 +600,49 @@ const profileData = reactive({
   city: "",
   state: "",
   zip: "",
-  country: "",
+  location: "",
   photoURL: "",
   emailNotifications: false,
   publicProfile: false,
   isProfileComplete: false,
+});
+
+// Available options for dropdowns
+const availableStates = ref(Object.keys(nigeriaLocations));
+const availableLGAs = computed(() => {
+  if (!selectedState.value) return [];
+  return Object.keys(nigeriaLocations[selectedState.value] || {});
+});
+const availableLocations = computed(() => {
+  if (!selectedState.value || !selectedLGA.value) return [];
+  return nigeriaLocations[selectedState.value]?.[selectedLGA.value] || [];
+});
+
+// Reset dependent dropdowns when parent selection changes
+watch(selectedState, () => {
+  selectedLGA.value = "";
+  selectedLocation.value = "";
+});
+
+watch(selectedLGA, () => {
+  selectedLocation.value = "";
+});
+
+// Computed property to get full location string
+const fullLocation = computed(() => {
+  if (!selectedState.value) return "";
+
+  let locationParts = [selectedState.value];
+
+  if (selectedLGA.value) {
+    locationParts.push(selectedLGA.value);
+
+    if (selectedLocation.value) {
+      locationParts.push(selectedLocation.value);
+    }
+  }
+
+  return locationParts.join(", ");
 });
 
 const isGoogleUser = computed(() => {
@@ -624,7 +728,7 @@ const checkProfileComplete = () => {
     "city",
     "state",
     "zip",
-    "country",
+    "location",
   ];
   return requiredFields.every(
     (field) => profileData[field] && profileData[field].trim() !== ""
