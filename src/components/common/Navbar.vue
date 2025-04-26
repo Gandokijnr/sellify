@@ -375,6 +375,18 @@ onMounted(async () => {
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
             >Profile</router-link
           >
+          <router-link
+            to="/buyer/requests"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            Submit Product Request
+          </router-link>
+          <router-link
+            to="/buyer/requests/list"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            View buyer requests
+          </router-link>
           <!-- <router-link
             to="/my-ads"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
