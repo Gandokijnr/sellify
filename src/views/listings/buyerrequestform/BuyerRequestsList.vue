@@ -496,7 +496,7 @@ function getBudgetClass(maxBudget) {
     <!-- Contact Modal -->
     <div
       v-if="showContactModal"
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 bg-opacity-20 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
     >
       <div
         class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden"
