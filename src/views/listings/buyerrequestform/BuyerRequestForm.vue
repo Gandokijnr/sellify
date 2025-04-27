@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useToast } from "vue-toastification";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
+import nigeriaLocations from "@/stores/location";
 
 const router = useRouter();
 const toast = useToast();
@@ -21,6 +22,28 @@ const form = ref({
   maxBudget: "",
   location: "",
   contactMethod: "phone",
+});
+
+const selectedState = ref("");
+const selectedLGA = ref("");
+const selectedArea = ref("");
+const availableStates = ref(Object.keys(nigeriaLocations));
+const availableLGAs = computed(() => {
+  if (!selectedState.value) return [];
+  return Object.keys(nigeriaLocations[selectedState.value] || {});
+});
+const availableAreas = computed(() => {
+  if (!selectedState.value || !selectedLGA.value) return [];
+  return nigeriaLocations[selectedState.value][selectedLGA.value] || [];
+});
+
+// Watch for location changes and update form.location
+watch([selectedState, selectedLGA, selectedArea], () => {
+  const locationParts = [];
+  if (selectedState.value) locationParts.push(selectedState.value);
+  if (selectedLGA.value) locationParts.push(selectedLGA.value);
+  if (selectedArea.value) locationParts.push(selectedArea.value);
+  form.value.location = locationParts.join(", ");
 });
 
 // UI states
@@ -125,7 +148,6 @@ const submitRequest = async () => {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    // Add request to Firestore
     const requestData = {
       ...form.value,
       minBudget: parseFloat(form.value.minBudget),
@@ -462,50 +484,87 @@ const getStepIcon = (step) => {
 
               <!-- Location -->
               <div class="mb-5">
-                <label
-                  for="location"
-                  class="block text-gray-700 font-medium mb-2"
-                >
+                <label class="block text-gray-700 font-medium mb-2">
                   Location <span class="text-red-500">*</span>
                 </label>
-                <div class="relative">
-                  <div
-                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+
+                <!-- State Dropdown -->
+                <div class="mb-3">
+                  <label for="state" class="block text-gray-600 text-sm mb-1"
+                    >State*</label
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    id="location"
-                    v-model="form.location"
+                  <select
+                    id="state"
+                    v-model="selectedState"
                     :class="[
-                      'w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500',
+                      'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500',
                       validationErrors.location
                         ? 'border-red-300 bg-red-50'
                         : 'border-gray-300',
                     ]"
-                    placeholder="City, State"
-                  />
+                  >
+                    <option value="" disabled selected>Select State</option>
+                    <option
+                      v-for="state in availableStates"
+                      :key="state"
+                      :value="state"
+                    >
+                      {{ state }}
+                    </option>
+                  </select>
                 </div>
+
+                <!-- LGA Dropdown -->
+                <div class="mb-3" v-if="selectedState">
+                  <label for="lga" class="block text-gray-600 text-sm mb-1"
+                    >Local Government Area</label
+                  >
+                  <select
+                    id="lga"
+                    v-model="selectedLGA"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value="" disabled selected>Select LGA</option>
+                    <option
+                      v-for="lga in availableLGAs"
+                      :key="lga"
+                      :value="lga"
+                    >
+                      {{ lga }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Area Dropdown -->
+                <div
+                  class="mb-3"
+                  v-if="selectedLGA && availableAreas.length > 0"
+                >
+                  <label for="area" class="block text-gray-600 text-sm mb-1"
+                    >Area/Neighborhood</label
+                  >
+                  <select
+                    id="area"
+                    v-model="selectedArea"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value="" disabled selected>Select Area</option>
+                    <option
+                      v-for="area in availableAreas"
+                      :key="area"
+                      :value="area"
+                    >
+                      {{ area }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Display selected location -->
+                <div v-if="form.location" class="mt-2 text-sm text-gray-600">
+                  Selected location:
+                  <span class="font-medium">{{ form.location }}</span>
+                </div>
+
                 <p
                   v-if="validationErrors.location"
                   class="mt-1 text-sm text-red-600"

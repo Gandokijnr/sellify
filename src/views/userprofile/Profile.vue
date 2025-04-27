@@ -219,44 +219,6 @@
                   </div>
                 </div>
 
-                <!-- City -->
-                <div>
-                  <label
-                    for="city"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >City</label
-                  >
-                  <input
-                    v-if="editMode"
-                    id="city"
-                    v-model="profileData.city"
-                    type="text"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                  />
-                  <div v-else class="text-gray-900">
-                    {{ profileData.city || "Not set" }}
-                  </div>
-                </div>
-
-                <!-- State -->
-                <div>
-                  <label
-                    for="state"
-                    class="block text-sm font-medium text-gray-700 mb-1"
-                    >State</label
-                  >
-                  <input
-                    v-if="editMode"
-                    id="state"
-                    v-model="profileData.state"
-                    type="text"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                  />
-                  <div v-else class="text-gray-900">
-                    {{ profileData.state || "Not set" }}
-                  </div>
-                </div>
-
                 <!-- Zip Code -->
                 <div>
                   <label
@@ -282,81 +244,94 @@
                     >Location (Nigeria)*</label
                   >
 
-                  <!-- State Dropdown -->
-                  <div class="mb-3">
-                    <label for="state" class="block text-gray-600 text-sm mb-1"
-                      >State*</label
-                    >
-                    <select
-                      id="state"
-                      v-model="selectedState"
-                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-                      required
-                    >
-                      <option value="" disabled selected>Select State</option>
-                      <option
-                        v-for="state in availableStates"
-                        :key="state"
-                        :value="state"
-                      >
-                        {{ state }}
-                      </option>
-                    </select>
+                  <!-- Display mode (when not editing) -->
+                  <div v-if="!editMode" class="text-gray-900">
+                    {{ profileData.location || "Not set" }}
                   </div>
 
-                  <!-- LGA Dropdown (only shows if state is selected) -->
-                  <div class="mb-3" v-if="selectedState">
-                    <label for="lga" class="block text-gray-600 text-sm mb-1"
-                      >Local Government Area</label
-                    >
-                    <select
-                      id="lga"
-                      v-model="selectedLGA"
-                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-                    >
-                      <option value="" disabled selected>Select LGA</option>
-                      <option
-                        v-for="lga in availableLGAs"
-                        :key="lga"
-                        :value="lga"
+                  <!-- Edit mode (dropdown selectors) -->
+                  <div v-else>
+                    <!-- State Dropdown -->
+                    <div class="mb-3">
+                      <label
+                        for="state"
+                        class="block text-gray-600 text-sm mb-1"
+                        >State*</label
                       >
-                        {{ lga }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <!-- Location Dropdown (only shows if LGA is selected) -->
-                  <div class="mb-3" v-if="selectedLGA">
-                    <label
-                      for="specific-location"
-                      class="block text-gray-600 text-sm mb-1"
-                      >Area/Location</label
-                    >
-                    <select
-                      id="specific-location"
-                      v-model="selectedLocation"
-                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-                    >
-                      <option value="" disabled selected>
-                        Select Location
-                      </option>
-                      <option
-                        v-for="location in availableLocations"
-                        :key="location"
-                        :value="location"
+                      <select
+                        id="state"
+                        v-model="selectedState"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
                       >
-                        {{ location }}
-                      </option>
-                    </select>
-                  </div>
+                        <option value="" disabled selected>Select State</option>
+                        <option
+                          v-for="state in availableStates"
+                          :key="state"
+                          :value="state"
+                        >
+                          {{ state }}
+                        </option>
+                      </select>
+                    </div>
 
-                  <!-- Display full location path -->
-                  <div
-                    v-if="profileData.location"
-                    class="mt-2 text-sm text-gray-600"
-                  >
-                    Selected location:
-                    <span class="font-medium">{{ profileData.location }}</span>
+                    <!-- LGA Dropdown -->
+                    <div class="mb-3" v-if="selectedState">
+                      <label for="lga" class="block text-gray-600 text-sm mb-1"
+                        >Local Government Area*</label
+                      >
+                      <select
+                        id="lga"
+                        v-model="selectedLGA"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                      >
+                        <option value="" disabled selected>Select LGA</option>
+                        <option
+                          v-for="lga in availableLGAs"
+                          :key="lga"
+                          :value="lga"
+                        >
+                          {{ lga }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- Location Dropdown -->
+                    <div class="mb-3" v-if="selectedLGA">
+                      <label
+                        for="specific-location"
+                        class="block text-gray-600 text-sm mb-1"
+                        >Area/Location</label
+                      >
+                      <select
+                        id="specific-location"
+                        v-model="selectedLocation"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        <option value="" disabled selected>
+                          Select Location
+                        </option>
+                        <option
+                          v-for="location in availableLocations"
+                          :key="location"
+                          :value="location"
+                        >
+                          {{ location }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- Display full location path -->
+                    <div
+                      v-if="profileData.location"
+                      class="mt-2 text-sm text-gray-600"
+                    >
+                      Selected location:
+                      <span class="font-medium">{{
+                        profileData.location
+                      }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -618,14 +593,23 @@ const availableLocations = computed(() => {
   return nigeriaLocations[selectedState.value]?.[selectedLGA.value] || [];
 });
 
-// Reset dependent dropdowns when parent selection changes
-watch(selectedState, () => {
-  selectedLGA.value = "";
-  selectedLocation.value = "";
-});
+// Initialize location from profile data when loading
+watch(
+  () => profileData.location,
+  (newLocation) => {
+    if (newLocation) {
+      const parts = newLocation.split(", ");
+      if (parts.length >= 1) selectedState.value = parts[0];
+      if (parts.length >= 2) selectedLGA.value = parts[1];
+      if (parts.length >= 3) selectedLocation.value = parts[2];
+    }
+  },
+  { immediate: true }
+);
 
-watch(selectedLGA, () => {
-  selectedLocation.value = "";
+// Update profile location when selections change
+watch([selectedState, selectedLGA, selectedLocation], () => {
+  profileData.location = fullLocation.value;
 });
 
 // Computed property to get full location string
@@ -730,9 +714,11 @@ const checkProfileComplete = () => {
     "zip",
     "location",
   ];
-  return requiredFields.every(
-    (field) => profileData[field] && profileData[field].trim() !== ""
-  );
+  return (
+    requiredFields.every(
+      (field) => profileData[field] && profileData[field].trim() !== ""
+    ) && selectedState.value
+  ); // Ensure at least state is selected
 };
 
 const saveProfile = async () => {
