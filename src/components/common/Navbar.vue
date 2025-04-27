@@ -25,7 +25,7 @@ onMounted(async () => {
           toast.warning(
             "Please verify your account by completing your profile",
             {
-              timeout: false,
+              timeout: 4000,
               closeOnClick: false,
               pauseOnFocusLoss: true,
             }
