@@ -73,6 +73,16 @@ const routes = [
     component: () =>
       import("@/views/listings/buyerrequestform/BuyerRequestsList.vue"),
   },
+
+  //forgot password
+  {
+    path: "/forgot-password",
+    name: "forgotpassword",
+    component: () => import("@/views/auth/ForgotPassword.vue"),
+    meta: {
+      requiresAuth: false,
+    },
+  },
 ];
 
 const router = createRouter({

@@ -73,6 +73,10 @@
           </div>
         </div>
 
+        <div v-if="error" class="text-red-500 text-sm mt-2">
+          {{ error }}
+        </div>
+
         <div>
           <button
             type="submit"
@@ -97,7 +101,7 @@
         <!-- Social Sign-in Buttons -->
         <div class="mt-6 grid grid-cols-1 gap-3">
           <button
-            @click="handleGoogleSignIn"
+            @click.prevent="handleGoogleSignIn"
             type="button"
             :disabled="loading"
             class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
@@ -131,8 +135,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import { useToast } from "vue-toastification";
 import { useAuthStore } from "@/stores/auth";
@@ -146,6 +148,24 @@ const password = ref("");
 const rememberMe = ref(false);
 const loading = ref(false);
 const error = ref(null);
+
+onMounted(async () => {
+  try {
+    await authStore.initAuth();
+
+    const redirectResult = await authStore.handleGoogleRedirectResult();
+    if (redirectResult) {
+      toast.success("Logged in successfully!");
+      router.push("/");
+    }
+
+    if (authStore.isAuthenticated) {
+      router.push("/");
+    }
+  } catch (err) {
+    console.error("Auth initialization error:", err);
+  }
+});
 
 const getErrorMessage = (code) => {
   switch (code) {
@@ -169,9 +189,11 @@ const handleSignIn = async () => {
   error.value = null;
 
   try {
-    await signInWithEmailAndPassword(auth, email.value, password.value);
+    await authStore.login({
+      email: email.value,
+      password: password.value,
+    });
 
-    // Show success toast
     toast.success("Logged in successfully!", {
       timeout: 3000,
     });
@@ -179,10 +201,9 @@ const handleSignIn = async () => {
     router.push("/");
   } catch (err) {
     console.error("Login error:", err);
-    const errorMsg = getErrorMessage(err.code);
+    const errorMsg = getErrorMessage(err.code || "unknown");
     error.value = errorMsg;
 
-    // Show error toast
     toast.error(errorMsg, {
       timeout: 4000,
     });
@@ -193,36 +214,44 @@ const handleSignIn = async () => {
 
 const handleGoogleSignIn = async () => {
   loading.value = true;
+  error.value = null;
+
   try {
-    // Use the existing authStore method
-    await authStore.handleGoogleSignIn();
-    toast.success("Welcome to selify!");
-    router.push("/");
-  } catch (error) {
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+
+    await authStore.handleGoogleSignIn(isMobile);
+
+    if (!isMobile) {
+      toast.success("Welcome to selify!");
+      router.push("/");
+    }
+  } catch (err) {
     let errorMessage = "Google sign-in failed. Please try again.";
 
-    if (error.code === "auth/account-exists-with-different-credential") {
+    if (err.code === "auth/account-exists-with-different-credential") {
       errorMessage = "This email is already registered with another method.";
-    } else if (error.code === "auth/popup-closed-by-user") {
+    } else if (err.code === "auth/popup-blocked") {
+      errorMessage = "Pop-up was blocked. Please allow pop-ups for this site.";
+      try {
+        await authStore.handleGoogleSignIn(true);
+        return;
+      } catch (redirectErr) {
+        console.error("Redirect fallback failed:", redirectErr);
+      }
+    } else if (err.code === "auth/popup-closed-by-user") {
       errorMessage = "Sign-in popup was closed before completing.";
-    } else if (error.code === "auth/cancelled-popup-request") {
+    } else if (err.code === "auth/cancelled-popup-request") {
       return;
     }
 
+    error.value = errorMessage;
     toast.error(errorMessage);
-    console.error("Google sign-in error:", error);
+    console.error("Google sign-in error:", err);
   } finally {
     loading.value = false;
   }
 };
-
-onMounted(async () => {
-  try {
-    if (authStore.handleGoogleRedirectResult) {
-      await authStore.handleGoogleRedirectResult();
-    }
-  } catch (error) {
-    console.error("Error handling redirect result:", error);
-  }
-});
 </script>

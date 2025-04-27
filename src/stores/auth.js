@@ -151,6 +151,40 @@ export const useAuthStore = defineStore("auth", () => {
     });
   };
 
+  // Login with email and password (ADDED FUNCTION)
+  const login = async ({ email, password }) => {
+    const auth = getAuth();
+    const db = getFirestore();
+
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const firebaseUser = userCredential.user;
+
+      // Update last login timestamp
+      await setDoc(
+        doc(db, "users", firebaseUser.uid),
+        { lastLogin: serverTimestamp() },
+        { merge: true }
+      );
+
+      // The rest will be handled by the onAuthStateChanged listener
+      return true;
+    } catch (err) {
+      console.error("Login error:", err);
+      error.value = err.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   // Register new user
   const register = async ({ email, password, firstName, lastName }) => {
     const auth = getAuth();
@@ -219,86 +253,50 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
-  // Google Sign-In handler
+  // Google Sign-In handler (FIXED)
   const handleGoogleSignIn = async (useRedirect = false) => {
     const auth = getAuth();
     const db = getFirestore();
     const provider = new GoogleAuthProvider();
 
-    // Add any additional scopes you might need
-    // provider.addScope('profile');
-    // provider.addScope('email');
-
     isLoading.value = true;
     error.value = null;
+
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       );
+
     try {
-      let result;
-
+      // FIXED: Use correct method based on conditions
       if (isMobile || useRedirect) {
-        // Handle redirect flow (better for mobile)
-        await signInWithPopup(auth, provider);
-        return; // Early return - the rest will be handled by initAuth
+        // Use redirect method for mobile
+        await signInWithRedirect(auth, provider);
+        return; // Auth state will be handled after redirect completes
       } else {
-        // Handle popup flow (better for desktop)
-        result = await signInWithPopup(auth, provider);
+        // Use popup for desktop
+        try {
+          const result = await signInWithPopup(auth, provider);
+
+          // Handle the sign-in result
+          await handleFirebaseGoogleUser(
+            result.user,
+            result._tokenResponse?.isNewUser || false,
+            db
+          );
+          return true;
+        } catch (popupErr) {
+          // Check if it's a popup blocked error
+          if (popupErr.code === "auth/popup-blocked") {
+            error.value =
+              "Popup was blocked. Please allow popups or try using redirect method.";
+            // Fall back to redirect method
+            await signInWithRedirect(auth, provider);
+            return;
+          }
+          throw popupErr;
+        }
       }
-
-      // Check if user is new or existing
-      const isNewUser = result._tokenResponse?.isNewUser || false;
-      const firebaseUser = result.user;
-
-      if (isNewUser) {
-        // Create user document in Firestore for new users
-        const displayName = firebaseUser.displayName || "Google User";
-        const firstName = displayName.split(" ")[0] || "";
-        const lastName = displayName.split(" ")[1] || "";
-
-        await setDoc(doc(db, "users", firebaseUser.uid), {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          firstName,
-          lastName,
-          displayName,
-          photoURL: firebaseUser.photoURL,
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-          role: "user",
-          provider: "google",
-        });
-      } else {
-        // Update last login for existing users
-        await setDoc(
-          doc(db, "users", firebaseUser.uid),
-          { lastLogin: serverTimestamp() },
-          { merge: true }
-        );
-      }
-
-      // Get the user document
-      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-
-      if (!userDoc.exists()) {
-        throw new Error("User document not found in Firestore");
-      }
-
-      // Update local state
-      user.value = {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
-        ...userDoc.data(),
-      };
-
-      // Get and store token
-      token.value = await firebaseUser.getIdToken();
-      persistAuthState(user.value, token.value);
-
-      return true;
     } catch (err) {
       console.error("Google Sign-In error:", err);
       error.value = err.message;
@@ -308,11 +306,52 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  // Helper function to handle Firebase Google user
+  const handleFirebaseGoogleUser = async (firebaseUser, isNewUser, db) => {
+    if (isNewUser) {
+      // Create user document in Firestore for new users
+      const displayName = firebaseUser.displayName || "Google User";
+      const nameParts = displayName.split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
+
+      await setDoc(doc(db, "users", firebaseUser.uid), {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        firstName,
+        lastName,
+        displayName,
+        photoURL: firebaseUser.photoURL,
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp(),
+        role: "user",
+        provider: "google",
+      });
+    } else {
+      // Update last login for existing users
+      await setDoc(
+        doc(db, "users", firebaseUser.uid),
+        { lastLogin: serverTimestamp() },
+        { merge: true }
+      );
+    }
+
+    // The rest will be handled by onAuthStateChanged
+  };
+
   const handleGoogleRedirectResult = async () => {
     const auth = getAuth();
+    const db = getFirestore();
+
+    isLoading.value = true;
+    error.value = null;
+
     try {
       const result = await getRedirectResult(auth);
       if (result) {
+        // Process the redirect result
+        const isNewUser = result._tokenResponse?.isNewUser || false;
+        await handleFirebaseGoogleUser(result.user, isNewUser, db);
         return true;
       }
       return false;
@@ -320,6 +359,8 @@ export const useAuthStore = defineStore("auth", () => {
       console.error("Google Redirect error:", err);
       error.value = err.message;
       throw err;
+    } finally {
+      isLoading.value = false;
     }
   };
 
@@ -343,6 +384,22 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  // Password reset request
+  const resetPassword = async (email) => {
+    const auth = getAuth();
+    try {
+      isLoading.value = true;
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (err) {
+      console.error("Password reset error:", err);
+      error.value = err.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   return {
     // State
     user,
@@ -356,10 +413,12 @@ export const useAuthStore = defineStore("auth", () => {
 
     // Actions
     initAuth,
+    login,
     register,
     handleGoogleSignIn,
     handleGoogleRedirectResult,
     logout,
+    resetPassword,
     cleanup,
   };
 });

@@ -40,7 +40,6 @@ const validateForm = () => {
     confirmPassword: "",
   };
 
-  // First Name validation
   if (!form.value.firstName.trim()) {
     errors.value.firstName = "First name is required";
     isValid = false;
@@ -49,13 +48,11 @@ const validateForm = () => {
     isValid = false;
   }
 
-  // Last Name validation
   if (!form.value.lastName.trim()) {
     errors.value.lastName = "Last name is required";
     isValid = false;
   }
 
-  // Email validation
   if (!form.value.email) {
     errors.value.email = "Email is required";
     isValid = false;
@@ -64,7 +61,6 @@ const validateForm = () => {
     isValid = false;
   }
 
-  // Password validation
   if (!form.value.password) {
     errors.value.password = "Password is required";
     isValid = false;
@@ -76,13 +72,11 @@ const validateForm = () => {
     }
   }
 
-  // Confirm Password validation
   if (form.value.password !== form.value.confirmPassword) {
     errors.value.confirmPassword = "Passwords do not match";
     isValid = false;
   }
 
-  // Terms and conditions
   if (!termsAccepted.value) {
     toast.error("You must accept the terms and conditions");
     isValid = false;
@@ -104,13 +98,10 @@ const handleEmailRegister = async () => {
       lastName: form.value.lastName,
     });
 
-    // Show success message
     toast.success("Welcome to selify!");
 
-    // Redirect to home page using router
     router.push("/");
   } catch (error) {
-    // Handle specific error cases
     let errorMessage = "Registration failed. Please try again.";
 
     if (error.code === "auth/email-already-in-use") {
@@ -126,7 +117,6 @@ const handleEmailRegister = async () => {
   }
 };
 
-// Simply call the authStore method instead of reimplementing
 const handleGoogleSignIn = async () => {
   googleLoading.value = true;
   try {
@@ -141,7 +131,6 @@ const handleGoogleSignIn = async () => {
     } else if (error.code === "auth/popup-closed-by-user") {
       errorMessage = "Sign-in popup was closed before completing.";
     } else if (error.code === "auth/cancelled-popup-request") {
-      // User cancelled the popup, no need to show error
       return;
     }
 
@@ -152,10 +141,8 @@ const handleGoogleSignIn = async () => {
   }
 };
 
-// Check for redirect results on component mount
 onMounted(async () => {
   try {
-    // If your authStore has handleGoogleRedirectResult method
     if (authStore.handleGoogleRedirectResult) {
       await authStore.handleGoogleRedirectResult();
     }
