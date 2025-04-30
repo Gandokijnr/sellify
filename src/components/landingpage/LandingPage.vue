@@ -16,8 +16,9 @@ const searchQuery = ref("");
 const favorites = ref([]);
 const authStore = useAuthStore();
 let unsubscribe = null;
-let electronicsUnsubscribe = null; // For the electronics count listener
+let categoriesUnsubscribes = []; // Array to store all category unsubscribe functions
 
+// Updated categories with proper route paths
 const categories = ref([
   {
     id: 1,
@@ -25,39 +26,91 @@ const categories = ref([
     icon: "📱",
     count: 0,
     isValid: true,
-    url: "/listings",
+    url: "/listings?category=electronics",
   },
-  { id: 2, name: "Vehicles", icon: "🚗", count: 8765, isValid: false, url: "" },
-  { id: 3, name: "Property", icon: "🏠", count: 6543, isValid: false, url: "" },
-  { id: 4, name: "Fashion", icon: "👕", count: 9876, isValid: false, url: "" },
+  {
+    id: 2,
+    name: "Vehicles",
+    icon: "🚗",
+    count: 0,
+    isValid: true,
+    url: "/listings?category=vehicles",
+  },
+  {
+    id: 3,
+    name: "Real Estate",
+    icon: "🏠",
+    count: 0,
+    isValid: true,
+    url: "/listings?category=real-estate",
+  },
+  {
+    id: 4,
+    name: "Fashion",
+    icon: "👕",
+    count: 0,
+    isValid: true,
+    url: "/listings?category=fashion",
+  },
   {
     id: 5,
     name: "Furniture",
     icon: "🛋️",
-    count: 5432,
-    isValid: false,
-    url: "",
+    count: 0,
+    isValid: true,
+    url: "/listings?category=furniture",
   },
-  { id: 6, name: "Jobs", icon: "💼", count: 7654, isValid: false, url: "" },
+  {
+    id: 6,
+    name: "Jobs",
+    icon: "💼",
+    count: 0,
+    isValid: true,
+    url: "/listings?category=jobs",
+  },
 ]);
 
-// Function to fetch electronics count
-const fetchElectronicsCount = () => {
-  try {
-    const q = query(
-      collection(db, "listings"),
-      where("category", "==", "electronics")
-    );
+// Function to navigate to category listings
+const navigateToCategory = (category) => {
+  if (category.isValid) {
+    router.push(category.url);
+  }
+};
 
-    electronicsUnsubscribe = onSnapshot(q, (querySnapshot) => {
-      const count = querySnapshot.size;
-      // Update the electronics category count
-      categories.value = categories.value.map((cat) =>
-        cat.id === 1 ? { ...cat, count } : cat
+// Function to fetch counts for all categories
+const fetchAllCategoryCounts = () => {
+  try {
+    // Unsubscribe from any existing listeners
+    if (categoriesUnsubscribes.length > 0) {
+      categoriesUnsubscribes.forEach((unsubscribe) => unsubscribe());
+      categoriesUnsubscribes = [];
+    }
+
+    // For each category, set up a real-time listener
+    categories.value.forEach((category, index) => {
+      // Convert category name to lowercase for consistency with database
+      // Handle "Real Estate" special case to match database format
+      const categoryName =
+        category.name === "Real Estate"
+          ? "real-estate"
+          : category.name.toLowerCase();
+
+      const q = query(
+        collection(db, "listings"),
+        where("category", "==", categoryName)
       );
+
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const count = querySnapshot.size;
+        // Update the specific category count
+        categories.value[index].count = count;
+      });
+
+      // Store the unsubscribe function
+      categoriesUnsubscribes.push(unsubscribe);
     });
   } catch (error) {
-    console.error("Error fetching electronics count:", error);
+    console.error("Error fetching category counts:", error);
   }
 };
 
@@ -81,10 +134,6 @@ const fetchProducts = () => {
 function viewListing(id) {
   router.push({ name: "listing-details", params: { id } });
 }
-
-// const callSeller = (phoneNumber) => {
-//   window.location.href = `tel:${phoneNumber}`;
-// };
 
 // Load favorites from localStorage when component mounts
 const loadFavorites = () => {
@@ -123,22 +172,19 @@ watch(
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
-  fetchElectronicsCount();
+  fetchAllCategoryCounts(); // Replace fetchelectronicsCount with new function
   loadFavorites();
-
-  // Load favorites from localStorage
-  //   const savedFavorites = localStorage.getItem("favorites");
-  //   if (savedFavorites) {
-  //     favorites.value = JSON.parse(savedFavorites);
-  //   }
 });
 
 onUnmounted(() => {
+  // Clean up all listeners
   if (unsubscribe) {
     unsubscribe();
   }
-  if (electronicsUnsubscribe) {
-    electronicsUnsubscribe();
+
+  // Clean up category listeners
+  if (categoriesUnsubscribes.length > 0) {
+    categoriesUnsubscribes.forEach((unsubscribe) => unsubscribe());
   }
 });
 
@@ -213,6 +259,7 @@ function initializeScrollAnimations() {
               </span>
               <button
                 class="absolute right-2 top-2 bg-green-700 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors shadow"
+                @click="$router.push(`/listings?query=${searchQuery}`)"
               >
                 Search
               </button>
@@ -222,20 +269,19 @@ function initializeScrollAnimations() {
       </div>
 
       <!-- Categories -->
-      <!-- Categories -->
       <div class="py-12 bg-white">
         <div class="container mx-auto px-4">
           <h2 class="text-2xl font-bold mb-8 animate-on-scroll">
             Popular Categories
           </h2>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
             <div
               v-for="(category, index) in categories"
               :key="category.id"
               class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer animate-on-scroll relative"
               :class="`delay-${index % 3}`"
-              @click="category.isValid ? $router.push(category.url) : null"
+              @click="navigateToCategory(category)"
             >
               <span class="text-3xl mb-2">{{ category.icon }}</span>
               <h3 class="font-medium text-gray-800 text-center">
@@ -291,7 +337,6 @@ function initializeScrollAnimations() {
             :listings="listings || []"
             :loading="loading"
             v-model:searchQuery="searchQuery"
-            v-model:selectedCategory="selectedCategory"
             @viewListing="viewListing"
             :showSort="false"
             :showHeader="false"

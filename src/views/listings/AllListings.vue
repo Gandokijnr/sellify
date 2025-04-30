@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted, ref, computed, onUnmounted } from "vue";
+import { onMounted, ref, computed, onUnmounted, watch } from "vue";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import ListingsGrid from "@/components/listings/ListingsGrid.vue";
 import CategoriesFilter from "@/components/listings/CategoriesFilter.vue";
 import SearchHeader from "@/components/listings/SearchHeader.vue";
@@ -12,6 +12,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useToast } from "vue-toastification";
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 const authStore = useAuthStore();
 const listings = ref([]);
@@ -20,17 +21,43 @@ const searchQuery = ref("");
 const selectedCategory = ref("All");
 const userProfile = ref(null);
 
+onMounted(() => {
+  const categoryParam = route.query.category;
+  if (categoryParam) {
+    selectedCategory.value = categoryParam;
+  }
+
+  // Get search query from URL if present
+  const queryParam = route.query.query;
+  if (queryParam) {
+    searchQuery.value = queryParam;
+  }
+});
+
+// Watch for route changes to update filters
+watch(
+  () => route.query,
+  (newQuery) => {
+    if (newQuery.category) {
+      selectedCategory.value = newQuery.category;
+    }
+    if (newQuery.query) {
+      searchQuery.value = newQuery.query;
+    }
+  }
+);
+
 // Store the unsubscribe function for cleanup
 let unsubscribe = null;
 
 const categories = ref([
-  { id: 1, name: "All", icon: "📦" },
-  { id: 2, name: "Electronics", icon: "📱" },
-  { id: 3, name: "Vehicles", icon: "🚗" },
-  { id: 4, name: "Property", icon: "🏠" },
-  { id: 5, name: "Fashion", icon: "👕" },
-  { id: 6, name: "Furniture", icon: "🛋️" },
-  { id: 7, name: "Jobs", icon: "💼" },
+  { id: 1, name: "All", label: "All", icon: "📦" },
+  { id: 2, name: "electronics", label: "Electronics", icon: "📱" },
+  { id: 3, name: "vehicles", label: "Vehicles", icon: "🚗" },
+  { id: 4, name: "property", label: "Property", icon: "🏠" },
+  { id: 5, name: "fashion", label: "Fashion", icon: "👕" },
+  { id: 6, name: "furniture", label: "Furniture", icon: "🛋️" },
+  { id: 7, name: "jobs", label: "Jobs", icon: "💼" },
 ]);
 
 const fetchUserProfile = async () => {
@@ -62,7 +89,7 @@ const fetchProducts = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log("Listings updated in real-time" + unsubscribe);
+      console.log("Listings updated in real-time");
     });
   } catch (error) {
     console.error("Failed to set up real-time listener:", error);
@@ -81,6 +108,34 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubscribe) {
     unsubscribe();
+  }
+});
+
+// Update URL when filters change
+watch(selectedCategory, (newCategory) => {
+  // Update URL with new category
+  router.replace({
+    query: {
+      ...route.query,
+      category: newCategory !== "All" ? newCategory : undefined,
+    },
+  });
+});
+
+watch(searchQuery, (newQuery) => {
+  // Debounce search query updates to URL
+  if (newQuery) {
+    router.replace({
+      query: {
+        ...route.query,
+        query: newQuery,
+      },
+    });
+  } else if (route.query.query) {
+    // Remove query param if search is cleared
+    const newQuery = { ...route.query };
+    delete newQuery.query;
+    router.replace({ query: newQuery });
   }
 });
 
@@ -157,8 +212,14 @@ function initializeScrollAnimations() {
             <div class="relative max-w-xl animate-on-scroll delay-2">
               <SearchHeader
                 v-model:searchQuery="searchQuery"
-                title="Browse All Listings"
-                description="Discover thousands of products and services across Nigeria"
+                :title="
+                  selectedCategory === 'All'
+                    ? 'Browse All Listings'
+                    : `Browse ${selectedCategory} Listings`
+                "
+                :description="`Discover thousands of products and services across Nigeria${
+                  selectedCategory !== 'All' ? ' in ' + selectedCategory : ''
+                }`"
               />
             </div>
           </div>

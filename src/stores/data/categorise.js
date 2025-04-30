@@ -1,121 +1,230 @@
-// data/categories.js
-export default {
-    'Electronics': {
-      'Mobile Phones': {
-        'Smartphones': ['Android', 'iOS', 'Windows', 'Other'],
-        'Feature Phones': ['Basic', 'Senior-friendly'],
-        'Accessories': ['Cases', 'Chargers', 'Screen Protectors', 'Headphones', 'Power Banks']
-      },
-      'Computers': {
-        'Laptops': ['Gaming', 'Business', 'Ultrabooks', 'Chromebooks', 'MacBooks'],
-        'Desktops': ['Gaming PCs', 'All-in-Ones', 'Workstations', 'Mini PCs'],
-        'Components': ['Processors', 'Graphics Cards', 'Storage', 'Memory', 'Motherboards', 'Power Supplies']
-      },
-      'Audio & Video': {
-        'TVs': ['LED', 'OLED', 'QLED', 'Smart TVs', '4K/8K'],
-        'Speakers': ['Bluetooth', 'Soundbars', 'Home Theater', 'Portable'],
-        'Headphones': ['Over-ear', 'In-ear', 'Wireless', 'Noise-cancelling']
-      }
-    },
-    'Fashion': {
-      'Women\'s Clothing': {
-        'Tops': ['T-shirts', 'Blouses', 'Sweaters', 'Hoodies', 'Tank Tops'],
-        'Bottoms': ['Jeans', 'Skirts', 'Shorts', 'Trousers', 'Leggings'],
-        'Dresses': ['Casual', 'Formal', 'Party', 'Maxi', 'Mini'],
-        'Outerwear': ['Jackets', 'Coats', 'Blazers', 'Cardigans']
-      },
-      'Men\'s Clothing': {
-        'Tops': ['T-shirts', 'Shirts', 'Polos', 'Sweaters', 'Hoodies'],
-        'Bottoms': ['Jeans', 'Trousers', 'Shorts', 'Chinos', 'Track Pants'],
-        'Suits': ['Business', 'Formal', 'Casual', 'Tuxedos'],
-        'Outerwear': ['Jackets', 'Coats', 'Blazers', 'Vests']
-      },
-      'Accessories': {
-        'Bags': ['Handbags', 'Backpacks', 'Wallets', 'Totes', 'Luggage'],
-        'Jewelry': ['Necklaces', 'Earrings', 'Bracelets', 'Rings', 'Watches'],
-        'Footwear': ['Sneakers', 'Heels', 'Boots', 'Sandals', 'Flats', 'Loafers']
-      }
-    },
-    'Furniture': {
-      'Living Room': {
-        'Seating': ['Sofas', 'Armchairs', 'Recliners', 'Sectionals', 'Loveseats'],
-        'Tables': ['Coffee Tables', 'Side Tables', 'Console Tables', 'TV Stands'],
-        'Storage': ['Bookcases', 'Cabinets', 'Shelves', 'Entertainment Centers']
-      },
-      'Bedroom': {
-        'Beds': ['Single', 'Double', 'Queen', 'King', 'Bunk Beds', 'Platform Beds'],
-        'Storage': ['Dressers', 'Wardrobes', 'Nightstands', 'Chests of Drawers'],
-        'Mattresses': ['Spring', 'Memory Foam', 'Hybrid', 'Latex', 'Adjustable']
-      },
-      'Dining Room': {
-        'Tables': ['Dining Tables', 'Kitchen Tables', 'Extendable Tables', 'Bar Tables'],
-        'Seating': ['Dining Chairs', 'Benches', 'Bar Stools', 'Counter Stools'],
-        'Storage': ['Sideboards', 'Buffets', 'China Cabinets', 'Wine Racks']
-      },
-      'Office': {
-        'Desks': ['Computer Desks', 'Writing Desks', 'Standing Desks', 'Corner Desks'],
-        'Chairs': ['Office Chairs', 'Ergonomic Chairs', 'Task Chairs', 'Executive Chairs'],
-        'Storage': ['Filing Cabinets', 'Bookcases', 'Shelving Units', 'Credenzas']
-      }
-    },
-    'Real Estate': {
-      'Residential': {
-        'For Sale': ['Houses', 'Apartments', 'Condos', 'Townhouses', 'Land', 'Villas'],
-        'For Rent': ['Apartments', 'Houses', 'Rooms', 'Condos', 'Studios', 'Vacation Rentals'],
-        'Short-term': ['Holiday Homes', 'Serviced Apartments', 'Guesthouses']
-      },
-      'Commercial': {
-        'Offices': ['Small', 'Medium', 'Large', 'Co-working Spaces', 'Executive Suites'],
-        'Retail': ['Shops', 'Malls', 'Storefronts', 'Pop-up Stores', 'Food Courts'],
-        'Industrial': ['Warehouses', 'Factories', 'Workshops', 'Distribution Centers']
-      },
-      'Land': {
-        'Residential Lots': ['Urban', 'Suburban', 'Rural', 'Waterfront'],
-        'Commercial Lots': ['City Center', 'Industrial Zone', 'Retail Zone', 'Mixed Use'],
-        'Agricultural': ['Farms', 'Ranches', 'Orchards', 'Vineyards']
-      }
-    },
-    'Vehicles': {
-      'Cars': {
-        'Sedans': ['Compact', 'Midsize', 'Full-size', 'Luxury', 'Sports'],
-        'SUVs': ['Compact', 'Midsize', 'Full-size', 'Luxury', 'Off-road'],
-        'Hatchbacks': ['Compact', 'Subcompact', 'Hot Hatch', 'Electric'],
-        'Trucks': ['Pickup', 'Commercial', 'Heavy Duty', 'Light Duty']
-      },
-      'Motorcycles': {
-        'Sport': ['600cc', '1000cc', 'Superbikes', 'Sport Touring'],
-        'Cruisers': ['Classic', 'Power Cruisers', 'Touring', 'Bagger'],
-        'Off-road': ['Dirt Bikes', 'Adventure', 'Motocross', 'Enduro'],
-        'Scooters': ['Urban', 'Maxi', 'Electric', 'Touring']
-      },
-      'Commercial': {
-        'Vans': ['Cargo', 'Passenger', 'Minivans', 'Conversion'],
-        'Trucks': ['Box Trucks', 'Semi-trucks', 'Dump Trucks', 'Flatbeds'],
-        'Buses': ['School', 'Transit', 'Coach', 'Minibus']
-      }
-    },
-    'Jobs': {
-      'Full-time': {
-        'Tech': ['Software Developer', 'IT Support', 'Data Analyst', 'Product Manager', 'UX Designer'],
-        'Healthcare': ['Nurse', 'Doctor', 'Medical Assistant', 'Therapist', 'Pharmacist'],
-        'Finance': ['Accountant', 'Financial Analyst', 'Investment Banker', 'Auditor', 'Tax Specialist'],
-        'Education': ['Teacher', 'Professor', 'Tutor', 'Administrator', 'Counselor']
-      },
-      'Part-time': {
-        'Retail': ['Sales Associate', 'Cashier', 'Store Manager', 'Visual Merchandiser'],
-        'Hospitality': ['Server', 'Bartender', 'Hotel Staff', 'Barista', 'Host/Hostess'],
-        'Administrative': ['Receptionist', 'Data Entry', 'Office Assistant', 'Customer Service']
-      },
-      'Remote': {
-        'Development': ['Web Developer', 'Mobile Developer', 'DevOps Engineer', 'QA Tester'],
-        'Design': ['Graphic Designer', 'UI/UX Designer', 'Illustrator', 'Motion Designer'],
-        'Writing': ['Content Writer', 'Copywriter', 'Technical Writer', 'Editor', 'Translator'],
-        'Marketing': ['Social Media Manager', 'SEO Specialist', 'Digital Marketer', 'Affiliate Marketer']
-      },
-      'Freelance': {
-        'Creative': ['Photographer', 'Videographer', 'Animator', 'Voice Actor'],
-        'Professional': ['Consultant', 'Legal Services', 'Accounting', 'Project Management'],
-        'Technical': ['Programming', 'IT Support', 'Database Administration', 'System Administration']
-      }
-    }
+/**
+ * Hierarchical category structure for the marketplace.
+ * This structure supports up to three levels of categorization:
+ * - Main Category (e.g., "Electronics")
+ * - Subcategory (e.g., "Mobile Phones")
+ * - Sub-subcategory (e.g., "Android Phones")
+ *
+ * Format: {
+ *   MainCategory: {
+ *     Subcategory1: [SubSubCategory1, SubSubCategory2, ...],
+ *     Subcategory2: [SubSubCategory1, SubSubCategory2, ...],
+ *   }
+ * }
+ */
+
+const categoryStructure = {
+  Electronics: {
+    "Mobile Phones": [
+      "Android Phones",
+      "iPhones",
+      "Feature Phones",
+      "Accessories",
+    ],
+    Computers: ["Laptops", "Desktops", "Tablets", "Accessories"],
+    "TV & Audio": [
+      "Televisions",
+      "Home Theater",
+      "Audio Systems",
+      "Accessories",
+    ],
+    Cameras: [
+      "Digital Cameras",
+      "DSLR Cameras",
+      "Video Cameras",
+      "Accessories",
+    ],
+    "Home Appliances": [
+      "Kitchen Appliances",
+      "Washing Machines",
+      "Air Conditioners",
+      "Refrigerators",
+    ],
+  },
+  Vehicles: {
+    Cars: ["Sedan", "SUV", "Truck", "Van", "Convertible"],
+    Motorcycles: ["Sport Bikes", "Cruisers", "Scooters", "Off-Road"],
+    "Commercial Vehicles": ["Buses", "Trucks", "Tractors", "Trailers"],
+    Watercraft: ["Boats", "Jet Skis", "Yachts"],
+    "Vehicle Parts": ["Car Parts", "Motorcycle Parts", "Commercial Parts"],
+  },
+  "Real Estate": {
+    "Houses & Apartments For Sale": [
+      "Houses",
+      "Apartments",
+      "Land",
+      "Commercial Property",
+    ],
+    "Houses & Apartments For Rent": [
+      "Houses",
+      "Apartments",
+      "Short Lets",
+      "Roommates",
+    ],
+    Land: [
+      "Residential Land",
+      "Commercial Land",
+      "Industrial Land",
+      "Agricultural Land",
+    ],
+    "Commercial Property": [
+      "Office Space",
+      "Shop Space",
+      "Warehouses",
+      "Event Centers",
+    ],
+  },
+  Fashion: {
+    Clothing: ["Men's Clothing", "Women's Clothing", "Children's Clothing"],
+    Footwear: ["Men's Footwear", "Women's Footwear", "Children's Footwear"],
+    Bags: ["Handbags", "Backpacks", "Travel Bags", "Wallets"],
+    Jewelry: ["Necklaces", "Rings", "Earrings", "Bracelets"],
+    Watches: [
+      "Men's Watches",
+      "Women's Watches",
+      "Smart Watches",
+      "Luxury Watches",
+    ],
+  },
+  Jobs: {
+    "Full-time": [
+      "IT & Software",
+      "Marketing",
+      "Sales",
+      "Administrative",
+      "Engineering",
+    ],
+    "Part-time": ["Retail", "Hospitality", "Education", "Customer Service"],
+    Contract: [
+      "Project Management",
+      "Consulting",
+      "Construction",
+      "Healthcare",
+    ],
+    Internships: ["Student Internships", "Graduate Internships"],
+    "Remote Work": [
+      "Remote IT",
+      "Remote Writing",
+      "Remote Administrative",
+      "Remote Customer Support",
+    ],
+  },
+  Services: {
+    "Home Services": ["Cleaning", "Repairs", "Gardening", "Construction"],
+    "Professional Services": [
+      "Legal",
+      "Accounting",
+      "Consulting",
+      "IT Support",
+    ],
+    "Health & Beauty": ["Salon", "Spa", "Fitness", "Healthcare"],
+    Events: [
+      "Wedding Planning",
+      "Birthday Parties",
+      "Corporate Events",
+      "Catering",
+    ],
+    Education: ["Tutoring", "Training Courses", "Coaching", "Workshops"],
+  },
+  Furniture: {
+    "Living Room": ["Sofas", "Tables", "TV Stands", "Bookshelves"],
+    Bedroom: ["Beds", "Mattresses", "Wardrobes", "Nightstands"],
+    "Kitchen & Dining": [
+      "Dining Tables",
+      "Chairs",
+      "Kitchen Cabinets",
+      "Bar Stools",
+    ],
+    "Office Furniture": [
+      "Desks",
+      "Office Chairs",
+      "Filing Cabinets",
+      "Bookshelves",
+    ],
+    "Outdoor Furniture": [
+      "Patio Sets",
+      "Garden Chairs",
+      "Hammocks",
+      "Outdoor Tables",
+    ],
+  },
+  Agriculture: {
+    Livestock: ["Cattle", "Poultry", "Fish Farming", "Other Animals"],
+    Crops: ["Grains", "Vegetables", "Fruits", "Cash Crops"],
+    "Farm Equipment": [
+      "Tractors",
+      "Ploughs",
+      "Harvesters",
+      "Irrigation Systems",
+    ],
+    "Farm Land": ["Agricultural Land", "Plantations", "Ranches"],
+    "Agricultural Services": ["Consulting", "Training", "Farm Management"],
+  },
+};
+
+export default categoryStructure;
+
+/**
+ * Function to convert nested category structure to a flat list of paths
+ * This is useful for displaying in dropdowns or when you need a flat list
+ * @returns {Array<string>} Array of category paths (e.g., ["Electronics > Mobile Phones > Android Phones"])
+ */
+export const getCategoryPaths = () => {
+  const paths = [];
+
+  Object.entries(categoryStructure).forEach(([mainCategory, subCategories]) => {
+    // Add main category
+    paths.push(mainCategory);
+
+    Object.entries(subCategories).forEach(([subCategory, subSubCategories]) => {
+      // Add main > sub
+      paths.push(`${mainCategory} > ${subCategory}`);
+
+      // Add main > sub > subsub
+      subSubCategories.forEach((subSubCategory) => {
+        paths.push(`${mainCategory} > ${subCategory} > ${subSubCategory}`);
+      });
+    });
+  });
+
+  return paths;
+};
+
+/**
+ * Function to parse a category path into its components
+ * @param {string} path - A category path string like "Electronics > Mobile Phones > Android Phones"
+ * @returns {Object} Object with mainCategory, subCategory, and subSubCategory fields
+ */
+export const parseCategoryPath = (path) => {
+  if (!path) return { mainCategory: "", subCategory: "", subSubCategory: "" };
+
+  const parts = path.split(" > ");
+  return {
+    mainCategory: parts[0] || "",
+    subCategory: parts[1] || "",
+    subSubCategory: parts[2] || "",
   };
+};
+
+/**
+ * Function to build a category path from components
+ * @param {Object} components - Object with mainCategory, subCategory, and subSubCategory fields
+ * @returns {string} A category path string
+ */
+export const buildCategoryPath = ({
+  mainCategory,
+  subCategory,
+  subSubCategory,
+}) => {
+  let path = mainCategory || "";
+
+  if (subCategory) {
+    path += ` > ${subCategory}`;
+
+    if (subSubCategory) {
+      path += ` > ${subSubCategory}`;
+    }
+  }
+
+  return path;
+};

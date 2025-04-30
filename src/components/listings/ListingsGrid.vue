@@ -45,6 +45,7 @@ const emit = defineEmits([
 ]);
 
 const localFavorites = ref([]);
+const sortOption = ref("newest");
 
 onMounted(() => {
   const savedFavorites = localStorage.getItem("favorites");
@@ -79,36 +80,102 @@ const toggleFavorite = (listingId, event) => {
 
 const filteredListings = computed(() => {
   let result = props.listings;
+
+  // Apply filters
   if (props.searchQuery) {
     result = result.filter((listing) =>
       listing.title.toLowerCase().includes(props.searchQuery.toLowerCase())
     );
   }
-  if (props.selectedCategory && props.selectedCategory !== "All") {
+  if (
+    props.selectedCategory &&
+    props.selectedCategory !== "all" &&
+    props.selectedCategory !== "All"
+  ) {
     result = result.filter(
-      (listing) => listing.category === props.selectedCategory
+      (listing) =>
+        listing.category.toLowerCase() === props.selectedCategory.toLowerCase()
     );
   }
-  return result;
+
+  // Apply sorting
+  const sorted = [...result];
+
+  switch (sortOption.value) {
+    case "newest":
+      // Assuming each listing has a createdAt property
+      sorted.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        return dateB - dateA; // Newest first
+      });
+      break;
+    case "price-low-high":
+      sorted.sort((a, b) => {
+        // Extract numeric price from different possible formats
+        const getNumericPrice = (price) => {
+          if (typeof price === "number") return price;
+          if (typeof price === "string") {
+            return parseFloat(price.replace(/[^\d.]/g, "")) || 0;
+          }
+          return 0; // Default for other cases
+        };
+
+        const priceA = getNumericPrice(a.price);
+        const priceB = getNumericPrice(b.price);
+        return priceA - priceB;
+      });
+      break;
+    case "price-high-low":
+      sorted.sort((a, b) => {
+        // Extract numeric price from different possible formats
+        const getNumericPrice = (price) => {
+          if (typeof price === "number") return price;
+          if (typeof price === "string") {
+            return parseFloat(price.replace(/[^\d.]/g, "")) || 0;
+          }
+          return 0; // Default for other cases
+        };
+
+        const priceA = getNumericPrice(a.price);
+        const priceB = getNumericPrice(b.price);
+        return priceB - priceA;
+      });
+      break;
+  }
+
+  return sorted;
 });
 
 const formatNumber = (num) => num?.toLocaleString() || "0";
+
+const handleSortChange = (event) => {
+  sortOption.value = event.target.value;
+};
 </script>
 
 <template>
   <div class="flex-1">
     <div v-if="showHeader" class="flex justify-between items-center mb-6">
       <h2 class="text-xl font-bold animate-on-scroll">
-        {{ selectedCategory === "All" ? "All Listings" : selectedCategory }}
+        {{
+          selectedCategory === "all" || selectedCategory === "All"
+            ? "All Listings"
+            : selectedCategory
+        }}
         <span class="text-sm font-normal text-gray-500 ml-2">
           ({{ formatNumber(filteredListings.length) }} items)
         </span>
       </h2>
       <div v-if="showSort" class="animate-on-scroll delay-1">
-        <select class="border rounded-lg px-3 py-2 text-sm focus:outline-none">
-          <option>Sort by: Newest</option>
-          <option>Sort by: Price (Low to High)</option>
-          <option>Sort by: Price (High to Low)</option>
+        <select
+          class="border rounded-lg px-3 py-2 text-sm focus:outline-none"
+          v-model="sortOption"
+          @change="handleSortChange"
+        >
+          <option value="newest">Sort by: Newest</option>
+          <option value="price-low-high">Sort by: Price (Low to High)</option>
+          <option value="price-high-low">Sort by: Price (High to Low)</option>
         </select>
       </div>
     </div>
@@ -153,7 +220,7 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
       <button
         @click="
           emit('update:searchQuery', '');
-          emit('update:selectedCategory', 'All');
+          emit('update:selectedCategory', 'all');
         "
         class="text-green-600 hover:text-green-700 font-medium"
       >
@@ -164,7 +231,7 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
     <!-- Listings Grid -->
     <div
       v-else
-      class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"
+      class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
     >
       <div
         v-for="listing in filteredListings"
@@ -253,7 +320,6 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
               v-if="showCallSeller"
               class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
               @click.stop="emit('callSeller', listing.phoneNumber)"
-              
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
