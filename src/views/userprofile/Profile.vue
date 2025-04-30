@@ -95,7 +95,7 @@
             </div>
 
             <div class="w-full md:w-2/3">
-              <!-- <div
+              <div
                 class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6"
                 v-if="!profileData.isProfileComplete"
               >
@@ -120,12 +120,12 @@
                     </p>
                   </div>
                 </div>
-              </div> -->
+              </div>
 
-              <!-- <div class="text-sm font-medium text-gray-500 mb-4">
+              <div class="text-sm font-medium text-gray-500 mb-4">
                 Account created on
                 {{ formatDate(authStore.user?.metadata?.creationTime) }}
-              </div> -->
+              </div>
 
               <div class="flex gap-4">
                 <button
