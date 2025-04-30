@@ -252,7 +252,8 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
             <button
               v-if="showCallSeller"
               class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
-              @click.stop="emit('callSeller', listing.phone)"
+              @click.stop="emit('callSeller', listing.phoneNumber)"
+              
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

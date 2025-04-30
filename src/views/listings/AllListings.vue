@@ -62,7 +62,7 @@ const fetchProducts = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log("Listings updated in real-time");
+      console.log("Listings updated in real-time" + unsubscribe);
     });
   } catch (error) {
     console.error("Failed to set up real-time listener:", error);
