@@ -163,7 +163,7 @@ onMounted(() => {
               <img
                 :src="listing.images[activeImage]"
                 :alt="listing.title"
-                class="w-full h-full object-contain"
+                class="w-full h-full object-cover"
               />
             </div>
 
