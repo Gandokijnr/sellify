@@ -225,7 +225,7 @@ const handleGoogleSignIn = async () => {
     await authStore.handleGoogleSignIn(isMobile);
 
     if (!isMobile) {
-      toast.success("Welcome to selify!");
+      // toast.success("Welcome to selify!");
       router.push("/");
     }
   } catch (err) {

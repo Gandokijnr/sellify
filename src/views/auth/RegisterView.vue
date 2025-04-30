@@ -98,7 +98,7 @@ const handleEmailRegister = async () => {
       lastName: form.value.lastName,
     });
 
-    toast.success("Welcome to selify!");
+    // toast.success("Welcome to selify!");
 
     router.push("/");
   } catch (error) {
