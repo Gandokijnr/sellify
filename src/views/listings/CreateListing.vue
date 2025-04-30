@@ -471,7 +471,7 @@ onMounted(() => {
                 <label
                   class="px-4 py-2 bg-jiji-primary text-white rounded-lg cursor-pointer hover:bg-jiji-primary-dark transition-colors"
                 >
-                  <span>Select Files</span>
+                  <span class="text-gray-400">Select Files</span>
                   <input
                     type="file"
                     multiple
