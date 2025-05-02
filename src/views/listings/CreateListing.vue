@@ -25,6 +25,12 @@ const selectedState = ref("");
 const selectedLGA = ref("");
 const selectedLocation = ref("");
 
+const areRequiredFieldsFilled = computed(() => {
+  return categoryFields.value
+    .filter((field) => field.required)
+    .every((field) => !!form[field.name]);
+});
+
 // Available options for dropdowns
 const availableStates = ref(Object.keys(nigeriaLocations));
 const availableLGAs = computed(() => {
@@ -891,7 +897,6 @@ onMounted(() => {
                 type="button"
                 @click="goToStep('location')"
                 class="px-6 py-2 bg-green-900 text-white rounded-lg hover:bg-jiji-primary-dark transition-colors"
-                :disabled="!form.title || !form.price"
               >
                 Continue
               </button>
