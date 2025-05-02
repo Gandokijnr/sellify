@@ -1,13 +1,8 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
-import {
-  collection,
-  onSnapshot,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { onMounted, computed, onUnmounted, ref, watch } from "vue";
+import { collection, onSnapshot } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
+import CategoryGrid from "@/components/categories/CategoryGrid.vue"; // Import the new component
 
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
@@ -22,176 +17,6 @@ const searchQuery = ref("");
 const favorites = ref([]);
 const authStore = useAuthStore();
 let unsubscribe = null;
-let categoriesUnsubscribes = []; // Array to store all category unsubscribe functions
-
-// Updated categories with proper route paths and new order
-const categories = ref([
-  {
-    id: 1,
-    name: "Mobile Phones",
-    icon: "📱",
-    count: 0,
-    isValid: true,
-    url: "/listings?subcategory=mobile phones",
-  },
-  {
-    id: 2,
-    name: "Laptops",
-    icon: "💻",
-    count: 0,
-    isValid: true,
-    url: "/listings?leafCategory=laptops",
-  },
-  {
-    id: 3,
-    name: "Land For Sale",
-    icon: "🏞️",
-    count: 0,
-    isValid: true,
-    url: "/listings?subcategory=land for sale",
-  },
-  {
-    id: 4,
-    name: "House For Rent",
-    icon: "🏠",
-    count: 0,
-    isValid: true,
-    url: "/listings?subcategory=house for rent",
-  },
-  {
-    id: 5,
-    name: "Jobs",
-    icon: "💼",
-    count: 0,
-    isValid: true,
-    url: "/listings?category=jobs",
-  },
-  {
-    id: 6,
-    name: "Vehicles",
-    icon: "🚗",
-    count: 0,
-    isValid: true,
-    url: "/listings?category=vehicles",
-  },
-  {
-    id: 7,
-    name: "Clothing",
-    icon: "👕",
-    count: 0,
-    isValid: true,
-    url: "/listings?subcategory=clothing",
-  },
-]);
-
-// Function to navigate to category listings
-const navigateToCategory = (category) => {
-  if (category.isValid) {
-    router.push(category.url);
-  }
-};
-
-// Function to fetch counts for all categories
-const fetchAllCategoryCounts = async () => {
-  try {
-    if (categoriesUnsubscribes.length > 0) {
-      categoriesUnsubscribes.forEach((unsubscribe) => unsubscribe());
-      categoriesUnsubscribes = [];
-    }
-
-    for (let i = 0; i < categories.value.length; i++) {
-      const category = categories.value[i];
-      const categoryMapping = {
-        "Mobile Phones": "Mobile Phones",
-        Laptops: "Laptops",
-        "Land For Sale": "land for sale",
-        "House For Rent": "house for rent",
-        Jobs: "Jobs",
-        Vehicles: "Vehicles",
-        Clothing: "Clothing",
-      };
-
-      const categoryValue = categoryMapping[category.name];
-
-      const updateCategoryCount = () => {
-        const fetchInitialData = async () => {
-          const uniqueDocIds = new Set();
-
-          // Get subCategory results
-          const qSubCategory = query(
-            collection(db, "listings"),
-            where("subCategory", "==", categoryValue)
-          );
-          const subCategorySnapshot = await getDocs(qSubCategory);
-          subCategorySnapshot.docs.forEach((doc) => uniqueDocIds.add(doc.id));
-
-          // Get leafCategory results
-          const qLeafCategory = query(
-            collection(db, "listings"),
-            where("leafCategory", "==", categoryValue)
-          );
-          const leafCategorySnapshot = await getDocs(qLeafCategory);
-          leafCategorySnapshot.docs.forEach((doc) => uniqueDocIds.add(doc.id));
-
-          // Update count
-          categories.value[i].count = uniqueDocIds.size;
-          console.log(`${category.name} initial count: ${uniqueDocIds.size}`);
-        };
-
-        fetchInitialData();
-
-        const uniqueDocIds = new Set();
-
-        // Listen for subCategory changes
-        const subCategoryUnsubscribe = onSnapshot(
-          query(
-            collection(db, "listings"),
-            where("subCategory", "==", categoryValue)
-          ),
-          (snapshot) => {
-            // Process updates and removals
-            snapshot.docChanges().forEach((change) => {
-              if (change.type === "added" || change.type === "modified") {
-                uniqueDocIds.add(change.doc.id);
-              } else if (change.type === "removed") {
-                uniqueDocIds.delete(change.doc.id);
-              }
-            });
-            categories.value[i].count = uniqueDocIds.size;
-          }
-        );
-
-        // Listen for leafCategory changes
-        const leafCategoryUnsubscribe = onSnapshot(
-          query(
-            collection(db, "listings"),
-            where("leafCategory", "==", categoryValue)
-          ),
-          (snapshot) => {
-            // Process updates and removals
-            snapshot.docChanges().forEach((change) => {
-              if (change.type === "added" || change.type === "modified") {
-                uniqueDocIds.add(change.doc.id);
-              } else if (change.type === "removed") {
-                uniqueDocIds.delete(change.doc.id);
-              }
-            });
-            categories.value[i].count = uniqueDocIds.size;
-          }
-        );
-
-        // Store unsubscribe functions
-        categoriesUnsubscribes.push(subCategoryUnsubscribe);
-        categoriesUnsubscribes.push(leafCategoryUnsubscribe);
-      };
-
-      // Execute the function for this category
-      updateCategoryCount();
-    }
-  } catch (error) {
-    console.error("Error fetching category counts:", error);
-  }
-};
 
 const fetchProducts = () => {
   loading.value = true;
@@ -251,19 +76,14 @@ watch(
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
-  fetchAllCategoryCounts(); // Replace fetchelectronicsCount with new function
   loadFavorites();
+  // Note: Category fetching is now handled by the CategoryGrid component
 });
 
 onUnmounted(() => {
-  // Clean up all listeners
+  // Clean up listeners
   if (unsubscribe) {
     unsubscribe();
-  }
-
-  // Clean up category listeners
-  if (categoriesUnsubscribes.length > 0) {
-    categoriesUnsubscribes.forEach((unsubscribe) => unsubscribe());
   }
 });
 
@@ -347,38 +167,12 @@ function initializeScrollAnimations() {
         </div>
       </div>
 
-      <!-- Categories -->
-      <div class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-          <h2 class="text-2xl font-bold mb-8 animate-on-scroll">
-            Popular Categories
-          </h2>
-
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
-            <div
-              v-for="(category, index) in categories"
-              :key="category.id"
-              class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer animate-on-scroll relative"
-              :class="`delay-${index % 3}`"
-              @click="navigateToCategory(category)"
-            >
-              <span class="text-3xl mb-2">{{ category.icon }}</span>
-              <h3 class="font-medium text-gray-800 text-center">
-                {{ category.name }}
-              </h3>
-              <p class="text-sm text-gray-500 mt-1">
-                {{ formatNumber(category.count) }} ads
-              </p>
-              <div
-                v-if="!category.isValid"
-                class="absolute opacity-90 top-0 left-0 right-0 bg-amber-100 text-amber-800 text-xs font-medium text-center py-1 rounded-t-xl"
-              >
-                Coming Soon
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Categories - Now using the CategoryGrid component -->
+      <CategoryGrid
+        title="Popular Categories"
+        :showCounts="true"
+        containerClass="py-12 bg-white"
+      />
 
       <!-- Featured Listings -->
       <div class="py-12">
