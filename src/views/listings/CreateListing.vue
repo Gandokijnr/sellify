@@ -10,15 +10,15 @@ import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "vue-toastification";
 import nigeriaLocations from "@/stores/location";
-import CategorySelector from '@/components/categories/CategorySelector.vue';
-import categoriesData from '@/stores/data/categorise';
+import CategorySelector from "@/components/categories/CategorySelector.vue";
+import categoriesData from "@/stores/data/categorise";
 
 const router = useRouter();
 const isLoading = ref(false);
 const errorMessage = ref("");
 const authStore = useAuthStore();
 const toast = useToast();
-const currentStep = ref('category'); // Start with category selection step
+const currentStep = ref("category"); // Start with category selection step
 
 // Location-related refs
 const selectedState = ref("");
@@ -63,113 +63,325 @@ const fullLocation = computed(() => {
   return locationParts.join(", ");
 });
 
+// Enhanced category structure
+const categoryStructure = reactive({
+  mainCategory: "",
+  subCategory: "",
+  subSubCategory: "",
+  leafCategory: "",
+});
+
+// For displaying the full category path
+const displayCategoryPath = computed(() => {
+  const parts = [];
+  if (categoryStructure.mainCategory)
+    parts.push(categoryStructure.mainCategory);
+  if (categoryStructure.subCategory) parts.push(categoryStructure.subCategory);
+  if (categoryStructure.subSubCategory)
+    parts.push(categoryStructure.subSubCategory);
+  if (categoryStructure.leafCategory)
+    parts.push(categoryStructure.leafCategory);
+  return parts.join(" > ");
+});
+
+// Check if we've reached a leaf category
+const isLeafCategorySelected = computed(() => {
+  // Logic to determine if we're at a leaf node in the category hierarchy
+  if (!categoryStructure.mainCategory) return false;
+
+  const mainCat = categoriesData[categoryStructure.mainCategory];
+  if (!mainCat) return false;
+
+  if (!categoryStructure.subCategory) return false;
+  const subCat = mainCat[categoryStructure.subCategory];
+  if (!subCat) return false;
+
+  // If subCategory is an array, it means we've reached leaf level
+  if (Array.isArray(subCat)) {
+    return categoryStructure.leafCategory !== "";
+  }
+
+  // Otherwise, check if subSubCategory exists and is a leaf
+  if (!categoryStructure.subSubCategory) return false;
+  const subSubCat = subCat[categoryStructure.subSubCategory];
+  if (!subSubCat) return false;
+
+  // If we have array at subSubCategory level, check for leafCategory
+  if (Array.isArray(subSubCat)) {
+    return categoryStructure.leafCategory !== "";
+  }
+
+  return false;
+});
+
 const form = reactive({
   title: "",
   description: "",
   price: "",
-  category: "",
   condition: "used",
   location: "",
   images: [],
-  
+
+  // Category fields stored separately
+  mainCategory: "",
+  subCategory: "",
+  subSubCategory: "",
+  leafCategory: "",
+
   // Category-specific fields
   // Electronics
   brand: "",
   model: "",
   specifications: "",
-  
+
   // Real Estate
   propertySize: "",
   bedrooms: "",
   bathrooms: "",
-  
+
   // Vehicles
   year: "",
   mileage: "",
   transmission: "",
   fuelType: "",
-  
+
   // Fashion
   size: "",
   color: "",
   material: "",
-  
+
   // Furniture
   dimensions: "",
   material: "",
   style: "",
-  
+
   // Jobs
   salary: "",
   employmentType: "",
   experienceLevel: "",
 });
 
+const updateCategoryStructure = (structuredCategory) => {
+  // Update the structure with the values from the component
+  categoryStructure.mainCategory = structuredCategory.mainCategory || "";
+  categoryStructure.subCategory = structuredCategory.subCategory || "";
+  categoryStructure.subSubCategory = structuredCategory.subSubCategory || "";
+  categoryStructure.leafCategory = structuredCategory.leafCategory || "";
+};
+
+// Update form's category fields when categoryStructure changes
+watch(
+  categoryStructure,
+  (newValue) => {
+    form.mainCategory = newValue.mainCategory;
+    form.subCategory = newValue.subCategory;
+    form.subSubCategory = newValue.subSubCategory;
+    form.leafCategory = newValue.leafCategory;
+  },
+  { deep: true }
+);
+
 // Fields to display based on main category
 const categoryFields = computed(() => {
-  if (!form.category) return [];
-  
-  const mainCategory = form.category.split(' > ')[0];
-  
-  switch (mainCategory) {
-    case 'Electronics':
+  if (!form.mainCategory) return [];
+
+  switch (form.mainCategory) {
+    case "Electronics":
       return [
-        { name: 'brand', label: 'Brand', type: 'text', required: true },
-        { name: 'model', label: 'Model', type: 'text', required: true },
-        { name: 'specifications', label: 'Specifications', type: 'textarea', required: false }
+        { name: "title", label: "Title", type: "text", required: true },
+        { name: "model", label: "Model", type: "text", required: true },
+        {
+          name: "specifications",
+          label: "Specifications",
+          type: "textarea",
+          required: false,
+        },
+        { name: "brand", label: "Brand", type: "text", required: true },
+        { name: "model", label: "Model", type: "text", required: true },
+        {
+          name: "specifications",
+          label: "Specifications",
+          type: "textarea",
+          required: false,
+        },
       ];
-    case 'Real Estate':
+    case "Real Estate":
       return [
-        { name: 'propertySize', label: 'Property Size (sqm)', type: 'number', required: true },
-        { name: 'bedrooms', label: 'Bedrooms', type: 'number', required: false },
-        { name: 'bathrooms', label: 'Bathrooms', type: 'number', required: false }
+        {
+          name: "property name",
+          label: "Property Name",
+          type: "text",
+          required: true,
+        },
+
+        {
+          name: "price",
+          label: "Price",
+          type: "number",
+          required: true,
+        },
+        {
+          name: "location",
+          label: "Location",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "propertySize",
+          label: "Property Size (sqm)",
+          type: "number",
+          required: true,
+        },
+        {
+          name: "bedrooms",
+          label: "Bedrooms",
+          type: "number",
+          required: false,
+        },
+        {
+          name: "bathrooms",
+          label: "Bathrooms",
+          type: "number",
+          required: false,
+        },
       ];
-    case 'Vehicles':
+    case "Vehicles":
       return [
-        { name: 'year', label: 'Year', type: 'number', required: true },
-        { name: 'mileage', label: 'Mileage', type: 'number', required: true },
-        { name: 'transmission', label: 'Transmission', type: 'select', 
-          options: ['Automatic', 'Manual', 'CVT', 'Semi-automatic'], required: true },
-        { name: 'fuelType', label: 'Fuel Type', type: 'select', 
-          options: ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG/LPG'], required: true }
+        {
+          name: "title",
+          label: "Title",
+          type: "text",
+          required: true,
+        },
+        { name: "price", label: "Price", type: "number", required: true },
+
+        { name: "model", label: "Model", type: "text", required: true },
+
+        { name: "brand", label: "Brand", type: "text", required: true },
+        { name: "year", label: "Year", type: "number", required: true },
+        { name: "mileage", label: "Mileage", type: "number", required: true },
+        {
+          name: "transmission",
+          label: "Transmission",
+          type: "select",
+          options: ["Automatic", "Manual", "CVT", "Semi-automatic"],
+          required: true,
+        },
+        {
+          name: "fuelType",
+          label: "Fuel Type",
+          type: "select",
+          options: ["Petrol", "Diesel", "Electric", "Hybrid", "CNG/LPG"],
+          required: true,
+        },
       ];
-    case 'Fashion':
+    case "Fashion":
       return [
-        { name: 'size', label: 'Size', type: 'text', required: true },
-        { name: 'color', label: 'Color', type: 'text', required: true },
-        { name: 'material', label: 'Material', type: 'text', required: false }
+        {
+          name: "title",
+          label: "Title",
+          type: "text",
+          required: true,
+        },
+        { name: "price", label: "Price", type: "number", required: true },
+        { name: "size", label: "Size", type: "text", required: true },
+        { name: "color", label: "Color", type: "text", required: true },
+        { name: "material", label: "Material", type: "text", required: false },
       ];
-    case 'Furniture':
+    case "Furniture":
       return [
-        { name: 'dimensions', label: 'Dimensions (L x W x H)', type: 'text', required: true },
-        { name: 'material', label: 'Material', type: 'text', required: true },
-        { name: 'style', label: 'Style', type: 'text', required: false }
+        {
+          name: "title",
+          label: "Title",
+          type: "text",
+          required: true,
+        },
+        { name: "price", label: "Price", type: "number", required: true },
+        {
+          name: "dimensions",
+          label: "Dimensions (L x W x H)",
+          type: "text",
+          required: true,
+        },
+        { name: "material", label: "Material", type: "text", required: true },
+        { name: "style", label: "Style", type: "text", required: false },
       ];
-    case 'Jobs':
+    case "Jobs":
       return [
-        { name: 'salary', label: 'Salary Range', type: 'text', required: false },
-        { name: 'employmentType', label: 'Employment Type', type: 'select', 
-          options: ['Full-time', 'Part-time', 'Contract', 'Temporary', 'Internship'], required: true },
-        { name: 'experienceLevel', label: 'Experience Level', type: 'select', 
-          options: ['Entry Level', 'Mid Level', 'Senior Level', 'Manager', 'Executive'], required: true }
+        {
+          name: "title",
+          label: "Job Title",
+          type: "text",
+          required: true,
+        },
+        { name: "description", label: "Job Description", type: "textarea" },
+        { name: "location", label: "Location", type: "text", required: true },
+
+        {
+          name: "salary",
+          label: "Salary Range",
+          type: "text",
+          required: false,
+        },
+        {
+          name: "employmentType",
+          label: "Employment Type",
+          type: "select",
+          options: [
+            "Full-time",
+            "Part-time",
+            "Contract",
+            "Temporary",
+            "Internship",
+          ],
+          required: true,
+        },
+        {
+          name: "experienceLevel",
+          label: "Experience Level",
+          type: "select",
+          options: [
+            "Entry Level",
+            "Mid Level",
+            "Senior Level",
+            "Manager",
+            "Executive",
+          ],
+          required: true,
+        },
       ];
     default:
       return [];
   }
 });
 
+// Add a computed property to determine if we should show the condition field
+const showConditionField = computed(() => {
+  // Categories where condition makes sense
+  const conditionCategories = [
+    "Electronics",
+    "Vehicles",
+    "Fashion",
+    "Furniture",
+    "Mobile Phones",
+    "Computers & Laptops",
+    "TV & DVD Equipment",
+    "Home Appliances",
+  ];
+
+  // Check if the main category or any subcategory contains these terms
+  return conditionCategories.some(
+    (category) =>
+      form.mainCategory.includes(category) ||
+      form.subCategory.includes(category) ||
+      form.subSubCategory.includes(category) ||
+      form.leafCategory.includes(category)
+  );
+});
+
 // Update form location when any location selection changes
 watch(fullLocation, (newLocation) => {
   form.location = newLocation;
-});
-
-// Watch for category changes and move to details step when category is selected
-watch(() => form.category, (newCategory) => {
-  if (newCategory && newCategory.split(' > ').length >= newCategory.length) {
-    currentStep.value = 'details';
-  } else {
-    currentStep.value = 'category';
-  }
 });
 
 const previewImages = ref([]);
@@ -251,14 +463,6 @@ const submitForm = async () => {
   }
 
   if (!authStore.user?.phoneNumber) {
-    // toast.error(
-    //   "Please update your phone number in your profile before creating listings",
-    //   {
-    //     timeout: 5000,
-    //     closeOnClick: false,
-    //     pauseOnFocusLoss: true,
-    //   }
-    // );
     router.push("/profile");
     return;
   }
@@ -272,12 +476,17 @@ const submitForm = async () => {
       throw new Error("Failed to upload images");
     }
 
-    // Create base listing data
+    // Create base listing data with separate category fields
     const listingData = {
       title: form.title,
       description: form.description,
       price: parseFloat(form.price),
-      category: form.category,
+      mainCategory: form.mainCategory,
+      subCategory: form.subCategory,
+      subSubCategory: form.subSubCategory,
+      leafCategory: form.leafCategory,
+      // Include full category path for easier querying/filtering
+      categoryPath: displayCategoryPath.value,
       condition: form.condition,
       location: form.location,
       images: imageUrls,
@@ -289,7 +498,7 @@ const submitForm = async () => {
     };
 
     // Add category-specific fields
-    categoryFields.value.forEach(field => {
+    categoryFields.value.forEach((field) => {
       if (form[field.name]) {
         listingData[field.name] = form[field.name];
       }
@@ -321,6 +530,14 @@ const submitForm = async () => {
 };
 
 const goToStep = (step) => {
+  // Only allow going to details if a leaf category is selected
+  if (step === "details" && !isLeafCategorySelected.value) {
+    toast.warning("Please select a specific category before continuing", {
+      timeout: 3000,
+    });
+    return;
+  }
+
   currentStep.value = step;
 };
 
@@ -343,6 +560,20 @@ const dropFiles = (e) => {
   e.currentTarget.classList.remove("border-jiji-primary", "bg-orange-50");
   const files = e.dataTransfer.files;
   handleImageUpload({ target: { files } });
+};
+
+// Handle category selection change
+const handleCategoryChange = (categoryPath) => {
+  if (!categoryPath) return;
+
+  // Split the full path into parts
+  const parts = categoryPath.split(" > ");
+
+  // Reset the category structure
+  categoryStructure.mainCategory = parts[0] || "";
+  categoryStructure.subCategory = parts[1] || "";
+  categoryStructure.subSubCategory = parts[2] || "";
+  categoryStructure.leafCategory = parts[3] || "";
 };
 
 onMounted(() => {
@@ -370,22 +601,54 @@ onMounted(() => {
         <!-- Progress Steps -->
         <div class="flex justify-between mb-8">
           <div class="flex flex-col items-center">
-            <div :class="`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'category' ? 'bg-green-900 text-white' : 'bg-gray-200'}`">1</div>
+            <div
+              :class="`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep === 'category'
+                  ? 'bg-green-900 text-white'
+                  : 'bg-gray-200'
+              }`"
+            >
+              1
+            </div>
             <span class="text-sm mt-1">Category</span>
           </div>
           <div class="flex-1 h-0.5 bg-gray-200 self-center mx-2"></div>
           <div class="flex flex-col items-center">
-            <div :class="`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'details' ? 'bg-green-900 text-white' : 'bg-gray-200'}`">2</div>
+            <div
+              :class="`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep === 'details'
+                  ? 'bg-green-900 text-white'
+                  : 'bg-gray-200'
+              }`"
+            >
+              2
+            </div>
             <span class="text-sm mt-1">Details</span>
           </div>
           <div class="flex-1 h-0.5 bg-gray-200 self-center mx-2"></div>
           <div class="flex flex-col items-center">
-            <div :class="`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'location' ? 'bg-green-900 text-white' : 'bg-gray-200'}`">3</div>
+            <div
+              :class="`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep === 'location'
+                  ? 'bg-green-900 text-white'
+                  : 'bg-gray-200'
+              }`"
+            >
+              3
+            </div>
             <span class="text-sm mt-1">Location</span>
           </div>
           <div class="flex-1 h-0.5 bg-gray-200 self-center mx-2"></div>
           <div class="flex flex-col items-center">
-            <div :class="`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === 'images' ? 'bg-green-900 text-white' : 'bg-gray-200'}`">4</div>
+            <div
+              :class="`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentStep === 'images'
+                  ? 'bg-green-900 text-white'
+                  : 'bg-gray-200'
+              }`"
+            >
+              4
+            </div>
             <span class="text-sm mt-1">Images</span>
           </div>
         </div>
@@ -402,19 +665,58 @@ onMounted(() => {
           <div v-if="currentStep === 'category'">
             <div class="mb-6">
               <h2 class="text-xl font-semibold mb-4">Select Category</h2>
-              <p class="text-gray-600 mb-4">What are you selling? Choose the right category for your item.</p>
+              <p class="text-gray-600 mb-4">
+                What are you selling? Choose the right category for your item.
+                Please select down to the most specific category.
+              </p>
+
               <CategorySelector
-                v-model="form.category"
+                v-model="displayCategoryPath"
                 :categories="categoriesData"
-                required
+                :required="true"
+                @selection-object="updateCategoryStructure"
               />
-              
+
               <!-- Display selected category -->
-              <div v-if="form.category" class="mt-4 text-sm text-gray-600">
-                Selected: <span class="font-medium">{{ form.category }}</span>
+              <div
+                v-if="displayCategoryPath"
+                class="mt-4 text-sm text-gray-600"
+              >
+                Selected:
+                <span class="font-medium">{{ displayCategoryPath }}</span>
+                <div v-if="!isLeafCategorySelected" class="mt-2 text-amber-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 inline-block mr-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Please select the most specific category before continuing
+                </div>
+                <div v-else class="mt-2 text-green-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 inline-block mr-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Category selection complete
+                </div>
               </div>
             </div>
-            
+
             <div class="flex justify-between mt-8">
               <button
                 type="button"
@@ -427,7 +729,7 @@ onMounted(() => {
                 type="button"
                 @click="goToStep('details')"
                 class="px-6 py-2 bg-green-900 text-white rounded-lg hover:bg-jiji-primary-dark transition-colors"
-                :disabled="!form.category"
+                :disabled="!isLeafCategorySelected"
               >
                 Continue
               </button>
@@ -438,10 +740,18 @@ onMounted(() => {
           <div v-if="currentStep === 'details'">
             <div class="mb-6">
               <h2 class="text-xl font-semibold mb-4">Product Details</h2>
-              
+
+              <!-- Selected Category Display -->
+              <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                <div class="text-sm text-gray-600">Category:</div>
+                <div class="font-medium">{{ displayCategoryPath }}</div>
+              </div>
+
               <!-- Title -->
-              <div class="mb-4">
-                <label for="title" class="block text-gray-700 font-medium mb-2">Title*</label>
+              <!-- <div class="mb-4">
+                <label for="title" class="block text-gray-700 font-medium mb-2"
+                  >Title*</label
+                >
                 <input
                   type="text"
                   id="title"
@@ -452,9 +762,11 @@ onMounted(() => {
                 />
               </div>
 
-              <!-- Price -->
-              <div class="mb-4">
-                <label for="price" class="block text-gray-700 font-medium mb-2">Price*</label>
+              <-- Price -->
+              <!-- <div class="mb-4">
+                <label for="price" class="block text-gray-700 font-medium mb-2"
+                  >Price*</label
+                >
                 <input
                   type="number"
                   id="price"
@@ -465,11 +777,13 @@ onMounted(() => {
                   step="0.01"
                   required
                 />
-              </div>
+              </div> -->
 
               <!-- Condition -->
-              <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-2">Condition</label>
+              <!-- <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2"
+                  >Condition</label
+                >
                 <div class="flex space-x-4">
                   <label class="inline-flex items-center">
                     <input
@@ -490,14 +804,21 @@ onMounted(() => {
                     <span class="ml-2">Used</span>
                   </label>
                 </div>
-              </div>
+              </div> -->
 
               <!-- Category-specific fields -->
-              <div v-for="field in categoryFields" :key="field.name" class="mb-4">
-                <label :for="field.name" class="block text-gray-700 font-medium mb-2">
-                  {{ field.label }}{{ field.required ? '*' : '' }}
+              <div
+                v-for="field in categoryFields"
+                :key="field.name"
+                class="mb-4"
+              >
+                <label
+                  :for="field.name"
+                  class="block text-gray-700 font-medium mb-2"
+                >
+                  {{ field.label }}{{ field.required ? "*" : "" }}
                 </label>
-                
+
                 <!-- Text input -->
                 <input
                   v-if="field.type === 'text' || field.type === 'number'"
@@ -508,7 +829,7 @@ onMounted(() => {
                   :placeholder="`Enter ${field.label.toLowerCase()}`"
                   :required="field.required"
                 />
-                
+
                 <!-- Textarea -->
                 <textarea
                   v-else-if="field.type === 'textarea'"
@@ -519,7 +840,7 @@ onMounted(() => {
                   :placeholder="`Enter ${field.label.toLowerCase()}`"
                   :required="field.required"
                 ></textarea>
-                
+
                 <!-- Select dropdown -->
                 <select
                   v-else-if="field.type === 'select'"
@@ -528,8 +849,14 @@ onMounted(() => {
                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
                   :required="field.required"
                 >
-                  <option value="" disabled selected>Select {{ field.label }}</option>
-                  <option v-for="option in field.options" :key="option" :value="option">
+                  <option value="" disabled selected>
+                    Select {{ field.label }}
+                  </option>
+                  <option
+                    v-for="option in field.options"
+                    :key="option"
+                    :value="option"
+                  >
                     {{ option }}
                   </option>
                 </select>
@@ -537,7 +864,11 @@ onMounted(() => {
 
               <!-- Description -->
               <div class="mb-4">
-                <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
+                <label
+                  for="description"
+                  class="block text-gray-700 font-medium mb-2"
+                  >Description</label
+                >
                 <textarea
                   id="description"
                   v-model="form.description"
@@ -575,7 +906,9 @@ onMounted(() => {
 
               <!-- State Dropdown -->
               <div class="mb-3">
-                <label for="state" class="block text-gray-700 font-medium mb-2">State*</label>
+                <label for="state" class="block text-gray-700 font-medium mb-2"
+                  >State*</label
+                >
                 <select
                   id="state"
                   v-model="selectedState"
@@ -595,7 +928,9 @@ onMounted(() => {
 
               <!-- LGA Dropdown (only shows if state is selected) -->
               <div class="mb-3" v-if="selectedState">
-                <label for="lga" class="block text-gray-700 font-medium mb-2">Local Government Area</label>
+                <label for="lga" class="block text-gray-700 font-medium mb-2"
+                  >Local Government Area</label
+                >
                 <select
                   id="lga"
                   v-model="selectedLGA"
@@ -610,7 +945,11 @@ onMounted(() => {
 
               <!-- Location Dropdown (only shows if LGA is selected) -->
               <div class="mb-3" v-if="selectedLGA">
-                <label for="specific-location" class="block text-gray-700 font-medium mb-2">Area/Location</label>
+                <label
+                  for="specific-location"
+                  class="block text-gray-700 font-medium mb-2"
+                  >Area/Location</label
+                >
                 <select
                   id="specific-location"
                   v-model="selectedLocation"
@@ -657,7 +996,9 @@ onMounted(() => {
           <div v-if="currentStep === 'images'">
             <div class="mb-6">
               <h2 class="text-xl font-semibold mb-4">Product Images</h2>
-              <p class="text-gray-600 mb-4">Add photos of your item (maximum 10 images)</p>
+              <p class="text-gray-600 mb-4">
+                Add photos of your item (maximum 10 images)
+              </p>
 
               <div
                 @dragover.prevent="dragover"

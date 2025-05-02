@@ -163,7 +163,7 @@ onMounted(() => {
               <img
                 :src="listing.images[activeImage]"
                 :alt="listing.title"
-                class=" object-fit"
+                class="object-fit"
               />
             </div>
 
@@ -300,7 +300,7 @@ onMounted(() => {
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <p class="text-gray-500">Category</p>
-                  <p>{{ listing.category }}</p>
+                  <p>{{ listing.categoryPath }}</p>
                 </div>
                 <div>
                   <p class="text-gray-500">Condition</p>

@@ -1,4 +1,3 @@
-<!-- components/CategorySelector.vue -->
 <script setup>
 import { ref, computed, watch } from "vue";
 
@@ -17,11 +16,25 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits([
+  "update:modelValue",
+  "validation-change",
+  "selection-object",
+]);
 
-// Support up to 4 levels: main category, subcategory, sub-subcategory, specific type
+// Support up to 3 levels of categories
 const selectedLevels = ref([null, null, null]);
 const finalSelection = ref("");
+
+function getStructuredCategory() {
+  const structure = {};
+  const levels = selectedLevels.value.filter(Boolean);
+  if (levels[0]) structure.mainCategory = levels[0];
+  if (levels[1]) structure.subCategory = levels[1];
+  if (levels[2]) structure.subSubCategory = levels[2];
+  if (finalSelection.value) structure.leafCategory = finalSelection.value;
+  return structure;
+}
 
 // Compute available options for each level based on selected parent values
 const levelOptions = computed(() => {
@@ -64,10 +77,34 @@ const leafOptions = computed(() => {
 });
 
 // Track if we have a complete selection path (for validation)
-const hasCompletePath = computed(() => {
+const isSelectionComplete = computed(() => {
+  if (selectedLevels.value[0] === null) return false;
+
+  let currentLevel = props.categories;
+  let depth = 0;
+
+  // Navigate to the deepest selected level
+  for (const level of selectedLevels.value) {
+    if (!level) break;
+
+    if (currentLevel[level]) {
+      currentLevel = currentLevel[level];
+      depth++;
+    } else {
+      break;
+    }
+  }
+
+  // If we've reached an array of leaf options, we need a final selection
+  if (Array.isArray(currentLevel)) {
+    return finalSelection.value !== "";
+  }
+
+  // If we've reached a terminal object (no more levels), we're complete
   return (
-    selectedLevels.value[0] !== null &&
-    (leafOptions.value.length === 0 || finalSelection.value !== "")
+    typeof currentLevel === "object" &&
+    !Array.isArray(currentLevel) &&
+    Object.keys(currentLevel).length === 0
   );
 });
 
@@ -95,6 +132,11 @@ watch(
 // When final selection changes, update output
 watch(finalSelection, updateCategoryString);
 
+// Emit validation state changes to parent
+watch(isSelectionComplete, (newVal) => {
+  emit("validation-change", newVal);
+});
+
 function updateCategoryString() {
   const parts = [
     ...selectedLevels.value.filter(Boolean),
@@ -103,6 +145,7 @@ function updateCategoryString() {
 
   const categoryString = parts.join(" > ");
   emit("update:modelValue", categoryString);
+  emit("selection-object", getStructuredCategory());
 }
 
 // Initialize from provided modelValue if it exists
@@ -152,12 +195,14 @@ watch(() => props.modelValue, initFromModelValue, { immediate: true });
   <div class="category-selector">
     <!-- Main Category - First Level -->
     <div class="mb-3">
-      <label class="block text-sm font-medium text-gray-700 mb-1"
-        >Main Category</label
-      >
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Main Category
+        <span class="text-red-500" v-if="required">*</span>
+      </label>
       <select
         v-model="selectedLevels[0]"
         class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+        :class="{ 'border-red-500': required && selectedLevels[0] === null }"
         :required="required"
       >
         <option :value="null" disabled>Select Main Category</option>
@@ -181,10 +226,15 @@ watch(() => props.modelValue, initFromModelValue, { immediate: true });
             ? "Sub-subcategory"
             : `Level ${index + 2}`
         }}
+        <span class="text-red-500" v-if="required">*</span>
       </label>
       <select
         v-model="selectedLevels[index + 1]"
         class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+        :class="{
+          'border-red-500': required && selectedLevels[index + 1] === null,
+        }"
+        :required="required"
       >
         <option :value="null" disabled>
           {{
@@ -203,12 +253,17 @@ watch(() => props.modelValue, initFromModelValue, { immediate: true });
 
     <!-- Leaf Options (Final Selection) -->
     <div class="mb-3" v-if="leafOptions.length > 0">
-      <label class="block text-sm font-medium text-gray-700 mb-1"
-        >Specific Type</label
-      >
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Specific Type
+        <span class="text-red-500" v-if="required">*</span>
+      </label>
       <select
         v-model="finalSelection"
         class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
+        :class="{
+          'border-red-500':
+            required && leafOptions.length > 0 && finalSelection === '',
+        }"
         :required="required && leafOptions.length > 0"
       >
         <option value="" disabled>Select Specific Type</option>
@@ -218,12 +273,56 @@ watch(() => props.modelValue, initFromModelValue, { immediate: true });
       </select>
     </div>
 
-    <!-- Preview of current selection -->
-    <div class="mt-4 text-sm text-gray-600" v-if="hasCompletePath">
-      <p>
-        Selected category:
-        <span class="font-medium">{{ props.modelValue }}</span>
-      </p>
+    <!-- Category Path Visualization -->
+    <div class="mt-4 border-t pt-3">
+      <h4 class="text-sm font-semibold text-gray-700 mb-2">Category Path:</h4>
+      <div class="flex flex-wrap items-center text-sm">
+        <template
+          v-for="(level, index) in selectedLevels.filter(Boolean)"
+          :key="`path-${index}`"
+        >
+          <span class="bg-gray-100 px-2 py-1 rounded-lg">{{ level }}</span>
+          <span
+            class="mx-1 text-gray-400"
+            v-if="
+              index < selectedLevels.filter(Boolean).length - 1 ||
+              finalSelection
+            "
+            >›</span
+          >
+        </template>
+        <span v-if="finalSelection" class="bg-gray-100 px-2 py-1 rounded-lg">{{
+          finalSelection
+        }}</span>
+        <span v-if="!isSelectionComplete" class="ml-2 text-orange-500 italic">
+          (selection incomplete)
+        </span>
+        <span v-else class="ml-2 text-green-500 flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mr-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          Complete
+        </span>
+      </div>
+    </div>
+
+    <!-- Validation Message -->
+    <div
+      v-if="required && !isSelectionComplete"
+      class="mt-2 text-sm text-red-500"
+    >
+      Please complete your category selection before proceeding.
     </div>
   </div>
 </template>
