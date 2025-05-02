@@ -203,13 +203,7 @@ const categoryFields = computed(() => {
           required: false,
         },
         { name: "brand", label: "Brand", type: "text", required: true },
-        { name: "model", label: "Model", type: "text", required: true },
-        {
-          name: "specifications",
-          label: "Specifications",
-          type: "textarea",
-          required: false,
-        },
+
         {
           name: "condition",
           label: "Condition",
