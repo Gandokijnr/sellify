@@ -1,6 +1,12 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
 
 import { db } from "@/firebase";
@@ -18,18 +24,50 @@ const authStore = useAuthStore();
 let unsubscribe = null;
 let categoriesUnsubscribes = []; // Array to store all category unsubscribe functions
 
-// Updated categories with proper route paths
+// Updated categories with proper route paths and new order
 const categories = ref([
   {
     id: 1,
-    name: "Electronics",
+    name: "Mobile Phones",
     icon: "📱",
     count: 0,
     isValid: true,
-    url: "/listings?category=electronics",
+    url: "/listings?subcategory=mobile phones",
   },
   {
     id: 2,
+    name: "Laptops",
+    icon: "💻",
+    count: 0,
+    isValid: true,
+    url: "/listings?leafCategory=laptops",
+  },
+  {
+    id: 3,
+    name: "Land For Sale",
+    icon: "🏞️",
+    count: 0,
+    isValid: true,
+    url: "/listings?subcategory=land for sale",
+  },
+  {
+    id: 4,
+    name: "House For Rent",
+    icon: "🏠",
+    count: 0,
+    isValid: true,
+    url: "/listings?subcategory=house for rent",
+  },
+  {
+    id: 5,
+    name: "Jobs",
+    icon: "💼",
+    count: 0,
+    isValid: true,
+    url: "/listings?category=jobs",
+  },
+  {
+    id: 6,
     name: "Vehicles",
     icon: "🚗",
     count: 0,
@@ -37,36 +75,12 @@ const categories = ref([
     url: "/listings?category=vehicles",
   },
   {
-    id: 3,
-    name: "Real Estate",
-    icon: "🏠",
-    count: 0,
-    isValid: true,
-    url: "/listings?category=real-estate",
-  },
-  {
-    id: 4,
-    name: "Fashion",
+    id: 7,
+    name: "Clothing",
     icon: "👕",
     count: 0,
     isValid: true,
-    url: "/listings?category=fashion",
-  },
-  {
-    id: 5,
-    name: "Furniture",
-    icon: "🛋️",
-    count: 0,
-    isValid: true,
-    url: "/listings?category=furniture",
-  },
-  {
-    id: 6,
-    name: "Jobs",
-    icon: "💼",
-    count: 0,
-    isValid: true,
-    url: "/listings?category=jobs",
+    url: "/listings?subcategory=clothing",
   },
 ]);
 
@@ -78,37 +92,102 @@ const navigateToCategory = (category) => {
 };
 
 // Function to fetch counts for all categories
-const fetchAllCategoryCounts = () => {
+const fetchAllCategoryCounts = async () => {
   try {
-    // Unsubscribe from any existing listeners
     if (categoriesUnsubscribes.length > 0) {
       categoriesUnsubscribes.forEach((unsubscribe) => unsubscribe());
       categoriesUnsubscribes = [];
     }
 
-    // For each category, set up a real-time listener
-    categories.value.forEach((category, index) => {
-      // Convert category name to lowercase for consistency with database
-      // Handle "Real Estate" special case to match database format
-      const categoryName =
-        category.name === "Real Estate"
-          ? "real-estate"
-          : category.name.toLowerCase();
+    for (let i = 0; i < categories.value.length; i++) {
+      const category = categories.value[i];
+      const categoryMapping = {
+        "Mobile Phones": "Mobile Phones",
+        Laptops: "Laptops",
+        "Land For Sale": "land for sale",
+        "House For Rent": "house for rent",
+        Jobs: "Jobs",
+        Vehicles: "Vehicles",
+        Clothing: "Clothing",
+      };
 
-      const q = query(
-        collection(db, "listings"),
-        where("category", "==", categoryName)
-      );
+      const categoryValue = categoryMapping[category.name];
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const count = querySnapshot.size;
-        // Update the specific category count
-        categories.value[index].count = count;
-      });
+      const updateCategoryCount = () => {
+        const fetchInitialData = async () => {
+          const uniqueDocIds = new Set();
 
-      // Store the unsubscribe function
-      categoriesUnsubscribes.push(unsubscribe);
-    });
+          // Get subCategory results
+          const qSubCategory = query(
+            collection(db, "listings"),
+            where("subCategory", "==", categoryValue)
+          );
+          const subCategorySnapshot = await getDocs(qSubCategory);
+          subCategorySnapshot.docs.forEach((doc) => uniqueDocIds.add(doc.id));
+
+          // Get leafCategory results
+          const qLeafCategory = query(
+            collection(db, "listings"),
+            where("leafCategory", "==", categoryValue)
+          );
+          const leafCategorySnapshot = await getDocs(qLeafCategory);
+          leafCategorySnapshot.docs.forEach((doc) => uniqueDocIds.add(doc.id));
+
+          // Update count
+          categories.value[i].count = uniqueDocIds.size;
+          console.log(`${category.name} initial count: ${uniqueDocIds.size}`);
+        };
+
+        fetchInitialData();
+
+        const uniqueDocIds = new Set();
+
+        // Listen for subCategory changes
+        const subCategoryUnsubscribe = onSnapshot(
+          query(
+            collection(db, "listings"),
+            where("subCategory", "==", categoryValue)
+          ),
+          (snapshot) => {
+            // Process updates and removals
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === "added" || change.type === "modified") {
+                uniqueDocIds.add(change.doc.id);
+              } else if (change.type === "removed") {
+                uniqueDocIds.delete(change.doc.id);
+              }
+            });
+            categories.value[i].count = uniqueDocIds.size;
+          }
+        );
+
+        // Listen for leafCategory changes
+        const leafCategoryUnsubscribe = onSnapshot(
+          query(
+            collection(db, "listings"),
+            where("leafCategory", "==", categoryValue)
+          ),
+          (snapshot) => {
+            // Process updates and removals
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === "added" || change.type === "modified") {
+                uniqueDocIds.add(change.doc.id);
+              } else if (change.type === "removed") {
+                uniqueDocIds.delete(change.doc.id);
+              }
+            });
+            categories.value[i].count = uniqueDocIds.size;
+          }
+        );
+
+        // Store unsubscribe functions
+        categoriesUnsubscribes.push(subCategoryUnsubscribe);
+        categoriesUnsubscribes.push(leafCategoryUnsubscribe);
+      };
+
+      // Execute the function for this category
+      updateCategoryCount();
+    }
   } catch (error) {
     console.error("Error fetching category counts:", error);
   }
