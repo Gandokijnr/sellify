@@ -210,6 +210,14 @@ const categoryFields = computed(() => {
           type: "textarea",
           required: false,
         },
+        {
+          name: "condition",
+          label: "Condition",
+          type: "select",
+          options: ["New", "Used"],
+          required: true,
+        },
+        { name: "price", label: "Price", type: "number", required: true },
       ];
     case "Real Estate":
       return [

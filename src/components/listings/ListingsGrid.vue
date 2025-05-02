@@ -291,7 +291,7 @@ const handleSortChange = (event) => {
             <span
               class="text-xs bg-gray-100 text-gray-600 px-1 sm:px-2 py-1 rounded ml-1 truncate"
             >
-              {{ listing.mainCategory }}
+              {{ listing.leafCategory }}
             </span>
           </div>
           <div class="flex items-center mb-2 text-gray-500 text-xs">
