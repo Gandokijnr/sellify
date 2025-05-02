@@ -289,7 +289,7 @@ const handleSortChange = (event) => {
               {{ listing.title }}
             </h3>
             <span
-              class="text-xs bg-gray-100 text-gray-600 px-1 sm:px-2 py-1 rounded ml-1 truncate"
+              class="text-xs bg-gray-100 text-gray-600 px-1 sm:px-2 py-1 rounded ml-1"
             >
               {{ listing.leafCategory }}
             </span>

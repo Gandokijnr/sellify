@@ -300,7 +300,7 @@ onMounted(() => {
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <p class="text-gray-500">Category</p>
-                  <p>{{ listing.categoryPath }}</p>
+                  <p>{{ listing.subCategory }}</p>
                 </div>
                 <div>
                   <p class="text-gray-500">Condition</p>
