@@ -118,8 +118,9 @@ onUnmounted(() => {
         <!-- User Actions -->
         <div class="flex items-center space-x-4">
           <router-link
-            to="/"
-            class="hidden md:flex flex-col items-center text-gray-600 hover:text-green-600"
+            :to="null"
+            class="flex-col items-center text-gray-400 cursor-not-allowed pointer-events-none"
+            aria-disabled="true"
           >
             <svg
               class="w-6 h-6"
@@ -139,7 +140,7 @@ onUnmounted(() => {
 
           <router-link
             :to="authStore.isAuthenticated ? '/chats' : '/login'"
-            class="hidden md:flex flex-col items-center text-gray-600 hover:text-green-600 relative"
+            class="flex-col items-center text-gray-600 hover:text-green-600 relative"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
               <path d="M3.505 2.365A41.369 41.369 0 0 1 9 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 0 0-.577-.069 43.141 43.141 0 0 0-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 0 1 5 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914Z" />
