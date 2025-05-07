@@ -83,6 +83,20 @@ const routes = [
       requiresAuth: false,
     },
   },
+
+  //user chat route
+  {
+    path: '/chat/:sellerId',
+    name: 'chat',
+    component: () => import('@/views/userchat/ChatView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/chats',
+    name: 'chats',
+    component: () => import('@/views/userchat/ChatOverview.vue'),
+    meta: { requiresAuth: true }
+  }
 ];
 
 const router = createRouter({

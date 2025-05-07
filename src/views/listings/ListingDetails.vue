@@ -77,7 +77,14 @@ const callSeller = () => {
 };
 
 const startChat = () => {
-  showChatModal.value = true;
+  if (!authStore.user) {
+    router.push('/login');
+    return;
+  }
+  router.push({
+    name: 'chat',
+    params: { sellerId: listing.value.userId }
+  });
 };
 
 const sendMessage = () => {
