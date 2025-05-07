@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { onMounted, computed, onUnmounted, ref, watch } from "vue";
+import { collection, onSnapshot } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
+import CategoryGrid from "@/components/categories/CategoryGrid.vue"; // Import the new component
 
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
@@ -16,50 +17,6 @@ const searchQuery = ref("");
 const favorites = ref([]);
 const authStore = useAuthStore();
 let unsubscribe = null;
-let electronicsUnsubscribe = null; // For the electronics count listener
-
-const categories = ref([
-  {
-    id: 1,
-    name: "Electronics",
-    icon: "📱",
-    count: 0,
-    isValid: true,
-    url: "/listings",
-  },
-  { id: 2, name: "Vehicles", icon: "🚗", count: 8765, isValid: false, url: "" },
-  { id: 3, name: "Property", icon: "🏠", count: 6543, isValid: false, url: "" },
-  { id: 4, name: "Fashion", icon: "👕", count: 9876, isValid: false, url: "" },
-  {
-    id: 5,
-    name: "Furniture",
-    icon: "🛋️",
-    count: 5432,
-    isValid: false,
-    url: "",
-  },
-  { id: 6, name: "Jobs", icon: "💼", count: 7654, isValid: false, url: "" },
-]);
-
-// Function to fetch electronics count
-const fetchElectronicsCount = () => {
-  try {
-    const q = query(
-      collection(db, "listings"),
-      where("category", "==", "electronics")
-    );
-
-    electronicsUnsubscribe = onSnapshot(q, (querySnapshot) => {
-      const count = querySnapshot.size;
-      // Update the electronics category count
-      categories.value = categories.value.map((cat) =>
-        cat.id === 1 ? { ...cat, count } : cat
-      );
-    });
-  } catch (error) {
-    console.error("Error fetching electronics count:", error);
-  }
-};
 
 const fetchProducts = () => {
   loading.value = true;
@@ -81,10 +38,6 @@ const fetchProducts = () => {
 function viewListing(id) {
   router.push({ name: "listing-details", params: { id } });
 }
-
-// const callSeller = (phoneNumber) => {
-//   window.location.href = `tel:${phoneNumber}`;
-// };
 
 // Load favorites from localStorage when component mounts
 const loadFavorites = () => {
@@ -123,22 +76,14 @@ watch(
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
-  fetchElectronicsCount();
   loadFavorites();
-
-  // Load favorites from localStorage
-  //   const savedFavorites = localStorage.getItem("favorites");
-  //   if (savedFavorites) {
-  //     favorites.value = JSON.parse(savedFavorites);
-  //   }
+  // Note: Category fetching is now handled by the CategoryGrid component
 });
 
 onUnmounted(() => {
+  // Clean up listeners
   if (unsubscribe) {
     unsubscribe();
-  }
-  if (electronicsUnsubscribe) {
-    electronicsUnsubscribe();
   }
 });
 
@@ -213,6 +158,7 @@ function initializeScrollAnimations() {
               </span>
               <button
                 class="absolute right-2 top-2 bg-green-700 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors shadow"
+                @click="$router.push(`/listings?query=${searchQuery}`)"
               >
                 Search
               </button>
@@ -221,39 +167,12 @@ function initializeScrollAnimations() {
         </div>
       </div>
 
-      <!-- Categories -->
-      <!-- Categories -->
-      <div class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-          <h2 class="text-2xl font-bold mb-8 animate-on-scroll">
-            Popular Categories
-          </h2>
-
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            <div
-              v-for="(category, index) in categories"
-              :key="category.id"
-              class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer animate-on-scroll relative"
-              :class="`delay-${index % 3}`"
-              @click="category.isValid ? $router.push(category.url) : null"
-            >
-              <span class="text-3xl mb-2">{{ category.icon }}</span>
-              <h3 class="font-medium text-gray-800 text-center">
-                {{ category.name }}
-              </h3>
-              <p class="text-sm text-gray-500 mt-1">
-                {{ formatNumber(category.count) }} ads
-              </p>
-              <div
-                v-if="!category.isValid"
-                class="absolute opacity-90 top-0 left-0 right-0 bg-amber-100 text-amber-800 text-xs font-medium text-center py-1 rounded-t-xl"
-              >
-                Coming Soon
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Categories - Now using the CategoryGrid component -->
+      <CategoryGrid
+        title="Popular Categories"
+        :showCounts="true"
+        containerClass="py-12 bg-white"
+      />
 
       <!-- Featured Listings -->
       <div class="py-12">
@@ -291,7 +210,6 @@ function initializeScrollAnimations() {
             :listings="listings || []"
             :loading="loading"
             v-model:searchQuery="searchQuery"
-            v-model:selectedCategory="selectedCategory"
             @viewListing="viewListing"
             :showSort="false"
             :showHeader="false"
