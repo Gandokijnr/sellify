@@ -4,6 +4,8 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuthStore } from '@/stores/auth';
+import Navbar from '@/components/common/Navbar.vue';
+import Footer from '@/components/common/Footer.vue';
 
 const authStore = useAuthStore();
 const chats = ref([]);
@@ -94,4 +96,5 @@ const getUserInfo = async (userId) => {
       </div>
     </main>
   </div>
+  <Footer />
 </template>

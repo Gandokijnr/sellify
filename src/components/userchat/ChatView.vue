@@ -2,6 +2,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import Navbar from '@/components/common/Navbar.vue';
+import Footer from '@/components/common/Footer.vue';
 
 import { 
   collection, 
@@ -216,8 +218,11 @@ onMounted(async () => {
           </div>
         </div>
       </div>
+
     </main>
   </div>
+  <Footer />
+
 </template>
 
 <style scoped>
