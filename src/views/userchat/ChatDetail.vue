@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRoute } from "vue-router";
 import {
   collection,
   query,
@@ -22,70 +22,111 @@ import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
 
 const route = useRoute();
-const router = useRouter();
 const authStore = useAuthStore();
 const messages = ref([]);
 const newMessage = ref("");
 const loading = ref(true);
 const error = ref(null);
-const chatId = ref(route.params.chatId || null);
+const chatId = ref(null);
 const otherUser = ref(null);
 const unsubscribeMessages = ref(null);
 const sending = ref(false);
 const messagesContainer = ref(null);
 
-const currentUserId = computed(() => authStore.user?.uid || null);
-
-// Watch for changes in route or auth state
-watch([() => route.params.chatId, currentUserId], ([newChatId, newUserId]) => {
-  if (newChatId && newUserId) {
-    initializeChat();
-  }
-});
+const currentUserId = computed(() => authStore.user.uid);
+const sellerId = computed(() => route.params.sellerId);
 
 // Determine which messages are from the current user
 const isCurrentUserMessage = (message) => {
   return message.senderId === currentUserId.value;
 };
 
-// Fetch chat details and participants
-const fetchChatDetails = async () => {
+// Find or create a chat between the current user and the seller
+const findOrCreateChat = async () => {
   try {
-    if (!chatId.value) {
-      error.value = "Missing chat ID";
+    // Validate required user IDs before proceeding
+    if (!currentUserId.value) {
+      console.error("Current user ID is missing");
+      error.value = "You must be logged in to chat.";
+      return null;
+    }
+
+    if (!sellerId.value) {
+      console.error("Seller ID is missing");
+      error.value = "Invalid seller profile.";
+      return null;
+    }
+
+    // First, check if a chat already exists between these two users
+    const chatsRef = collection(db, "chats");
+    const q = query(
+      chatsRef,
+      where("participants", "array-contains", currentUserId.value)
+    );
+
+    const querySnapshot = await getDocs(q);
+    let existingChat = null;
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.participants && data.participants.includes(sellerId.value)) {
+        existingChat = { id: doc.id, ...data };
+      }
+    });
+
+    if (existingChat) {
+      // Use existing chat
+      chatId.value = existingChat.id;
+      return existingChat.id;
+    } else {
+      // Create a new chat document
+      const chatData = {
+        participants: [currentUserId.value, sellerId.value],
+        lastMessage: { text: "" },
+        lastUpdated: serverTimestamp(),
+        [`unread_${sellerId.value}`]: 0,
+        [`unread_${currentUserId.value}`]: 0,
+      };
+
+      // Make sure all values in chatData are defined
+      Object.keys(chatData).forEach((key) => {
+        if (chatData[key] === undefined) {
+          console.warn(`Fixing undefined value for ${key} in chatData`);
+          chatData[key] = null; // Replace undefined with null for Firestore
+        }
+      });
+
+      const newChatRef = await addDoc(chatsRef, chatData);
+      chatId.value = newChatRef.id;
+      return newChatRef.id;
+    }
+  } catch (err) {
+    console.error("Error finding or creating chat:", err);
+    error.value = "Failed to load or create chat.";
+    return null;
+  }
+};
+
+// Fetch other user's info
+const fetchOtherUserInfo = async () => {
+  try {
+    // Check if sellerId is valid before proceeding
+    if (!sellerId.value) {
+      console.error("No seller ID available");
+      otherUser.value = { displayName: "Unknown User" };
       return;
     }
 
-    const chatDoc = await getDoc(doc(db, "chats", chatId.value));
-    if (!chatDoc.exists()) {
-      error.value = "Chat not found";
-      return;
-    }
-
-    const chatData = chatDoc.data();
-    const participants = chatData.participants || [];
-
-    // Find the other participant (not current user)
-    const otherUserId = participants.find((id) => id !== currentUserId.value);
-
-    if (!otherUserId) {
-      error.value = "Invalid chat participants";
-      return;
-    }
-
-    // Fetch other user's info
-    const userDoc = await getDoc(doc(db, "users", otherUserId));
+    const userDoc = await getDoc(doc(db, "users", sellerId.value));
     if (userDoc.exists()) {
       otherUser.value = { id: userDoc.id, ...userDoc.data() };
     } else {
-      otherUser.value = { id: otherUserId, displayName: "Unknown User" };
+      otherUser.value = { id: sellerId.value, displayName: "Unknown User" };
     }
-
-    return chatData;
   } catch (err) {
-    console.error("Error fetching chat details:", err);
-    error.value = "Failed to load chat details";
-    return null;
+    console.error("Error fetching user info:", err);
+    // Set a default user to prevent further errors
+    otherUser.value = { displayName: "Unknown User" };
   }
 };
 
@@ -111,8 +152,7 @@ const sendMessage = async () => {
     await updateDoc(chatRef, {
       lastMessage: { text: messageData.text },
       lastUpdated: serverTimestamp(),
-      // Increment unread count for the other participant
-      [`unread_${otherUser.value?.id}`]: increment(1),
+      [`unread_${sellerId.value}`]: increment(1),
     });
 
     // Clear the input
@@ -144,11 +184,11 @@ const markMessagesAsRead = async () => {
       [`unread_${currentUserId.value}`]: 0,
     });
 
-    // Mark individual messages as read
+    // Optionally, mark individual messages as read
     const messagesRef = collection(db, "chats", chatId.value, "messages");
     const q = query(
       messagesRef,
-      where("senderId", "==", otherUser.value?.id),
+      where("senderId", "==", sellerId.value),
       where("read", "==", false)
     );
 
@@ -170,6 +210,7 @@ const formatTimestamp = (timestamp) => {
   if (!timestamp) return "";
 
   try {
+    // Check if timestamp is a Firestore Timestamp that needs conversion
     if (typeof timestamp.toDate === "function") {
       const date = timestamp.toDate();
       const now = new Date();
@@ -185,6 +226,7 @@ const formatTimestamp = (timestamp) => {
 
       return date.toLocaleDateString();
     } else {
+      // Handle case where timestamp might be a different format
       return "Unknown time";
     }
   } catch (err) {
@@ -200,28 +242,9 @@ const scrollToBottom = () => {
   }
 };
 
-// Redirect to chats overview page with error
-const redirectToChats = () => {
-  router.push({
-    name: "chats",
-    query: { error: "Invalid chat. Please select a valid chat." },
-  });
-};
-
-// Initialize chat (can be called when params change or component mounts)
-const initializeChat = async () => {
+// Initialize everything when component mounts
+onMounted(async () => {
   loading.value = true;
-  error.value = null;
-
-  // Reset state when reinitializing
-  if (unsubscribeMessages.value) {
-    unsubscribeMessages.value();
-    unsubscribeMessages.value = null;
-  }
-
-  messages.value = [];
-  otherUser.value = null;
-  chatId.value = route.params.chatId || null;
 
   try {
     // First check if user is authenticated
@@ -232,66 +255,68 @@ const initializeChat = async () => {
       return;
     }
 
-    // Check if chatId is available
-    if (!chatId.value) {
-      console.error("No chat ID available");
-      error.value = "Invalid chat. Chat information is missing.";
+    // Check if sellerId is available in route params
+    if (!route.params.sellerId) {
+      console.error("No seller ID in route params");
+      error.value = "Invalid chat. Seller information is missing.";
       loading.value = false;
-      setTimeout(redirectToChats, 3000);
       return;
     }
 
-    // Fetch chat details and other user's info
-    await fetchChatDetails();
+    // Fetch other user's info
+    await fetchOtherUserInfo();
 
-    // Subscribe to messages in this chat
-    const messagesRef = collection(db, "chats", chatId.value, "messages");
-    const q = query(messagesRef, orderBy("timestamp", "asc"));
+    // Find or create a chat
+    const activeChatId = await findOrCreateChat();
 
-    unsubscribeMessages.value = onSnapshot(
-      q,
-      (snapshot) => {
-        try {
-          const newMessages = [];
-          snapshot.forEach((doc) => {
-            const data = doc.data();
-            newMessages.push({
-              id: doc.id,
-              ...data,
-              timestamp: data.timestamp,
+    if (activeChatId) {
+      // Subscribe to messages in this chat
+      const messagesRef = collection(db, "chats", activeChatId, "messages");
+      const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+      unsubscribeMessages.value = onSnapshot(
+        q,
+        (snapshot) => {
+          try {
+            const newMessages = [];
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              newMessages.push({
+                id: doc.id,
+                ...data,
+                timestamp: data.timestamp, // This will be a Firestore Timestamp
+              });
             });
-          });
 
-          messages.value = newMessages;
-          loading.value = false;
+            messages.value = newMessages;
+            loading.value = false;
 
-          // Mark messages as read when they're loaded
-          markMessagesAsRead();
+            // Mark messages as read when they're loaded
+            markMessagesAsRead();
 
-          // Scroll to bottom after messages load
-          setTimeout(scrollToBottom, 100);
-        } catch (err) {
-          console.error("Error processing messages snapshot:", err);
-          error.value = "Error loading messages.";
+            // Scroll to bottom after messages load
+            setTimeout(scrollToBottom, 100);
+          } catch (err) {
+            console.error("Error processing messages snapshot:", err);
+            error.value = "Error loading messages.";
+            loading.value = false;
+          }
+        },
+        (err) => {
+          // Handle snapshot error
+          console.error("Error in messages snapshot listener:", err);
+          error.value = "Error listening for new messages.";
           loading.value = false;
         }
-      },
-      (err) => {
-        console.error("Error in messages snapshot listener:", err);
-        error.value = "Error listening for new messages.";
-        loading.value = false;
-      }
-    );
+      );
+    } else {
+      loading.value = false;
+    }
   } catch (err) {
     console.error("Error initializing chat:", err);
     error.value = "Failed to load chat history.";
     loading.value = false;
   }
-};
-
-// Initialize everything when component mounts
-onMounted(() => {
-  initializeChat();
 });
 
 // Clean up when component unmounts
@@ -379,16 +404,6 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Error Banner for Missing Chat ID -->
-        <div
-          v-if="!chatId"
-          class="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100"
-        >
-          <p class="text-center">
-            Missing chat information. Redirecting to chats page...
-          </p>
-        </div>
-
         <!-- Chat Messages -->
         <div
           class="h-96 p-4 overflow-y-auto flex flex-col space-y-4"
@@ -409,7 +424,7 @@ onUnmounted(() => {
             <div class="text-center">
               <p class="text-red-500">{{ error }}</p>
               <button
-                @click="initializeChat"
+                @click="findOrCreateChat"
                 class="mt-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
               >
                 Retry
@@ -419,7 +434,7 @@ onUnmounted(() => {
 
           <!-- Empty State -->
           <div
-            v-else-if="messages.length === 0 && !error && !loading"
+            v-else-if="messages.length === 0"
             class="flex justify-center items-center h-full text-center"
           >
             <div>
@@ -497,12 +512,12 @@ onUnmounted(() => {
               type="text"
               placeholder="Type your message..."
               class="flex-1 border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-green-400 dark:focus:border-green-400 transition-colors"
-              :disabled="sending || !chatId || error"
+              :disabled="sending"
             />
             <button
               type="submit"
               class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full transition-colors focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              :disabled="!newMessage.trim() || sending || !chatId || error"
+              :disabled="!newMessage.trim() || sending"
             >
               <svg
                 v-if="sending"

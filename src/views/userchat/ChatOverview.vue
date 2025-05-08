@@ -180,10 +180,7 @@ const getInitials = (name) => {
                 <router-link
                   v-for="chat in filteredChats"
                   :key="chat.id"
-                  :to="{
-                    name: 'chat',
-                    params: { chatId: chat.id },
-                  }"
+                  :to="{ name: 'chat', params: { chatId: chat.id } }"
                   class="flex items-center p-4 md:p-6 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors cursor-pointer relative"
                   :class="{
                     'bg-green-50 dark:bg-green-900/20': chat.unreadCount > 0,
