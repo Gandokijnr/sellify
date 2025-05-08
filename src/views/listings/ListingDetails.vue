@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   doc,
@@ -9,11 +9,16 @@ import {
   where,
   limit,
   getDocs,
+  updateDoc,
+  increment,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useAuthStore } from "@/stores/auth";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
+// Import chat store functions
+import { useChatStore } from "@/stores/chat.store";
+import { useToast } from "vue-toastification";
 
 const route = useRoute();
 const router = useRouter();
@@ -27,6 +32,17 @@ const showChatModal = ref(false);
 const sellerInfo = ref(null);
 const message = ref("");
 const authStore = useAuthStore();
+const chatLoading = ref(false);
+
+const toast = useToast();
+
+const chatStore = useChatStore();
+
+// Check if current user is the seller
+const isUserSeller = computed(() => {
+  if (!authStore.user || !listing.value) return false;
+  return authStore.user.uid === listing.value.userId;
+});
 
 const fetchListing = async () => {
   try {
@@ -34,26 +50,34 @@ const fetchListing = async () => {
     if (listingDoc.exists()) {
       listing.value = { id: listingDoc.id, ...listingDoc.data() };
 
-      console.log("Listing data:", listing.value);
+      // Increment view count
+      await updateDoc(doc(db, "listings", route.params.id), {
+        views: increment(1),
+      });
+
       if (listing.value.userId) {
         const userDoc = await getDoc(doc(db, "users", listing.value.userId));
-
         if (userDoc.exists()) {
-          sellerInfo.value = userDoc.data();
+          sellerInfo.value = { id: userDoc.id, ...userDoc.data() };
         }
       }
-      console.log("Seller info:", sellerInfo.value.phoneNumber);
+
+      // Fetch related listings after we have the main listing
+      await fetchRelatedListings();
     } else {
       router.push({ name: "not-found" });
     }
   } catch (err) {
     console.error("Error fetching data:", err);
+    error.value = "Failed to load listing. Please try again.";
   } finally {
     loading.value = false;
   }
 };
 
 const fetchRelatedListings = async () => {
+  if (!listing.value?.category) return;
+
   try {
     const q = query(
       collection(db, "listings"),
@@ -73,30 +97,142 @@ const fetchRelatedListings = async () => {
 };
 
 const callSeller = () => {
+  if (!sellerInfo.value?.phoneNumber) {
+    toast.warning("Seller's phone number is not available", "error");
+    return;
+  }
   window.location.href = `tel:${sellerInfo.value.phoneNumber}`;
 };
 
-const startChat = () => {
+const startChat = async () => {
   if (!authStore.user) {
+    // Store the current page URL to redirect back after login
+    localStorage.setItem("redirectAfterLogin", route.fullPath);
     router.push("/login");
     return;
   }
 
-  router.push({
-    name: "chat",
-    params: { chatId: listing.value.userId },
-  });
+  if (isUserSeller.value) {
+    toast.warning("You cannot message your own listing", "warning");
+    return;
+  }
+
+  chatLoading.value = true;
+
+  try {
+    // Check if user can message the seller (not blocked)
+    const canMessage = await chatStore.canMessageUser(
+      authStore.user.uid,
+      listing.value.userId
+    );
+
+    if (!canMessage) {
+      toast.error("Unable to message this user", "error");
+      return;
+    }
+
+    // Create or get existing chat conversation
+    const conversationId = await chatStore.startNewChat(
+      listing.value.id,
+      listing.value.userId, // seller ID
+      authStore.user.uid // buyer ID
+    );
+
+    // If chat modal is showing, send the initial message
+    if (showChatModal.value && message.value.trim()) {
+      await chatStore.sendMessage(conversationId, authStore.user.uid, {
+        content: message.value.trim(),
+        type: "text",
+      });
+      message.value = "";
+      showChatModal.value = false;
+      toast.success("Message sent successfully", "success");
+    }
+
+    // Navigate to the chat page with the conversation ID
+    router.push({
+      name: "chat",
+      params: { conversationId: conversationId },
+    });
+  } catch (err) {
+    console.error("Error starting chat:", err);
+    toast.error("Failed to start chat. Please try again.", "error");
+  } finally {
+    chatLoading.value = false;
+  }
 };
 
-const sendMessage = () => {
-  alert(`Message sent to seller: ${message.value}`);
-  showChatModal.value = false;
-  message.value = "";
+const openChatModal = () => {
+  if (!authStore.user) {
+    localStorage.setItem("redirectAfterLogin", route.fullPath);
+    router.push("/login");
+    return;
+  }
+
+  if (isUserSeller.value) {
+    toast("You cannot message your own listing", "warning");
+    return;
+  }
+
+  // Set default message text
+  message.value = `Hi, I'm interested in your ${listing.value.title}. Is this still available?`;
+  showChatModal.value = true;
+};
+
+const sendMessageDirectly = async () => {
+  if (!message.value.trim()) {
+    toast("Please enter a message", "warning");
+    return;
+  }
+
+  chatLoading.value = true;
+
+  try {
+    // Check if user can message the seller
+    const canMessage = await chatStore.canMessageUser(
+      authStore.user.uid,
+      listing.value.userId
+    );
+
+    if (!canMessage) {
+      toast("Unable to message this user", "error");
+      showChatModal.value = false;
+      return;
+    }
+
+    // Create or get existing chat conversation
+    const conversationId = await chatStore.startNewChat(
+      listing.value.id,
+      listing.value.userId, // seller ID
+      authStore.user.uid // buyer ID
+    );
+
+    // Send the message
+    await chatStore.sendMessage(conversationId, authStore.user.uid, {
+      content: message.value.trim(),
+      type: "text",
+    });
+
+    toast("Message sent successfully", "success");
+    showChatModal.value = false;
+    message.value = "";
+
+    // Navigate to the chat page with the conversation ID
+    router.push({
+      name: "chat",
+      params: { conversationId: conversationId },
+    });
+  } catch (err) {
+    console.error("Error sending message:", err);
+    toast("Failed to send message. Please try again.", "error");
+  } finally {
+    chatLoading.value = false;
+  }
 };
 
 const formatDate = (timestamp) => {
   if (!timestamp?.toDate) return "N/A";
-  const options = { year: "numeric", month: "long" };
+  const options = { year: "numeric", month: "long", day: "numeric" };
   return timestamp.toDate().toLocaleDateString(undefined, options);
 };
 
@@ -258,6 +394,7 @@ onMounted(() => {
               <button
                 @click="callSeller"
                 class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-colors"
+                :disabled="!sellerInfo?.phoneNumber"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -279,10 +416,13 @@ onMounted(() => {
               </button>
 
               <button
-                @click="startChat"
+                @click="openChatModal"
+                :disabled="chatLoading || isUserSeller"
                 class="bg-white border border-green-600 text-green-600 hover:bg-green-50 py-3 px-4 rounded-lg flex items-center justify-center transition-colors"
+                :class="{ 'opacity-50 cursor-not-allowed': isUserSeller }"
               >
                 <svg
+                  v-if="!chatLoading"
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
@@ -298,7 +438,11 @@ onMounted(() => {
                     d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                   />
                 </svg>
-                Chat
+                <div
+                  v-else
+                  class="animate-spin h-5 w-5 mr-2 border-2 border-green-600 border-t-transparent rounded-full"
+                ></div>
+                Chat with Seller
               </button>
             </div>
 
@@ -308,7 +452,7 @@ onMounted(() => {
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <p class="text-gray-500">Category</p>
-                  <p>{{ listing.subCategory }}</p>
+                  <p>{{ listing.subCategory || listing.category }}</p>
                 </div>
                 <div>
                   <p class="text-gray-500">Condition</p>
@@ -449,6 +593,20 @@ onMounted(() => {
             </button>
           </div>
           <div class="p-4">
+            <div class="mb-4">
+              <p class="font-medium text-gray-700 mb-1">About this listing:</p>
+              <div class="flex items-center">
+                <img
+                  :src="listing.images[0]"
+                  alt="Listing thumbnail"
+                  class="w-12 h-12 object-cover rounded mr-3"
+                />
+                <div>
+                  <p class="font-medium line-clamp-1">{{ listing.title }}</p>
+                  <p class="text-green-600">{{ listing.price }}</p>
+                </div>
+              </div>
+            </div>
             <textarea
               v-model="message"
               placeholder="Type your message here..."
@@ -456,9 +614,14 @@ onMounted(() => {
               rows="4"
             ></textarea>
             <button
-              @click="sendMessage"
-              class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors"
+              @click="sendMessageDirectly"
+              :disabled="chatLoading || !message.trim()"
+              class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors disabled:bg-green-400 flex items-center justify-center"
             >
+              <div
+                v-if="chatLoading"
+                class="animate-spin h-5 w-5 mr-2 border-2 border-white border-t-transparent rounded-full"
+              ></div>
               Send Message
             </button>
           </div>

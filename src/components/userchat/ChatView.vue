@@ -1,161 +1,227 @@
-<!-- ChatView.vue -->
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
-
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  getDoc,
-  getDocs,
-  doc,
-  updateDoc,
-  arrayUnion,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "@/firebase";
+import { useChatStore } from "@/stores/chat.store";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
+const chatStore = useChatStore();
 const route = useRoute();
 const router = useRouter();
+
+const { currentUser } = storeToRefs(authStore);
 const messages = ref([]);
 const newMessage = ref("");
-const sellerInfo = ref(null);
+const conversationData = ref(null);
+const otherUserInfo = ref(null);
+const listingInfo = ref(null);
 const unsubscribeMessages = ref(null);
-const chatRef = ref(null);
-const chatRoomId = ref("");
-const chatId = ref("");
+const unsubscribeConversation = ref(null);
+const sending = ref(false);
 
-// Fetch seller information
-const fetchSellerInfo = async () => {
+// Computed properties
+const isSeller = computed(() => {
+  return (
+    conversationData.value?.participants?.sellerId === currentUser.value?.uid
+  );
+});
+
+const otherUserId = computed(() => {
+  if (!conversationData.value?.participants) return null;
+  const { sellerId, buyerId } = conversationData.value.participants;
+  return currentUser.value?.uid === sellerId ? buyerId : sellerId;
+});
+
+const chatTitle = computed(() => {
+  return conversationData.value?.listingTitle
+    ? `Chat about ${conversationData.value.listingTitle}`
+    : "Chat";
+});
+
+const isActiveConversation = computed(() => {
+  return conversationData.value?.active !== false;
+});
+
+// Fetch user information
+const fetchUserInfo = async (userId) => {
   try {
-    const sellerDoc = await getDoc(doc(db, "users", route.params.chatId));
-    if (sellerDoc.exists()) {
-      sellerInfo.value = sellerDoc.data();
-    }
+    if (!userId) return;
+    const userDoc = await getDoc(doc(db, "users", userId));
+    otherUserInfo.value = userDoc.exists() ? userDoc.data() : null;
   } catch (error) {
-    console.error("Error fetching seller info:", error);
+    console.error("Error fetching user info:", error);
+    otherUserInfo.value = null;
   }
 };
 
-onUnmounted(() => {
-  if (unsubscribeMessages.value) unsubscribeMessages.value();
-});
-
-const sendMessage = async () => {
-  if (!newMessage.value.trim()) return;
-
+// Fetch listing information
+const fetchListingInfo = async () => {
   try {
-    // Update chat metadata
-    await updateDoc(chatRef.value, {
-      lastMessage: {
-        text: newMessage.value.trim(),
-        senderId: authStore.user.uid,
-        timestamp: serverTimestamp(),
-      },
-      lastUpdated: serverTimestamp(),
-      [`unread_${chatId.value}`]:
-        (await getDoc(chatRef.value)).data()[`unread_${chatId.value}`] + 1 || 1,
-      participants: arrayUnion(authStore.user.uid, chatId.value),
-    });
+    const listingId = conversationData.value?.listingId;
+    if (!listingId) return;
 
-    // Add message
-    await addDoc(collection(db, "chats", chatRoomId.value, "messages"), {
-      text: newMessage.value.trim(),
-      senderId: authStore.user.uid,
-      timestamp: serverTimestamp(),
-      read: false,
-    });
+    const listingDoc = await getDoc(doc(db, "listings", listingId));
+    listingInfo.value = listingDoc.exists() ? listingDoc.data() : null;
+  } catch (error) {
+    console.error("Error fetching listing info:", error);
+    listingInfo.value = null;
+  }
+};
 
+// Send message handler
+const sendMessage = async () => {
+  if (!newMessage.value.trim() || !isActiveConversation.value || sending.value)
+    return;
+
+  sending.value = true;
+  try {
+    await chatStore.sendMessage(
+      route.params.conversationId,
+      currentUser.value.uid,
+      {
+        content: newMessage.value.trim(),
+        type: "text",
+      }
+    );
     newMessage.value = "";
   } catch (error) {
     console.error("Error sending message:", error);
+  } finally {
+    sending.value = false;
   }
 };
 
-// Setup real-time messages listener
-onMounted(async () => {
-  if (!authStore.user) return router.push("/login");
+// Format timestamp
+const formatTimestamp = (timestamp) => {
+  if (!timestamp) return "";
+  try {
+    const date = timestamp.toDate();
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
+  }
+};
 
-  await fetchSellerInfo();
+// Scroll to bottom of messages
+const scrollToBottom = () => {
+  const container = document.querySelector(".messages-container");
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+};
 
-  chatId.value = route.params.chatId;
-  chatRoomId.value = [authStore.user.uid, chatId.value].sort().join("_");
-  chatRef.value = doc(db, "chats", chatRoomId.value);
+// Setup real-time listeners
+const setupListeners = async () => {
+  if (!currentUser.value) {
+    router.push("/login");
+    return;
+  }
 
-  const messagesRef = collection(db, "chats", chatRoomId.value, "messages");
+  if (!route.params.conversationId) {
+    router.push("/chats");
+    return;
+  }
 
-  const q = query(messagesRef, orderBy("timestamp", "asc"));
+  // Subscribe to conversation data
+  unsubscribeConversation.value = chatStore.subscribeToConversations(
+    route.params.conversationId,
+    async (conversation) => {
+      conversationData.value = conversation;
+      if (otherUserId.value) {
+        await fetchUserInfo(otherUserId.value);
+      }
+      await fetchListingInfo();
+    }
+  );
 
-  unsubscribeMessages.value = onSnapshot(q, (snapshot) => {
-    messages.value = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate(),
-    }));
-    // Scroll to bottom
-    setTimeout(() => {
-      const container = document.querySelector(".messages-container");
-      if (container) container.scrollTop = container.scrollHeight;
-    }, 100);
-  });
+  // Subscribe to messages
+  unsubscribeMessages.value = chatStore.subscribeToMessages(
+    route.params.conversationId,
+    currentUser.value.uid,
+    (msgs) => {
+      messages.value = msgs;
+      setTimeout(scrollToBottom, 100);
+    }
+  );
 
   // Mark messages as read when opening chat
-  const markAsRead = async () => {
-    const messagesSnapshot = await getDocs(
-      query(
-        collection(db, "chats", chatRoomId.value, "messages"),
-        where("read", "==", false),
-        where("senderId", "==", chatId.value)
-      )
-    );
+  await chatStore.markMessagesAsRead(
+    route.params.conversationId,
+    currentUser.value.uid
+  );
+};
 
-    messagesSnapshot.forEach(async (msgDoc) => {
-      await updateDoc(msgDoc.ref, { read: true });
-    });
+// Cleanup listeners
+onUnmounted(() => {
+  unsubscribeMessages.value?.();
+  unsubscribeConversation.value?.();
+});
 
-    await updateDoc(chatRef.value, {
-      [`unread_${authStore.user.uid}`]: 0,
-    });
-  };
-
-  markAsRead();
+// Initialize
+onMounted(() => {
+  setupListeners();
 });
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <Navbar />
 
     <main class="container mx-auto px-4 py-8 max-w-3xl">
-      <div class="bg-white rounded-lg shadow-sm">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Chat Header -->
-        <div class="p-4 border-b border-gray-200 flex items-center">
-          <router-link to="/" class="mr-4 text-green-600 hover:text-green-700">
-            &lt; Back
-          </router-link>
+        <div
+          class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"
+        >
           <div class="flex items-center">
-            <img
-              v-if="sellerInfo?.photoURL"
-              :src="sellerInfo.photoURL"
-              class="w-10 h-10 rounded-full mr-3"
-            />
-            <div>
-              <h1 class="font-semibold">
-                Chat with {{ sellerInfo?.displayName || "Seller" }}
-              </h1>
-              <p class="text-sm text-gray-500">
-                {{ sellerInfo?.email }}
-              </p>
+            <router-link
+              to="/chats"
+              class="mr-4 text-green-600 hover:text-green-700 dark:text-green-400"
+            >
+              &lt; Back to chats
+            </router-link>
+            <div class="flex items-center">
+              <img
+                v-if="otherUserInfo?.photoURL"
+                :src="otherUserInfo.photoURL"
+                class="w-10 h-10 rounded-full mr-3"
+              />
+              <div
+                v-else
+                class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-3"
+              >
+                <span class="text-gray-600 dark:text-gray-300 font-medium">
+                  {{ otherUserInfo?.displayName?.charAt(0) || "?" }}
+                </span>
+              </div>
+              <div>
+                <h1 class="font-semibold dark:text-white">
+                  {{ chatTitle }}
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ isSeller ? "Buyer" : "Seller" }}:
+                  {{ otherUserInfo?.displayName || "User" }}
+                </p>
+              </div>
             </div>
           </div>
+
+          <router-link
+            v-if="conversationData?.listingImage"
+            :to="`/listings/${conversationData.listingId}`"
+            class="w-16 h-16 flex-shrink-0"
+          >
+            <img
+              :src="conversationData.listingImage"
+              class="w-full h-full object-cover rounded"
+              :alt="conversationData.listingTitle"
+            />
+          </router-link>
         </div>
 
         <!-- Messages Container -->
@@ -165,7 +231,7 @@ onMounted(async () => {
             :key="message.id"
             :class="[
               'flex',
-              message.senderId === authStore.user.uid
+              message.senderId === currentUser?.uid
                 ? 'justify-end'
                 : 'justify-start',
             ]"
@@ -173,41 +239,61 @@ onMounted(async () => {
             <div
               :class="[
                 'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
-                message.senderId === authStore.user.uid
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-gray-100 text-gray-800',
+                message.senderId === currentUser?.uid
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                  : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
               ]"
             >
-              <p class="break-words">{{ message.text }}</p>
-              <p class="text-xs mt-1 text-opacity-70">
-                {{ message.timestamp?.toLocaleTimeString() }}
-              </p>
+              <p class="break-words">{{ message.content }}</p>
+              <div class="flex justify-between items-end mt-1">
+                <p class="text-xs opacity-70">
+                  {{ formatTimestamp(message.timestamp) }}
+                </p>
+                <span
+                  v-if="message.senderId === currentUser?.uid"
+                  class="text-xs ml-2"
+                >
+                  <span v-if="message.read">✓✓</span>
+                  <span v-else>✓</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Message Input -->
-        <div class="p-4 border-t border-gray-200">
-          <div class="flex gap-2">
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+          <form @submit.prevent="sendMessage" class="flex gap-2">
             <textarea
               v-model="newMessage"
-              @keydown.enter.prevent="sendMessage"
+              @keydown.enter.except.prevent="sendMessage"
               placeholder="Type your message..."
-              class="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              class="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               rows="1"
+              :disabled="!isActiveConversation || sending"
             ></textarea>
             <button
-              @click="sendMessage"
-              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              type="submit"
+              :disabled="!newMessage.trim() || !isActiveConversation || sending"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Send
+              <span v-if="sending">Sending...</span>
+              <span v-else>Send</span>
             </button>
+          </form>
+
+          <div
+            v-if="!isActiveConversation"
+            class="text-sm text-red-500 dark:text-red-400 mt-2"
+          >
+            This conversation has been archived and is no longer active.
           </div>
         </div>
       </div>
     </main>
+
+    <Footer />
   </div>
-  <Footer />
 </template>
 
 <style scoped>
