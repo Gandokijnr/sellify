@@ -92,7 +92,7 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/chat/:chatId",
+    path: "/chat/:conversationId",
     name: "chat",
     component: () => import("@/views/userchat/ChatDetail.vue"),
     meta: { requiresAuth: true },

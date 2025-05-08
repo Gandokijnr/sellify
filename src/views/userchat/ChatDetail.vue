@@ -1,20 +1,18 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
-import { useRoute } from "vue-router";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
+  doc,
+  getDoc,
   collection,
   query,
-  where,
   orderBy,
   onSnapshot,
-  doc,
   addDoc,
-  serverTimestamp,
-  getDoc,
-  getDocs,
   updateDoc,
-  increment,
-  writeBatch,
+  serverTimestamp,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useAuthStore } from "@/stores/auth";
@@ -22,152 +20,186 @@ import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
+
+// Reactive state
 const messages = ref([]);
 const newMessage = ref("");
 const loading = ref(true);
 const error = ref(null);
-const chatId = ref(null);
+const conversation = ref(null);
 const otherUser = ref(null);
+const listingInfo = ref(null);
 const unsubscribeMessages = ref(null);
+const unsubscribeConversation = ref(null);
 const sending = ref(false);
 const messagesContainer = ref(null);
+const userLoading = ref(false);
 
-const currentUserId = computed(() => authStore.user.uid);
-const sellerId = computed(() => route.params.sellerId);
+// Computed properties
+const currentUserId = computed(() => authStore.user?.uid);
+const conversationId = computed(() => route.params.conversationId);
 
-// Determine which messages are from the current user
-const isCurrentUserMessage = (message) => {
-  return message.senderId === currentUserId.value;
-};
+const isSeller = computed(() => {
+  return conversation.value?.participants?.sellerId === currentUserId.value;
+});
 
-// Find or create a chat between the current user and the seller
-const findOrCreateChat = async () => {
+const otherUserId = computed(() => {
+  if (!conversation.value?.participants) return null;
+  const { sellerId, buyerId } = conversation.value.participants;
+  return currentUserId.value === sellerId ? buyerId : sellerId;
+});
+
+const chatTitle = computed(() => {
+  return conversation.value?.listingTitle
+    ? `Chat about ${conversation.value.listingTitle}`
+    : "Chat";
+});
+
+// Fetch user information
+const fetchUserInfo = async (userId) => {
   try {
-    // Validate required user IDs before proceeding
-    if (!currentUserId.value) {
-      console.error("Current user ID is missing");
-      error.value = "You must be logged in to chat.";
-      return null;
-    }
-
-    if (!sellerId.value) {
-      console.error("Seller ID is missing");
-      error.value = "Invalid seller profile.";
-      return null;
-    }
-
-    // First, check if a chat already exists between these two users
-    const chatsRef = collection(db, "chats");
-    const q = query(
-      chatsRef,
-      where("participants", "array-contains", currentUserId.value)
-    );
-
-    const querySnapshot = await getDocs(q);
-    let existingChat = null;
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.participants && data.participants.includes(sellerId.value)) {
-        existingChat = { id: doc.id, ...data };
-      }
-    });
-
-    if (existingChat) {
-      // Use existing chat
-      chatId.value = existingChat.id;
-      return existingChat.id;
-    } else {
-      // Create a new chat document
-      const chatData = {
-        participants: [currentUserId.value, sellerId.value],
-        lastMessage: { text: "" },
-        lastUpdated: serverTimestamp(),
-        [`unread_${sellerId.value}`]: 0,
-        [`unread_${currentUserId.value}`]: 0,
-      };
-
-      // Make sure all values in chatData are defined
-      Object.keys(chatData).forEach((key) => {
-        if (chatData[key] === undefined) {
-          console.warn(`Fixing undefined value for ${key} in chatData`);
-          chatData[key] = null; // Replace undefined with null for Firestore
-        }
-      });
-
-      const newChatRef = await addDoc(chatsRef, chatData);
-      chatId.value = newChatRef.id;
-      return newChatRef.id;
-    }
-  } catch (err) {
-    console.error("Error finding or creating chat:", err);
-    error.value = "Failed to load or create chat.";
-    return null;
-  }
-};
-
-// Fetch other user's info
-const fetchOtherUserInfo = async () => {
-  try {
-    // Check if sellerId is valid before proceeding
-    if (!sellerId.value) {
-      console.error("No seller ID available");
-      otherUser.value = { displayName: "Unknown User" };
+    if (!userId) {
+      console.warn("No userId provided to fetchUserInfo");
       return;
     }
 
-    const userDoc = await getDoc(doc(db, "users", sellerId.value));
+    userLoading.value = true;
+    console.log("Fetching user info for:", userId);
+
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
-      otherUser.value = { id: userDoc.id, ...userDoc.data() };
+      otherUser.value = userDoc.data();
+      console.log("User data fetched:", otherUser.value);
     } else {
-      otherUser.value = { id: sellerId.value, displayName: "Unknown User" };
+      console.warn("User document doesn't exist for ID:", userId);
+      otherUser.value = null;
     }
-  } catch (err) {
-    console.error("Error fetching user info:", err);
-    // Set a default user to prevent further errors
-    otherUser.value = { displayName: "Unknown User" };
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    otherUser.value = null;
+  } finally {
+    userLoading.value = false;
   }
 };
 
-// Send a new message
+// Fetch listing information
+const fetchListingInfo = async (listingId) => {
+  try {
+    if (!listingId) {
+      console.warn("No listingId available to fetch listing info");
+      return;
+    }
+
+    console.log("Fetching listing info for:", listingId);
+    const listingDoc = await getDoc(doc(db, "listings", listingId));
+
+    if (listingDoc.exists()) {
+      listingInfo.value = listingDoc.data();
+      console.log("Listing data fetched:", listingInfo.value);
+    } else {
+      console.warn("Listing document doesn't exist for ID:", listingId);
+      listingInfo.value = null;
+    }
+  } catch (error) {
+    console.error("Error fetching listing info:", error);
+    listingInfo.value = null;
+  }
+};
+
+// Subscribe to conversation
+const subscribeToConversation = (convId) => {
+  if (!convId) return null;
+
+  console.log("Subscribing to conversation:", convId);
+  return onSnapshot(
+    doc(db, "conversations", convId),
+    (docSnap) => {
+      if (docSnap.exists()) {
+        conversation.value = docSnap.data();
+        console.log("Conversation data received:", conversation.value);
+      } else {
+        console.warn("Conversation doesn't exist");
+        error.value = "Conversation not found";
+      }
+    },
+    (err) => {
+      console.error("Error subscribing to conversation:", err);
+      error.value = "Failed to load conversation";
+    }
+  );
+};
+
+// Subscribe to messages
+const subscribeToMessages = (convId) => {
+  if (!convId) return null;
+
+  console.log("Subscribing to messages for conversation:", convId);
+  const messagesRef = collection(db, "conversations", convId, "messages");
+  const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+
+  return onSnapshot(
+    messagesQuery,
+    (querySnap) => {
+      const msgs = [];
+      querySnap.forEach((doc) => {
+        msgs.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+      messages.value = msgs;
+      loading.value = false;
+      console.log("Messages received:", msgs.length);
+      setTimeout(scrollToBottom, 100);
+    },
+    (err) => {
+      console.error("Error subscribing to messages:", err);
+      error.value = "Failed to load messages";
+      loading.value = false;
+    }
+  );
+};
+
+// Send message
 const sendMessage = async () => {
-  if (!newMessage.value.trim() || !chatId.value || sending.value) return;
+  if (
+    !newMessage.value.trim() ||
+    sending.value ||
+    !conversationId.value ||
+    !currentUserId.value
+  )
+    return;
 
   sending.value = true;
   try {
-    const messageData = {
-      text: newMessage.value.trim(),
+    const messagesRef = collection(
+      db,
+      "conversations",
+      conversationId.value,
+      "messages"
+    );
+
+    // Create the message document
+    await addDoc(messagesRef, {
+      content: newMessage.value.trim(),
       senderId: currentUserId.value,
       timestamp: serverTimestamp(),
+      type: "text",
       read: false,
-    };
-
-    // Add message to the messages subcollection
-    const messagesRef = collection(db, "chats", chatId.value, "messages");
-    await addDoc(messagesRef, messageData);
-
-    // Update the chat document with the last message and timestamp
-    const chatRef = doc(db, "chats", chatId.value);
-    await updateDoc(chatRef, {
-      lastMessage: { text: messageData.text },
-      lastUpdated: serverTimestamp(),
-      [`unread_${sellerId.value}`]: increment(1),
     });
 
-    // Clear the input
-    newMessage.value = "";
+    // Update the lastMessage in the conversation document
+    await updateDoc(doc(db, "conversations", conversationId.value), {
+      lastMessage: newMessage.value.trim(),
+      lastMessageTimestamp: serverTimestamp(),
+    });
 
-    // Scroll to bottom after sending
-    setTimeout(() => {
-      if (messagesContainer.value) {
-        messagesContainer.value.scrollTop =
-          messagesContainer.value.scrollHeight;
-      }
-    }, 100);
-  } catch (err) {
-    console.error("Error sending message:", err);
-    error.value = "Failed to send message.";
+    newMessage.value = "";
+  } catch (error) {
+    console.error("Error sending message:", error);
+    error.value = "Failed to send message";
   } finally {
     sending.value = false;
   }
@@ -175,155 +207,128 @@ const sendMessage = async () => {
 
 // Mark messages as read
 const markMessagesAsRead = async () => {
-  if (!chatId.value) return;
+  if (!conversationId.value || !currentUserId.value) return;
 
   try {
-    // Update the chat document to clear unread count for current user
-    const chatRef = doc(db, "chats", chatId.value);
-    await updateDoc(chatRef, {
-      [`unread_${currentUserId.value}`]: 0,
-    });
-
-    // Optionally, mark individual messages as read
-    const messagesRef = collection(db, "chats", chatId.value, "messages");
-    const q = query(
+    const messagesRef = collection(
+      db,
+      "conversations",
+      conversationId.value,
+      "messages"
+    );
+    const unreadQuery = query(
       messagesRef,
-      where("senderId", "==", sellerId.value),
+      where("senderId", "!=", currentUserId.value),
       where("read", "==", false)
     );
 
-    const querySnapshot = await getDocs(q);
-    const batch = writeBatch(db);
+    const unreadDocs = await getDocs(unreadQuery);
 
-    querySnapshot.forEach((doc) => {
-      batch.update(doc.ref, { read: true });
+    const updatePromises = [];
+    unreadDocs.forEach((doc) => {
+      updatePromises.push(updateDoc(doc.ref, { read: true }));
     });
 
-    await batch.commit();
-  } catch (err) {
-    console.error("Error marking messages as read:", err);
+    await Promise.all(updatePromises);
+    console.log(`Marked ${updatePromises.length} messages as read`);
+  } catch (error) {
+    console.error("Error marking messages as read:", error);
   }
 };
 
 // Format timestamp
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return "";
-
   try {
-    // Check if timestamp is a Firestore Timestamp that needs conversion
-    if (typeof timestamp.toDate === "function") {
-      const date = timestamp.toDate();
-      const now = new Date();
-      const diffMs = now - date;
-      const diffMins = Math.floor(diffMs / 60000);
-      const diffHours = Math.floor(diffMs / 3600000);
-      const diffDays = Math.floor(diffMs / 86400000);
-
-      if (diffMins < 1) return "Just now";
-      if (diffMins < 60) return `${diffMins}m ago`;
-      if (diffHours < 24) return `${diffHours}h ago`;
-      if (diffDays < 7) return `${diffDays}d ago`;
-
-      return date.toLocaleDateString();
-    } else {
-      // Handle case where timestamp might be a different format
-      return "Unknown time";
-    }
-  } catch (err) {
-    console.error("Error formatting timestamp:", err);
-    return "Unknown time";
+    const date = timestamp.toDate();
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
   }
 };
 
-// Scroll to the bottom of the messages container
+// Scroll to bottom of messages
 const scrollToBottom = () => {
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+  const container = document.querySelector(".messages-container");
+  if (container) {
+    container.scrollTop = container.scrollHeight;
   }
 };
 
-// Initialize everything when component mounts
-onMounted(async () => {
-  loading.value = true;
-
-  try {
-    // First check if user is authenticated
-    if (!authStore.user || !authStore.user.uid) {
-      console.error("User not logged in");
-      error.value = "You must be logged in to view this chat.";
-      loading.value = false;
-      return;
-    }
-
-    // Check if sellerId is available in route params
-    if (!route.params.sellerId) {
-      console.error("No seller ID in route params");
-      error.value = "Invalid chat. Seller information is missing.";
-      loading.value = false;
-      return;
-    }
-
-    // Fetch other user's info
-    await fetchOtherUserInfo();
-
-    // Find or create a chat
-    const activeChatId = await findOrCreateChat();
-
-    if (activeChatId) {
-      // Subscribe to messages in this chat
-      const messagesRef = collection(db, "chats", activeChatId, "messages");
-      const q = query(messagesRef, orderBy("timestamp", "asc"));
-
-      unsubscribeMessages.value = onSnapshot(
-        q,
-        (snapshot) => {
-          try {
-            const newMessages = [];
-            snapshot.forEach((doc) => {
-              const data = doc.data();
-              newMessages.push({
-                id: doc.id,
-                ...data,
-                timestamp: data.timestamp, // This will be a Firestore Timestamp
-              });
-            });
-
-            messages.value = newMessages;
-            loading.value = false;
-
-            // Mark messages as read when they're loaded
-            markMessagesAsRead();
-
-            // Scroll to bottom after messages load
-            setTimeout(scrollToBottom, 100);
-          } catch (err) {
-            console.error("Error processing messages snapshot:", err);
-            error.value = "Error loading messages.";
-            loading.value = false;
-          }
-        },
-        (err) => {
-          // Handle snapshot error
-          console.error("Error in messages snapshot listener:", err);
-          error.value = "Error listening for new messages.";
-          loading.value = false;
-        }
-      );
-    } else {
-      loading.value = false;
-    }
-  } catch (err) {
-    console.error("Error initializing chat:", err);
-    error.value = "Failed to load chat history.";
-    loading.value = false;
+// Watch for changes in otherUserId and fetch user data accordingly
+watch(otherUserId, async (newUserId, oldUserId) => {
+  if (newUserId && newUserId !== oldUserId) {
+    console.log("otherUserId changed, fetching user data:", newUserId);
+    await fetchUserInfo(newUserId);
   }
 });
 
-// Clean up when component unmounts
+// Watch for changes in conversation and fetch listing data accordingly
+watch(conversation, async (newConversation) => {
+  if (newConversation?.listingId) {
+    await fetchListingInfo(newConversation.listingId);
+  }
+});
+
+// Setup listeners
+const setupListeners = async () => {
+  if (!currentUserId.value) {
+    console.warn("No current user ID available, redirecting to login");
+    router.push("/login");
+    return;
+  }
+
+  if (!conversationId.value) {
+    console.warn("No conversation ID provided, redirecting to chats");
+    router.push("/chats");
+    return;
+  }
+
+  try {
+    loading.value = true;
+
+    // Subscribe to conversation data
+    unsubscribeConversation.value = subscribeToConversation(
+      conversationId.value
+    );
+
+    // Subscribe to messages
+    unsubscribeMessages.value = subscribeToMessages(conversationId.value);
+
+    // Mark messages as read when opening chat
+    await markMessagesAsRead();
+
+    // Set up interval to periodically mark messages as read
+    const readInterval = setInterval(markMessagesAsRead, 5000);
+
+    // Cleanup interval on unmount
+    onUnmounted(() => {
+      clearInterval(readInterval);
+    });
+  } catch (err) {
+    console.error("Error setting up listeners:", err);
+    error.value = "Failed to load chat data";
+    loading.value = false;
+  }
+};
+
+// Cleanup listeners
 onUnmounted(() => {
   if (unsubscribeMessages.value) {
+    console.log("Unsubscribing from messages");
     unsubscribeMessages.value();
   }
+
+  if (unsubscribeConversation.value) {
+    console.log("Unsubscribing from conversation");
+    unsubscribeConversation.value();
+  }
+});
+
+// Initialize
+onMounted(() => {
+  console.log("Chat component mounted, setting up listeners");
+  setupListeners();
 });
 </script>
 
@@ -341,73 +346,64 @@ onUnmounted(() => {
         >
           <div class="flex items-center">
             <router-link
-              :to="{ name: 'chats' }"
-              class="mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              to="/chats"
+              class="mr-4 text-green-600 hover:text-green-700 dark:text-green-400"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+              &lt; Back to chats
             </router-link>
-
-            <div v-if="otherUser" class="flex items-center">
-              <div class="relative">
-                <img
-                  v-if="otherUser.photoURL"
-                  :src="otherUser.photoURL"
-                  :alt="`${otherUser.displayName}'s profile`"
-                  class="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-gray-700"
-                />
-                <div
-                  v-else
-                  class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-lg font-medium text-gray-600 dark:text-gray-300"
-                >
-                  {{
-                    otherUser.displayName
-                      ? otherUser.displayName.charAt(0).toUpperCase()
-                      : "?"
-                  }}
-                </div>
+            <div class="flex items-center">
+              <div
+                v-if="userLoading"
+                class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-3 animate-pulse"
+              >
+                <span class="sr-only">Loading</span>
               </div>
-
-              <div class="ml-3">
-                <h2 class="font-semibold text-gray-900 dark:text-white">
-                  {{ otherUser.displayName || "Unknown User" }}
-                </h2>
-                <p
-                  v-if="otherUser.status"
-                  class="text-xs text-gray-500 dark:text-gray-400"
-                >
-                  {{ otherUser.status }}
+              <img
+                v-else-if="otherUser?.photoURL"
+                :src="otherUser.photoURL"
+                class="w-10 h-10 rounded-full mr-3"
+                alt="User avatar"
+              />
+              <div
+                v-else
+                class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-3"
+              >
+                <span class="text-gray-600 dark:text-gray-300 font-medium">
+                  {{ otherUser?.displayName?.charAt(0) || "?" }}
+                </span>
+              </div>
+              <div>
+                <h1 class="font-semibold dark:text-white">
+                  {{ chatTitle }}
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ isSeller ? "Buyer" : "Seller" }}:
+                  {{
+                    otherUser?.displayName ||
+                    (userLoading ? "Loading..." : "Unknown User")
+                  }}
                 </p>
               </div>
             </div>
-
-            <div v-else class="flex items-center animate-pulse">
-              <div
-                class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700"
-              ></div>
-              <div class="ml-3">
-                <div
-                  class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"
-                ></div>
-              </div>
-            </div>
           </div>
+
+          <router-link
+            v-if="conversation?.listingImage"
+            :to="`/listings/${conversation.listingId}`"
+            class="w-16 h-16 flex-shrink-0"
+          >
+            <img
+              :src="conversation.listingImage"
+              class="w-full h-full object-cover rounded"
+              :alt="conversation.listingTitle"
+            />
+          </router-link>
         </div>
 
-        <!-- Chat Messages -->
+        <!-- Messages Container -->
         <div
-          class="h-96 p-4 overflow-y-auto flex flex-col space-y-4"
           ref="messagesContainer"
+          class="messages-container h-96 overflow-y-auto p-4 space-y-4"
         >
           <!-- Loading State -->
           <div v-if="loading" class="flex justify-center items-center h-full">
@@ -421,11 +417,11 @@ onUnmounted(() => {
             v-else-if="error"
             class="flex justify-center items-center h-full"
           >
-            <div class="text-center">
-              <p class="text-red-500">{{ error }}</p>
+            <div class="text-center p-4 bg-red-100 dark:bg-red-900 rounded-lg">
+              <p class="text-red-600 dark:text-red-200">{{ error }}</p>
               <button
-                @click="findOrCreateChat"
-                class="mt-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                @click="setupListeners"
+                class="mt-2 px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800"
               >
                 Retry
               </button>
@@ -461,41 +457,36 @@ onUnmounted(() => {
           <!-- Messages -->
           <template v-else>
             <div
-              v-for="(message, index) in messages"
+              v-for="message in messages"
               :key="message.id"
               :class="[
                 'flex',
-                isCurrentUserMessage(message) ? 'justify-end' : 'justify-start',
-                index === 0 ||
-                (messages[index - 1] &&
-                  messages[index - 1].senderId !== message.senderId)
-                  ? 'mt-4'
-                  : 'mt-1',
+                message.senderId === currentUserId
+                  ? 'justify-end'
+                  : 'justify-start',
               ]"
             >
               <div
                 :class="[
-                  'max-w-xs md:max-w-md px-4 py-2 rounded-lg',
-                  isCurrentUserMessage(message)
-                    ? 'bg-green-500 text-white rounded-br-none'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-none',
+                  'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
+                  message.senderId === currentUserId
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                    : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
                 ]"
               >
-                <p>{{ message.text }}</p>
-                <p
-                  :class="[
-                    'text-xs mt-1 text-right',
-                    isCurrentUserMessage(message)
-                      ? 'text-green-100'
-                      : 'text-gray-500 dark:text-gray-400',
-                  ]"
-                >
-                  {{
-                    message.timestamp
-                      ? formatTimestamp(message.timestamp)
-                      : "Sending..."
-                  }}
-                </p>
+                <p class="break-words">{{ message.content }}</p>
+                <div class="flex justify-between items-end mt-1">
+                  <p class="text-xs opacity-70">
+                    {{ formatTimestamp(message.timestamp) }}
+                  </p>
+                  <span
+                    v-if="message.senderId === currentUserId"
+                    class="text-xs ml-2"
+                  >
+                    <span v-if="message.read">✓✓</span>
+                    <span v-else>✓</span>
+                  </span>
+                </div>
               </div>
             </div>
           </template>
@@ -503,44 +494,22 @@ onUnmounted(() => {
 
         <!-- Message Input -->
         <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-          <form
-            @submit.prevent="sendMessage"
-            class="flex items-center space-x-2"
-          >
-            <input
+          <form @submit.prevent="sendMessage" class="flex gap-2">
+            <textarea
               v-model="newMessage"
-              type="text"
+              @keydown.enter.except.prevent="sendMessage"
               placeholder="Type your message..."
-              class="flex-1 border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-green-400 dark:focus:border-green-400 transition-colors"
+              class="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              rows="1"
               :disabled="sending"
-            />
+            ></textarea>
             <button
               type="submit"
-              class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full transition-colors focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               :disabled="!newMessage.trim() || sending"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              <svg
-                v-if="sending"
-                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <span>Send</span>
+              <span v-if="sending">Sending...</span>
+              <span v-else>Send</span>
             </button>
           </form>
         </div>
@@ -550,3 +519,9 @@ onUnmounted(() => {
     <Footer />
   </div>
 </template>
+
+<style scoped>
+.messages-container {
+  scroll-behavior: smooth;
+}
+</style>
