@@ -81,7 +81,7 @@ const fetchUserProfile = async () => {
   }
 };
 
-const fetchProducts = () => {
+const fetchProducts = async () => {
   loading.value = true;
   try {
     unsubscribe = onSnapshot(collection(db, "listings"), (querySnapshot) => {
@@ -92,8 +92,7 @@ const fetchProducts = () => {
       console.log("Listings updated in real-time");
     });
   } catch (error) {
-    console.error("Failed to set up real-time listener:", error);
-    toast.error("Failed to load listings");
+    console.error("Error fetching listings:", error);
   } finally {
     loading.value = false;
   }
