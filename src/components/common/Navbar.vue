@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeMount, onUnmounted } from "vue";
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 import { useAuthStore } from "@/stores/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -13,7 +13,6 @@ const mobileMenuOpen = ref(false);
 const userProfile = ref(null);
 const unreadCount = ref(0);
 let unsubscribeUnread = null;
-
 
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
@@ -114,7 +113,6 @@ onUnmounted(() => {
           </router-link>
         </div>
 
-        
         <!-- User Actions -->
         <div class="flex items-center space-x-4">
           <router-link
@@ -135,26 +133,32 @@ onUnmounted(() => {
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               />
             </svg>
-            <span class="text-xs">Saved</span>
           </router-link>
 
           <router-link
             :to="authStore.isAuthenticated ? '/chats' : '/login'"
             class="flex-col items-center text-gray-600 hover:text-green-600 relative"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-              <path d="M3.505 2.365A41.369 41.369 0 0 1 9 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 0 0-.577-.069 43.141 43.141 0 0 0-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 0 1 5 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914Z" />
-              <path d="M14 6c-.762 0-1.52.02-2.271.062C10.157 6.148 9 7.472 9 8.998v2.24c0 1.519 1.147 2.839 2.71 2.935.214.013.428.024.642.034.2.009.385.09.518.224l2.35 2.35a.75.75 0 0 0 1.28-.531v-2.07c1.453-.195 2.5-1.463 2.5-2.915V8.998c0-1.526-1.157-2.85-2.729-2.936A41.645 41.645 0 0 0 14 6Z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="size-5"
+            >
+              <path
+                d="M3.505 2.365A41.369 41.369 0 0 1 9 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 0 0-.577-.069 43.141 43.141 0 0 0-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 0 1 5 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914Z"
+              />
+              <path
+                d="M14 6c-.762 0-1.52.02-2.271.062C10.157 6.148 9 7.472 9 8.998v2.24c0 1.519 1.147 2.839 2.71 2.935.214.013.428.024.642.034.2.009.385.09.518.224l2.35 2.35a.75.75 0 0 0 1.28-.531v-2.07c1.453-.195 2.5-1.463 2.5-2.915V8.998c0-1.526-1.157-2.85-2.729-2.936A41.645 41.645 0 0 0 14 6Z"
+              />
             </svg>
-            <span class="text-xs">Messages</span>
-            <span 
+            <span
               v-if="unreadCount > 0"
               class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs"
             >
               {{ unreadCount }}
             </span>
           </router-link>
-
 
           <div v-if="authStore.isLoading" class="flex items-center">
             <span class="text-gray-500 text-sm">Loading...</span>
