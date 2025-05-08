@@ -78,12 +78,12 @@ const callSeller = () => {
 
 const startChat = () => {
   if (!authStore.user) {
-    router.push('/login');
+    router.push("/login");
     return;
   }
   router.push({
-    name: 'chat',
-    params: { sellerId: listing.value.userId }
+    name: "chat",
+    params: { sellerId: listing.value.userId },
   });
 };
 

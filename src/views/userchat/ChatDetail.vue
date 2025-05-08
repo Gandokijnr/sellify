@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
-import { useRoute } from "vue-router";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   collection,
   query,
@@ -12,6 +12,9 @@ import {
   serverTimestamp,
   getDoc,
   getDocs,
+  updateDoc,
+  increment,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useAuthStore } from "@/stores/auth";
@@ -19,6 +22,7 @@ import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 const messages = ref([]);
 const newMessage = ref("");
@@ -28,9 +32,32 @@ const chatId = ref(null);
 const otherUser = ref(null);
 const unsubscribeMessages = ref(null);
 const sending = ref(false);
+const messagesContainer = ref(null);
 
-const currentUserId = computed(() => authStore.user.uid);
-const sellerId = computed(() => route.params.sellerId);
+// Get the seller ID from route params or query params
+const sellerId = computed(() => {
+  // First check route params
+  if (route.params.sellerId) {
+    return route.params.sellerId;
+  }
+
+  // Fall back to query params if available
+  if (route.query.sellerId) {
+    return route.query.sellerId;
+  }
+
+  return null;
+});
+
+const currentUserId = computed(() => authStore.user?.uid || null);
+
+// Watch for changes in route or auth state
+watch([sellerId, currentUserId], ([newSellerId, newUserId]) => {
+  if (newSellerId && newUserId && newSellerId !== newUserId) {
+    // Only reinitialize if we have both IDs and they're not the same user
+    initializeChat();
+  }
+});
 
 // Determine which messages are from the current user
 const isCurrentUserMessage = (message) => {
@@ -40,6 +67,19 @@ const isCurrentUserMessage = (message) => {
 // Find or create a chat between the current user and the seller
 const findOrCreateChat = async () => {
   try {
+    // Validate required user IDs before proceeding
+    if (!currentUserId.value) {
+      console.error("Current user ID is missing");
+      error.value = "You must be logged in to chat.";
+      return null;
+    }
+
+    if (!sellerId.value) {
+      console.error("Seller ID is missing");
+      error.value = "Invalid seller profile. Missing seller ID.";
+      return null;
+    }
+
     // First, check if a chat already exists between these two users
     const chatsRef = collection(db, "chats");
     const q = query(
@@ -52,7 +92,11 @@ const findOrCreateChat = async () => {
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      if (data.participants.includes(sellerId.value)) {
+      if (
+        data.participants &&
+        Array.isArray(data.participants) &&
+        data.participants.includes(sellerId.value)
+      ) {
         existingChat = { id: doc.id, ...data };
       }
     });
@@ -71,6 +115,14 @@ const findOrCreateChat = async () => {
         [`unread_${currentUserId.value}`]: 0,
       };
 
+      // Make sure all values in chatData are defined
+      Object.keys(chatData).forEach((key) => {
+        if (chatData[key] === undefined) {
+          console.warn(`Fixing undefined value for ${key} in chatData`);
+          chatData[key] = null; // Replace undefined with null for Firestore
+        }
+      });
+
       const newChatRef = await addDoc(chatsRef, chatData);
       chatId.value = newChatRef.id;
       return newChatRef.id;
@@ -85,14 +137,27 @@ const findOrCreateChat = async () => {
 // Fetch other user's info
 const fetchOtherUserInfo = async () => {
   try {
+    // Check if sellerId is valid before proceeding
+    if (!sellerId.value) {
+      console.error("No seller ID available");
+      error.value = "Missing seller information.";
+      otherUser.value = { displayName: "Unknown User" };
+      return;
+    }
+
     const userDoc = await getDoc(doc(db, "users", sellerId.value));
     if (userDoc.exists()) {
       otherUser.value = { id: userDoc.id, ...userDoc.data() };
     } else {
+      console.error("Seller document doesn't exist");
+      error.value = "Seller profile not found.";
       otherUser.value = { id: sellerId.value, displayName: "Unknown User" };
     }
   } catch (err) {
     console.error("Error fetching user info:", err);
+    error.value = "Error loading seller information.";
+    // Set a default user to prevent further errors
+    otherUser.value = { displayName: "Unknown User" };
   }
 };
 
@@ -123,6 +188,14 @@ const sendMessage = async () => {
 
     // Clear the input
     newMessage.value = "";
+
+    // Scroll to bottom after sending
+    setTimeout(() => {
+      if (messagesContainer.value) {
+        messagesContainer.value.scrollTop =
+          messagesContainer.value.scrollHeight;
+      }
+    }, 100);
   } catch (err) {
     console.error("Error sending message:", err);
     error.value = "Failed to send message.";
@@ -167,26 +240,83 @@ const markMessagesAsRead = async () => {
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return "";
 
-  const date = timestamp.toDate();
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+  try {
+    // Check if timestamp is a Firestore Timestamp that needs conversion
+    if (typeof timestamp.toDate === "function") {
+      const date = timestamp.toDate();
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+      if (diffMins < 1) return "Just now";
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
 
-  return date.toLocaleDateString();
+      return date.toLocaleDateString();
+    } else {
+      // Handle case where timestamp might be a different format
+      return "Unknown time";
+    }
+  } catch (err) {
+    console.error("Error formatting timestamp:", err);
+    return "Unknown time";
+  }
 };
 
-// Initialize everything when component mounts
-onMounted(async () => {
+// Scroll to the bottom of the messages container
+const scrollToBottom = () => {
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+  }
+};
+
+// Redirect to listings page with error
+const redirectToListings = () => {
+  router.push({
+    name: "listings",
+    query: {
+      error: "Invalid chat. Please select a valid seller to chat with.",
+    },
+  });
+};
+
+// Initialize chat (can be called when params change or component mounts)
+const initializeChat = async () => {
   loading.value = true;
+  error.value = null;
+
+  // Reset state when reinitializing
+  if (unsubscribeMessages.value) {
+    unsubscribeMessages.value();
+    unsubscribeMessages.value = null;
+  }
+
+  messages.value = [];
+  chatId.value = null;
+  otherUser.value = null;
 
   try {
+    // First check if user is authenticated
+    if (!authStore.user || !authStore.user.uid) {
+      console.error("User not logged in");
+      error.value = "You must be logged in to view this chat.";
+      loading.value = false;
+      return;
+    }
+
+    // Check if sellerId is available
+    if (!sellerId.value) {
+      console.error("No seller ID available");
+      error.value = "Invalid chat. Seller information is missing.";
+      loading.value = false;
+      // Consider redirecting to listings page after a delay
+      setTimeout(redirectToListings, 3000);
+      return;
+    }
+
     // Fetch other user's info
     await fetchOtherUserInfo();
 
@@ -198,29 +328,54 @@ onMounted(async () => {
       const messagesRef = collection(db, "chats", activeChatId, "messages");
       const q = query(messagesRef, orderBy("timestamp", "asc"));
 
-      unsubscribeMessages.value = onSnapshot(q, (snapshot) => {
-        const newMessages = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          newMessages.push({
-            id: doc.id,
-            ...data,
-            timestamp: data.timestamp, // This will be a Firestore Timestamp
-          });
-        });
+      unsubscribeMessages.value = onSnapshot(
+        q,
+        (snapshot) => {
+          try {
+            const newMessages = [];
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              newMessages.push({
+                id: doc.id,
+                ...data,
+                timestamp: data.timestamp, // This will be a Firestore Timestamp
+              });
+            });
 
-        messages.value = newMessages;
-        loading.value = false;
+            messages.value = newMessages;
+            loading.value = false;
 
-        // Mark messages as read when they're loaded
-        markMessagesAsRead();
-      });
+            // Mark messages as read when they're loaded
+            markMessagesAsRead();
+
+            // Scroll to bottom after messages load
+            setTimeout(scrollToBottom, 100);
+          } catch (err) {
+            console.error("Error processing messages snapshot:", err);
+            error.value = "Error loading messages.";
+            loading.value = false;
+          }
+        },
+        (err) => {
+          // Handle snapshot error
+          console.error("Error in messages snapshot listener:", err);
+          error.value = "Error listening for new messages.";
+          loading.value = false;
+        }
+      );
+    } else {
+      loading.value = false;
     }
   } catch (err) {
     console.error("Error initializing chat:", err);
     error.value = "Failed to load chat history.";
     loading.value = false;
   }
+};
+
+// Initialize everything when component mounts
+onMounted(() => {
+  initializeChat();
 });
 
 // Clean up when component unmounts
@@ -308,6 +463,16 @@ onUnmounted(() => {
           </div>
         </div>
 
+        <!-- Error Banner for Missing Seller ID -->
+        <div
+          v-if="!sellerId"
+          class="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100"
+        >
+          <p class="text-center">
+            Missing seller information. Redirecting to listings page...
+          </p>
+        </div>
+
         <!-- Chat Messages -->
         <div
           class="h-96 p-4 overflow-y-auto flex flex-col space-y-4"
@@ -328,7 +493,7 @@ onUnmounted(() => {
             <div class="text-center">
               <p class="text-red-500">{{ error }}</p>
               <button
-                @click="findOrCreateChat"
+                @click="initializeChat"
                 class="mt-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
               >
                 Retry
@@ -338,7 +503,7 @@ onUnmounted(() => {
 
           <!-- Empty State -->
           <div
-            v-else-if="messages.length === 0"
+            v-else-if="messages.length === 0 && !error && !loading"
             class="flex justify-center items-center h-full text-center"
           >
             <div>
@@ -416,12 +581,12 @@ onUnmounted(() => {
               type="text"
               placeholder="Type your message..."
               class="flex-1 border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:focus:ring-green-400 dark:focus:border-green-400 transition-colors"
-              :disabled="sending"
+              :disabled="sending || !sellerId || error"
             />
             <button
               type="submit"
               class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full transition-colors focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              :disabled="!newMessage.trim() || sending"
+              :disabled="!newMessage.trim() || sending || !sellerId || error"
             >
               <svg
                 v-if="sending"
