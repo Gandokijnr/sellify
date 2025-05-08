@@ -185,7 +185,7 @@ async function logContactAttempt() {
     const contactAttempt = {
       requestId: selectedRequest.value.id,
       buyerId: selectedRequest.value.userId,
-      sellerId: authStore.user.uid,
+      chatId: authStore.user.uid,
       timestamp: new Date(),
       requestTitle: selectedRequest.value.title,
     };

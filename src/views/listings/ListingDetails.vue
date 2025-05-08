@@ -81,9 +81,10 @@ const startChat = () => {
     router.push("/login");
     return;
   }
+
   router.push({
     name: "chat",
-    params: { sellerId: listing.value.userId },
+    params: { chatId: listing.value.userId },
   });
 };
 

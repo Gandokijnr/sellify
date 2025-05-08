@@ -99,13 +99,13 @@ const routes = [
     props: true,
   },
   // Backwards compatibility with old route pattern
-  {
-    path: "/chat/seller/:sellerId",
-    name: "chatWithSeller",
-    component: () => import("@/views/userchat/ChatDetail.vue"),
-    meta: { requiresAuth: true },
-    props: true,
-  },
+  // {
+  //   path: "/chat/seller/:chatId",
+  //   name: "chatWithSeller",
+  //   component: () => import("@/views/userchat/ChatDetail.vue"),
+  //   meta: { requiresAuth: true },
+  //   props: true,
+  // },
 ];
 
 const router = createRouter({

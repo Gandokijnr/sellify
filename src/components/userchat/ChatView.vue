@@ -1,50 +1,49 @@
 <!-- ChatView.vue -->
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import Navbar from '@/components/common/Navbar.vue';
-import Footer from '@/components/common/Footer.vue';
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Navbar from "@/components/common/Navbar.vue";
+import Footer from "@/components/common/Footer.vue";
 
-import { 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  onSnapshot, 
-  addDoc, 
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  addDoc,
   getDoc,
   getDocs,
   doc,
-  updateDoc, 
+  updateDoc,
   arrayUnion,
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '@/firebase';
-import { useAuthStore } from '@/stores/auth';
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "@/firebase";
+import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 const messages = ref([]);
-const newMessage = ref('');
+const newMessage = ref("");
 const sellerInfo = ref(null);
 const unsubscribeMessages = ref(null);
 const chatRef = ref(null);
-const chatRoomId = ref('');
-const sellerId = ref('');
+const chatRoomId = ref("");
+const chatId = ref("");
 
 // Fetch seller information
 const fetchSellerInfo = async () => {
   try {
-    const sellerDoc = await getDoc(doc(db, 'users', route.params.sellerId));
+    const sellerDoc = await getDoc(doc(db, "users", route.params.chatId));
     if (sellerDoc.exists()) {
       sellerInfo.value = sellerDoc.data();
     }
   } catch (error) {
-    console.error('Error fetching seller info:', error);
+    console.error("Error fetching seller info:", error);
   }
 };
-
 
 onUnmounted(() => {
   if (unsubscribeMessages.value) unsubscribeMessages.value();
@@ -59,80 +58,71 @@ const sendMessage = async () => {
       lastMessage: {
         text: newMessage.value.trim(),
         senderId: authStore.user.uid,
-        timestamp: serverTimestamp()
+        timestamp: serverTimestamp(),
       },
       lastUpdated: serverTimestamp(),
-      [`unread_${sellerId.value}`]: (await getDoc(chatRef.value)).data()[`unread_${sellerId.value}`] + 1 || 1,
-      participants: arrayUnion(authStore.user.uid, sellerId.value)
+      [`unread_${chatId.value}`]:
+        (await getDoc(chatRef.value)).data()[`unread_${chatId.value}`] + 1 || 1,
+      participants: arrayUnion(authStore.user.uid, chatId.value),
     });
 
     // Add message
-    await addDoc(
-      collection(db, 'chats', chatRoomId.value, 'messages'), 
-      {
-        text: newMessage.value.trim(),
-        senderId: authStore.user.uid,
-        timestamp: serverTimestamp(),
-        read: false
-      }
-    );
-    
-    newMessage.value = '';
+    await addDoc(collection(db, "chats", chatRoomId.value, "messages"), {
+      text: newMessage.value.trim(),
+      senderId: authStore.user.uid,
+      timestamp: serverTimestamp(),
+      read: false,
+    });
+
+    newMessage.value = "";
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error("Error sending message:", error);
   }
 };
 
-
 // Setup real-time messages listener
 onMounted(async () => {
-  if (!authStore.user) return router.push('/login');
-  
-  await fetchSellerInfo();
-  
-  sellerId.value = route.params.sellerId;
-  chatRoomId.value = [authStore.user.uid, sellerId.value].sort().join('_');
-  chatRef.value = doc(db, 'chats', chatRoomId.value);
+  if (!authStore.user) return router.push("/login");
 
-  const messagesRef = collection(
-    db, 
-    'chats', 
-    chatRoomId.value, 
-    'messages'
-  );
-  
-  const q = query(
-    messagesRef,
-    orderBy('timestamp', 'asc')
-  );
+  await fetchSellerInfo();
+
+  chatId.value = route.params.chatId;
+  chatRoomId.value = [authStore.user.uid, chatId.value].sort().join("_");
+  chatRef.value = doc(db, "chats", chatRoomId.value);
+
+  const messagesRef = collection(db, "chats", chatRoomId.value, "messages");
+
+  const q = query(messagesRef, orderBy("timestamp", "asc"));
 
   unsubscribeMessages.value = onSnapshot(q, (snapshot) => {
-    messages.value = snapshot.docs.map(doc => ({
+    messages.value = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate()
+      timestamp: doc.data().timestamp?.toDate(),
     }));
     // Scroll to bottom
     setTimeout(() => {
-      const container = document.querySelector('.messages-container');
+      const container = document.querySelector(".messages-container");
       if (container) container.scrollTop = container.scrollHeight;
     }, 100);
   });
 
   // Mark messages as read when opening chat
   const markAsRead = async () => {
-    const messagesSnapshot = await getDocs(query(
-      collection(db, 'chats', chatRoomId.value, 'messages'),
-      where('read', '==', false),
-      where('senderId', '==', sellerId.value)
-    ));
+    const messagesSnapshot = await getDocs(
+      query(
+        collection(db, "chats", chatRoomId.value, "messages"),
+        where("read", "==", false),
+        where("senderId", "==", chatId.value)
+      )
+    );
 
     messagesSnapshot.forEach(async (msgDoc) => {
       await updateDoc(msgDoc.ref, { read: true });
     });
 
     await updateDoc(chatRef.value, {
-      [`unread_${authStore.user.uid}`]: 0
+      [`unread_${authStore.user.uid}`]: 0,
     });
   };
 
@@ -143,26 +133,23 @@ onMounted(async () => {
 <template>
   <div class="min-h-screen bg-gray-50">
     <Navbar />
-    
+
     <main class="container mx-auto px-4 py-8 max-w-3xl">
       <div class="bg-white rounded-lg shadow-sm">
         <!-- Chat Header -->
         <div class="p-4 border-b border-gray-200 flex items-center">
-          <router-link 
-            to="/" 
-            class="mr-4 text-green-600 hover:text-green-700"
-          >
+          <router-link to="/" class="mr-4 text-green-600 hover:text-green-700">
             &lt; Back
           </router-link>
           <div class="flex items-center">
-            <img 
+            <img
               v-if="sellerInfo?.photoURL"
-              :src="sellerInfo.photoURL" 
+              :src="sellerInfo.photoURL"
               class="w-10 h-10 rounded-full mr-3"
             />
             <div>
               <h1 class="font-semibold">
-                Chat with {{ sellerInfo?.displayName || 'Seller' }}
+                Chat with {{ sellerInfo?.displayName || "Seller" }}
               </h1>
               <p class="text-sm text-gray-500">
                 {{ sellerInfo?.email }}
@@ -173,14 +160,14 @@ onMounted(async () => {
 
         <!-- Messages Container -->
         <div class="messages-container h-96 overflow-y-auto p-4 space-y-4">
-          <div 
+          <div
             v-for="message in messages"
             :key="message.id"
             :class="[
               'flex',
-              message.senderId === authStore.user.uid 
-                ? 'justify-end' 
-                : 'justify-start'
+              message.senderId === authStore.user.uid
+                ? 'justify-end'
+                : 'justify-start',
             ]"
           >
             <div
@@ -188,7 +175,7 @@ onMounted(async () => {
                 'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
                 message.senderId === authStore.user.uid
                   ? 'bg-green-100 text-green-800'
-                  : 'bg-gray-100 text-gray-800'
+                  : 'bg-gray-100 text-gray-800',
               ]"
             >
               <p class="break-words">{{ message.text }}</p>
@@ -218,11 +205,9 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-
     </main>
   </div>
   <Footer />
-
 </template>
 
 <style scoped>
