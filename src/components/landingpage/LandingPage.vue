@@ -1,8 +1,8 @@
 <script setup>
-import { onMounted, computed, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import { collection, onSnapshot } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
-import CategoryGrid from "@/components/categories/CategoryGrid.vue"; // Import the new component
+import CategoryGrid from "@/components/categories/CategoryGrid.vue";
 
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";

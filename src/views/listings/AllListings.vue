@@ -52,7 +52,7 @@ let unsubscribe = null;
 
 const categories = ref([
   { id: 1, name: "All", label: "All", icon: "📦" },
-  { id: 2, name: "electronics", label: "Electronics", icon: "📱" },
+  { id: 2, name: "Mobile Phones", label: "Mobile Phones", icon: "📱" },
   { id: 3, name: "vehicles", label: "Vehicles", icon: "🚗" },
   { id: 4, name: "property", label: "Property", icon: "🏠" },
   { id: 5, name: "fashion", label: "Fashion", icon: "👕" },
