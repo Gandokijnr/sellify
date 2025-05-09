@@ -564,7 +564,7 @@ onMounted(() => {
       <!-- Chat Modal -->
       <div
         v-if="showChatModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        class="fixed inset-0 backdrop-blur flex items-center justify-center p-4 z-50"
       >
         <div class="bg-white rounded-xl w-full max-w-md">
           <div
