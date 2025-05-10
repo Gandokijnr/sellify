@@ -424,7 +424,7 @@ function getBudgetClass(maxBudget) {
                   :class="getBudgetClass(request.maxBudget)"
                   class="ml-1 font-bold"
                 >
-                  ${{ request.minBudget }} - ${{ request.maxBudget }}
+                ₦{{ request.minBudget }} - ₦{{ request.maxBudget }}
                 </span>
               </div>
 

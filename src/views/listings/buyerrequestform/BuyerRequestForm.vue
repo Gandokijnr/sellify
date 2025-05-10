@@ -179,7 +179,7 @@ const cancel = () => {
       "Are you sure you want to cancel? All progress will be lost."
     )
   ) {
-    router.push("/buyer/requests");
+    router.push("/");
   }
 };
 
@@ -189,7 +189,7 @@ const getStepIcon = (step) => {
     case 1:
       return "clipboard-list";
     case 2:
-      return "currency-dollar";
+      return "currency-naira";
     case 3:
       return "check-circle";
     default:
