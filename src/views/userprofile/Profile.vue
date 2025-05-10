@@ -1,7 +1,7 @@
 <template>
   <Navbar />
   <div class="bg-gray-50 min-h-screen py-8">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="bg-white rounded-lg shadow overflow-hidden">
         <!-- Profile Header -->
         <div class="bg-green-600 px-6 py-4">
