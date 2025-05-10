@@ -208,7 +208,7 @@ const updateListing = async () => {
     await updateDoc(listingRef, updateData);
 
     toast.success("Listing updated successfully!");
-    router.push(`/listing/${listingId}`);
+    router.push(`/seller/dashboard`);
   } catch (err) {
     console.error("Update error:", err);
     error.value = err.message || "Failed to update listing";

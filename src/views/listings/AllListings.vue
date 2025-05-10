@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, computed, onUnmounted, watch } from "vue";
-import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, getDoc, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
@@ -84,15 +84,20 @@ const fetchUserProfile = async () => {
 const fetchProducts = async () => {
   loading.value = true;
   try {
-    unsubscribe = onSnapshot(collection(db, "listings"), (querySnapshot) => {
+    const q = query(
+      collection(db, "listings"),
+      where("status", "==", "active")
+    );
+
+    unsubscribe = onSnapshot(q, (querySnapshot) => {
       listings.value = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      console.log("Listings updated in real-time");
+      console.log("Active listings updated in real-time");
     });
   } catch (error) {
-    console.error("Error fetching listings:", error);
+    console.error("Error fetching active listings:", error);
   } finally {
     loading.value = false;
   }

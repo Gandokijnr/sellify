@@ -41,7 +41,7 @@ const categories = ref([
     icon: "📱",
     count: 0,
     isValid: true,
-    url: "/listings?subcategory=mobile phones",
+    url: "/listings?subcategory=Mobile phones",
   },
   {
     id: 2,
@@ -49,7 +49,7 @@ const categories = ref([
     icon: "💻",
     count: 0,
     isValid: true,
-    url: "/listings?leafCategory=laptops",
+    url: "/listings?leafCategory=Laptops",
   },
   {
     id: 3,
@@ -57,7 +57,7 @@ const categories = ref([
     icon: "🏞️",
     count: 0,
     isValid: true,
-    url: "/listings?subcategory=land for sale",
+    url: "/listings?subcategory=Land for sale",
   },
   {
     id: 4,
@@ -65,7 +65,7 @@ const categories = ref([
     icon: "🏠",
     count: 0,
     isValid: true,
-    url: "/listings?subcategory=house for rent",
+    url: "/listings?subcategory=House for rent",
   },
   {
     id: 5,
@@ -73,7 +73,7 @@ const categories = ref([
     icon: "💼",
     count: 0,
     isValid: true,
-    url: "/listings?category=jobs",
+    url: "/listings?category=Jobs",
   },
   {
     id: 6,
@@ -81,7 +81,7 @@ const categories = ref([
     icon: "🚗",
     count: 0,
     isValid: true,
-    url: "/listings?category=vehicles",
+    url: "/listings?category=Vehicles",
   },
   {
     id: 7,
@@ -89,7 +89,7 @@ const categories = ref([
     icon: "👕",
     count: 0,
     isValid: true,
-    url: "/listings?subcategory=clothing",
+    url: "/listings?subcategory=Clothing",
   },
 ]);
 
@@ -135,13 +135,15 @@ const fetchAllCategoryCounts = () => {
         // Create first query
         const qSubCategory = query(
           collection(db, "listings"),
-          where("subCategory", "==", categoryValue)
+          where("subCategory", "==", categoryValue),
+          where("status", "==", "active")
         );
 
         // Create second query
         const qLeafCategory = query(
           collection(db, "listings"),
-          where("leafCategory", "==", categoryValue)
+          where("leafCategory", "==", categoryValue),
+          where("status", "==", "active")
         );
 
         // Set up listeners for both queries
