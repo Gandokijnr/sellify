@@ -56,6 +56,20 @@
                       </div>
                     </div>
 
+                    <!-- status update -->
+                    <div>
+                      <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                      <select
+                        id="status"
+                        v-model="form.status"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        required
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
+
                     <!-- Description -->
                     <div class="col-span-2">
                       <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -121,6 +135,7 @@ const listingId = route.params.id;
 
 const form = reactive({
   price: "",
+  status: "active",
   description: ""
 });
 
@@ -151,7 +166,8 @@ const fetchListing = async () => {
     // Populate form data with only price and description
     Object.assign(form, {
       price: listingData.price || "",
-      description: listingData.description || ""
+      description: listingData.description || "",
+      status: listingData.status || "active"
     });
 
   } catch (err) {
@@ -181,6 +197,7 @@ const updateListing = async () => {
     // Prepare update data
     const updateData = {
       price: Number(form.price),
+      status: form.status,
       description: form.description,
       updatedAt: serverTimestamp()
     };

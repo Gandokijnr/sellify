@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
 import CategoryGrid from "@/components/categories/CategoryGrid.vue";
 
@@ -21,12 +21,17 @@ let unsubscribe = null;
 const fetchProducts = () => {
   loading.value = true;
   try {
-    unsubscribe = onSnapshot(collection(db, "listings"), (querySnapshot) => {
+    const activeListingsQuery = query(
+      collection(db, "listings"),
+      where("status", "==", "active")
+    );
+    
+    unsubscribe = onSnapshot(activeListingsQuery, (querySnapshot) => {
       listings.value = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      console.log("Listings updated in real-time");
+      console.log("Active listings updated in real-time");
     });
   } catch (error) {
     console.error("Failed to set up real-time listener:", error);
@@ -34,7 +39,6 @@ const fetchProducts = () => {
     loading.value = false;
   }
 };
-
 function viewListing(id) {
   router.push({ name: "listing-details", params: { id } });
 }
