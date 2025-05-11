@@ -43,45 +43,9 @@ function viewListing(id) {
   router.push({ name: "listing-details", params: { id } });
 }
 
-// Load favorites from localStorage when component mounts
-const loadFavorites = () => {
-  const savedFavorites = localStorage.getItem("favorites");
-  if (savedFavorites) {
-    favorites.value = JSON.parse(savedFavorites);
-  }
-};
-
-// Toggle favorite status
-const toggleFavorite = (listingId) => {
-  const index = favorites.value.indexOf(listingId);
-  if (index === -1) {
-    favorites.value.push(listingId);
-  } else {
-    favorites.value.splice(index, 1);
-  }
-  // Save to localStorage
-  localStorage.setItem("favorites", JSON.stringify(favorites.value));
-};
-
-// Check if listing is favorite
-const isFavorite = (listingId) => {
-  return favorites.value.includes(listingId);
-};
-
-// Watch for changes in favorites and save to localStorage
-watch(
-  favorites,
-  (newVal) => {
-    localStorage.setItem("favorites", JSON.stringify(newVal));
-  },
-  { deep: true }
-);
-
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
-  loadFavorites();
-  // Note: Category fetching is now handled by the CategoryGrid component
 });
 
 onUnmounted(() => {
