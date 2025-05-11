@@ -1,11 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { useSubscriptionStore } from "@/stores/subscription.store";
+import { useListingsStore } from "@/stores/listing.store";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: () => import("@/views/HomeView.vue"),
+  },
+  {
+    path: "/subscription",
+    name: "subscription",
+    component: () => import("@/views/Subscription.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/payment-success",
+    name: "payment-success",
+    component: () => import("@/views/PaymentSuccess.vue")
   },
   {
     path: "/login",
@@ -122,7 +135,44 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+  const subscriptionStore = useSubscriptionStore();
+  const listingsStore = useListingsStore();
   const isAuthenticated = !!authStore.token;
+
+  // Check if route requires authentication
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login');
+    return;
+  }
+
+  // Check if user needs subscription for create-listing route
+  if (isAuthenticated && to.name === 'create-listing') {
+    try {
+      // Check if user has exceeded free listing limit
+      const userListings = await listingsStore.fetchUserListings(authStore.user.uid);
+      const hasFreeListing = userListings.some(listing => listing.isFreeListing);
+      const totalListings = userListings.length;
+
+      // If user has used their free listing, require subscription
+      if (totalListings >= 1) {
+        // Check if user has active subscription
+        await subscriptionStore.fetchSubscription(authStore.user.uid);
+        const hasActiveSubscription = subscriptionStore.subscription && 
+                                   subscriptionStore.subscription.status === 'active';
+        
+        if (!hasActiveSubscription) {
+          next('/subscription');
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Subscription check failed:', error);
+      next('/subscription');
+      return;
+    }
+  }
+
+  next();
 
   if (to.meta.guestOnly && isAuthenticated) {
     next("/seller/dashboard");
