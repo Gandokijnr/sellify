@@ -166,7 +166,7 @@
           </div>
 
           <!-- Recent Messages -->
-          <div class="mt-8 bg-white shadow rounded-lg overflow-hidden">
+          <!-- <div class="mt-8 bg-white shadow rounded-lg overflow-hidden opacity-20">
             <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
                 Recent Messages
@@ -183,7 +183,7 @@
                 @click="handleMessageClick"
               />
             </div>
-          </div>
+          </div> -->
         </template>
       </div>
     </div>
