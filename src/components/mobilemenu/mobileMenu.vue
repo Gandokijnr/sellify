@@ -37,11 +37,6 @@
           <router-link
             to="/favorites"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-jiji-primary hover:bg-gray-50"
-            @click="$emit('close')"
-          >
-            Favorites
-          </router-link>
-          <router-link
             to="/cart"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-jiji-primary hover:bg-gray-50"
             @click="$emit('close')"
