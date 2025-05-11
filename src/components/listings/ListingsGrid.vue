@@ -108,7 +108,7 @@ const filteredListings = computed(() => {
           if (typeof price === "string") {
             return parseFloat(price.replace(/[^\d.]/g, "")) || 0;
           }
-          return 0;
+          return 0; // Default for other cases
         };
 
         const priceA = getNumericPrice(a.price);
@@ -123,7 +123,7 @@ const filteredListings = computed(() => {
           if (typeof price === "string") {
             return parseFloat(price.replace(/[^\d.]/g, "")) || 0;
           }
-          return 0;
+          return 0; // Default for other cases
         };
 
         const priceA = getNumericPrice(a.price);
