@@ -13,6 +13,8 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
+import { paymentService } from "@/services/payment.service";
+import { useSubscriptionStore } from "@/stores/subscription.store";
 
 export const useListingsStore = defineStore("listings", {
   state: () => ({
@@ -22,6 +24,7 @@ export const useListingsStore = defineStore("listings", {
   actions: {
     async createListing(listingData) {
       try {
+
         // Upload images first
         const imageUrls = await Promise.all(
           listingData.images.map(async (file) => {
@@ -40,10 +43,13 @@ export const useListingsStore = defineStore("listings", {
           images: imageUrls,
           createdAt: new Date(),
           userId: this.authStore.user.uid,
+          isFreeListing: !hasFreeListing,
+          paymentStatus: hasFreeListing ? 'paid' : 'free'
         });
 
         return docRef.id;
       } catch (error) {
+        console.error('Listing creation failed:', error);
         throw error;
       }
     },
