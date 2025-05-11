@@ -80,12 +80,8 @@ const filteredListings = computed(() => {
 
   // First sort by sponsored status (sponsored listings come first)
   sorted.sort((a, b) => {
-    const isASponsored = authStore.user && 
-      a.userId === authStore.user.uid && 
-      isUserListingWithActiveSubscription.value;
-    const isBSponsored = authStore.user && 
-      b.userId === authStore.user.uid && 
-      isUserListingWithActiveSubscription.value;
+    const isASponsored = a.isSponsored;
+    const isBSponsored = b.isSponsored;
     
     if (isASponsored && !isBSponsored) return -1;
     if (!isASponsored && isBSponsored) return 1;
@@ -242,7 +238,7 @@ const handleSortChange = (event) => {
             Featured
           </div>
           <div
-            v-if="authStore.user && listing.userId === authStore.user.uid && isUserListingWithActiveSubscription"
+            v-if="listing.isSponsored"
             class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded"
           >
             Sponsored

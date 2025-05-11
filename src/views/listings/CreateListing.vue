@@ -8,6 +8,7 @@ import { db } from "@/firebase";
 import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
+import { useSubscriptionStore } from "@/stores/subscription.store";
 import { useToast } from "vue-toastification";
 import nigeriaLocations from "@/stores/location";
 import CategorySelector from "@/components/categories/CategorySelector.vue";
@@ -17,6 +18,7 @@ const router = useRouter();
 const isLoading = ref(false);
 const errorMessage = ref("");
 const authStore = useAuthStore();
+const subscriptionStore = useSubscriptionStore();
 const toast = useToast();
 const currentStep = ref("category"); // Start with category selection step
 
@@ -127,6 +129,7 @@ const form = reactive({
   condition: "used",
   location: "",
   images: [],
+  isSponsored: false,
 
   // Category fields stored separately
   mainCategory: "",
@@ -504,6 +507,13 @@ const submitForm = async () => {
       status: "active",
       views: 0,
     };
+
+    // Check if user has an active subscription
+    await subscriptionStore.fetchSubscription(authStore.user.uid);
+    const hasActiveSubscription = subscriptionStore.subscription?.status === 'active';
+
+    // Set isSponsored based on subscription status
+    listingData.isSponsored = hasActiveSubscription;
 
     // Add category-specific fields
     categoryFields.value.forEach((field) => {

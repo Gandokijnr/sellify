@@ -15,6 +15,12 @@
         >
           Verified
         </div>
+        <div
+          v-if="listing.isSponsored"
+          class="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded"
+        >
+          Sponsored
+        </div>
       </div>
       <div class="p-4">
         <h3 class="text-lg font-medium text-gray-900 mb-1 truncate">
@@ -52,6 +58,7 @@ defineProps({
       location: "",
       date: "",
       image: "",
+      isSponsored: false,
     }),
   },
   showAction: {
