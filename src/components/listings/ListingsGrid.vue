@@ -1,5 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useSubscriptionStore } from '@/stores/subscription.store';
+import { useAuthStore } from '@/stores/auth';
 
 const props = defineProps({
   listings: {
@@ -26,10 +28,6 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  favorites: {
-    type: Array,
-    default: () => [],
-  },
   showCallSeller: {
     type: Boolean,
     default: true,
@@ -41,47 +39,27 @@ const emit = defineEmits([
   "update:selectedCategory",
   "viewListing",
   "callSeller",
-  "toggleFavorite",
 ]);
 
-const localFavorites = ref([]);
 const sortOption = ref("newest");
+const authStore = useAuthStore();
+const subscriptionStore = useSubscriptionStore();
 
-onMounted(() => {
-  const savedFavorites = localStorage.getItem("favorites");
-  if (savedFavorites) {
-    localFavorites.value = JSON.parse(savedFavorites);
-  }
+// Check if user has active subscription
+const isUserListingWithActiveSubscription = computed(() => {
+  if (!authStore.user) return false;
+  return subscriptionStore.subscription?.status === 'active';
 });
 
-// Check if listing is favorite
-const isFavorite = (listingId) => {
-  return (
-    localFavorites.value.includes(listingId) ||
-    props.favorites.includes(listingId)
-  );
-};
-
-// Toggle favorite status
-const toggleFavorite = (listingId, event) => {
-  event.stopPropagation();
-  let updatedFavorites;
-
-  if (isFavorite(listingId)) {
-    updatedFavorites = localFavorites.value.filter((id) => id !== listingId);
-  } else {
-    updatedFavorites = [...localFavorites.value, listingId];
+onMounted(async () => {
+  if (authStore.user) {
+    await subscriptionStore.fetchSubscription(authStore.user.uid);
   }
-
-  localFavorites.value = updatedFavorites;
-  localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-  emit("toggleFavorite", listingId);
-};
+});
 
 const filteredListings = computed(() => {
   let result = props.listings;
 
-  // Apply filters
   if (props.searchQuery) {
     result = result.filter((listing) =>
       listing.title.toLowerCase().includes(props.searchQuery.toLowerCase())
@@ -98,12 +76,25 @@ const filteredListings = computed(() => {
     );
   }
 
-  // Apply sorting
   const sorted = [...result];
 
+  // First sort by sponsored status (sponsored listings come first)
+  sorted.sort((a, b) => {
+    const isASponsored = authStore.user && 
+      a.userId === authStore.user.uid && 
+      isUserListingWithActiveSubscription.value;
+    const isBSponsored = authStore.user && 
+      b.userId === authStore.user.uid && 
+      isUserListingWithActiveSubscription.value;
+    
+    if (isASponsored && !isBSponsored) return -1;
+    if (!isASponsored && isBSponsored) return 1;
+    return 0;
+  });
+
+  // Then apply the selected sort option
   switch (sortOption.value) {
     case "newest":
-      // Assuming each listing has a createdAt property
       sorted.sort((a, b) => {
         const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
         const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
@@ -112,13 +103,12 @@ const filteredListings = computed(() => {
       break;
     case "price-low-high":
       sorted.sort((a, b) => {
-        // Extract numeric price from different possible formats
         const getNumericPrice = (price) => {
           if (typeof price === "number") return price;
           if (typeof price === "string") {
             return parseFloat(price.replace(/[^\d.]/g, "")) || 0;
           }
-          return 0; // Default for other cases
+          return 0;
         };
 
         const priceA = getNumericPrice(a.price);
@@ -128,13 +118,12 @@ const filteredListings = computed(() => {
       break;
     case "price-high-low":
       sorted.sort((a, b) => {
-        // Extract numeric price from different possible formats
         const getNumericPrice = (price) => {
           if (typeof price === "number") return price;
           if (typeof price === "string") {
             return parseFloat(price.replace(/[^\d.]/g, "")) || 0;
           }
-          return 0; // Default for other cases
+          return 0;
         };
 
         const priceA = getNumericPrice(a.price);
@@ -246,41 +235,17 @@ const handleSortChange = (event) => {
             class="w-full h-32 sm:h-48 object-cover cursor-pointer"
           />
 
-          <button
-            class="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow-sm hover:bg-gray-100"
-            @click.stop="toggleFavorite(listing.id, $event)"
-            :title="
-              isFavorite(listing.id)
-                ? 'Remove from favorites'
-                : 'Add to favorites'
-            "
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-heart"
-              :class="{
-                'fill-red-500 text-red-500': isFavorite(listing.id),
-                'text-gray-500': !isFavorite(listing.id),
-              }"
-            >
-              <path
-                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-              />
-            </svg>
-          </button>
           <div
             v-if="listing.featured"
             class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded"
           >
             Featured
+          </div>
+          <div
+            v-if="authStore.user && listing.userId === authStore.user.uid && isUserListingWithActiveSubscription"
+            class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded"
+          >
+            Sponsored
           </div>
         </div>
         <div class="p-3 sm:p-4 cursor-pointer">
