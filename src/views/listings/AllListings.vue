@@ -20,6 +20,7 @@ const loading = ref(true);
 const searchQuery = ref("");
 const selectedCategory = ref("All");
 const userProfile = ref(null);
+const sellerInfo = ref(null);
 
 onMounted(() => {
   const categoryParam = route.query.category;
@@ -168,19 +169,57 @@ function formatNumber(num) {
   return num?.toLocaleString() || "0";
 }
 
-function callSeller(phone) {
-  if (!userProfile.value?.phoneNumber) {
-    toast.error("Please update your phone number in your profile first", {
-      timeout: 5000,
-      closeOnClick: false,
-      pauseOnFocusLoss: true,
-    });
-
-    router.push("/profile");
-    return;
+const formatPhoneNumber = (phoneNumber) => {
+  if (!phoneNumber) return '';
+  // Remove any non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  // Add +234 for Nigerian numbers if not present
+  if (cleaned.startsWith('7') || cleaned.startsWith('1')) {
+    return `+234${cleaned}`;
   }
-  window.location.href = `tel:${phone}`;
-}
+  return cleaned;
+};
+
+const callSeller = async (listingId) => {
+  try {
+    if (!listingId) {
+      toast.warning("Invalid listing ID");
+      return;
+    }
+
+    const listingDoc = await getDoc(doc(db, "listings", listingId));
+    if (!listingDoc.exists()) {
+      toast.error("Listing not found");
+      return;
+    }
+
+    const listingData = listingDoc.data();
+    if (!listingData.userId) {
+      toast.warning("Seller information not available");
+      return;
+    }
+
+    const userDoc = await getDoc(doc(db, "users", listingData.userId));
+    if (!userDoc.exists()) {
+      toast.warning("Seller information not available");
+      return;
+    }
+
+    sellerInfo.value = { id: userDoc.id, ...userDoc.data() };
+    
+    if (!sellerInfo.value.phoneNumber) {
+      toast.warning("Seller's phone number is not available");
+      return;
+    }
+
+    // Format phone number
+    const formattedNumber = formatPhoneNumber(sellerInfo.value.phoneNumber);
+    window.open(`tel:${formattedNumber}`);
+  } catch (error) {
+    console.error("Error fetching seller info:", error);
+    toast.error("Failed to fetch seller information");
+  }
+};
 
 function viewListing(id) {
   router.push({ name: "listing-details", params: { id } });

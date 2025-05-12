@@ -904,10 +904,10 @@ onMounted(() => {
                   </option>
                   <option
                     v-for="option in field.options"
-                    :key="option"
-                    :value="option"
+                    :key="option.value"
+                    :value="option.value"
                   >
-                    {{ option }}
+                    {{ option.label }}
                   </option>
                 </select>
               </div>

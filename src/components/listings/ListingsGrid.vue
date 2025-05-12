@@ -52,7 +52,7 @@ const formatPhoneNumber = (phoneNumber) => {
   const cleaned = phoneNumber.replace(/\D/g, '');
   // Add +254 for Kenyan numbers if not present
   if (cleaned.startsWith('7') || cleaned.startsWith('1')) {
-    return `+254${cleaned}`;
+    return `+234${cleaned}`;
   }
   return cleaned;
 };
