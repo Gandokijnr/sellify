@@ -122,9 +122,35 @@
                 </div>
               </div>
 
+              <div
+                class="bg-green-50 border-l-4 border-green-400 p-4 mb-6"
+                v-if="profileData.isProfileComplete"
+              >
+                <div class="flex items-start">
+                  <div class="flex-shrink-0">
+                    <svg
+                      class="h-5 w-5 text-green-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-green-700">
+                      Your profile is complete! You can now start listing items.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div class="text-sm font-medium text-gray-500 mb-4">
                 Account created on
-                {{ formatDate(authStore.user?.metadata?.creationTime) }}
+                {{ formatDate(authStore.user?.createdAt) }}
               </div>
 
               <div class="flex gap-4">
@@ -336,6 +362,25 @@
                 </div>
               </div>
             </form>
+          </div>
+
+          <!-- Subscription Plan -->
+          <div class="border-t border-gray-200 px-6 py-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Subscription Plan</h3>
+            <div class="bg-white rounded-lg shadow p-4">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-gray-700">Current Plan</h4>
+                <span class="px-3 py-1 text-sm font-medium rounded-full" :class="{
+                  'bg-green-100 text-green-800': profileData.subscription.isActive,
+                  'bg-gray-100 text-gray-800': !profileData.subscription.isActive
+                }">
+                  {{ profileData.subscription.plan }}
+                </span>
+              </div>
+              <div v-if="profileData.subscription.isActive" class="text-sm text-gray-600">
+                <p>Plan Period: {{ formatDate(profileData.subscription.startDate) }} - {{ formatDate(profileData.subscription.endDate) }}</p>
+              </div>
+            </div>
           </div>
 
           <!-- Additional Settings -->
@@ -581,6 +626,12 @@ const profileData = reactive({
   emailNotifications: false,
   publicProfile: false,
   isProfileComplete: false,
+  subscription: {
+    plan: "free",
+    startDate: null,
+    endDate: null,
+    isActive: false
+  }
 });
 
 // Available options for dropdowns
@@ -681,27 +732,23 @@ const fetchUserProfile = async () => {
           profileData[key] = userData[key];
         }
       });
+      profileData.isProfileComplete = checkProfileComplete();
     } else {
-      // Create a new user profile if it doesn't exist
-      if (authStore.user.displayName) {
-        profileData.displayName = authStore.user.displayName;
-      }
-      if (authStore.user.photoURL) {
-        profileData.photoURL = authStore.user.photoURL;
-      }
-
-      await setDoc(userRef, {
-        email: authStore.user.email,
-        ...profileData,
-        createdAt: new Date(),
-      });
+      profileData.email = authStore.user.email;
+      profileData.displayName = authStore.user.displayName;
+      profileData.photoURL = authStore.user.photoURL;
+      profileData.subscription = {
+        plan: "free",
+        startDate: null,
+        endDate: null,
+        isActive: false
+      };
+      profileData.isProfileComplete = false;
     }
-
-    // Calculate if profile is complete
-    profileData.isProfileComplete = checkProfileComplete();
+    loading.value = false;
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    showNotification("Failed to load profile data", "error");
+    console.error("Error fetching profile:", error);
+    loading.value = false;
   }
 };
 
@@ -709,17 +756,14 @@ const checkProfileComplete = () => {
   const requiredFields = [
     "displayName",
     "phoneNumber",
-    "address",
-    "city",
-    "state",
-    "zip",
-    "location",
   ];
-  return (
-    requiredFields.every(
-      (field) => profileData[field] && profileData[field].trim() !== ""
-    ) && selectedState.value
-  ); // Ensure at least state is selected
+  
+  // Check if all required fields are filled
+  const fieldsComplete = requiredFields.every(
+    (field) => profileData[field] && profileData[field].trim() !== ""
+  );
+
+  return fieldsComplete
 };
 
 const saveProfile = async () => {
@@ -807,12 +851,22 @@ const changePassword = async () => {
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
-  const date = new Date(dateString);
+  
+  // Handle Firebase timestamp format
+  if (typeof dateString === 'object' && dateString.seconds) {
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(new Date(dateString.seconds * 1000));
+  }
+  
+  // Handle regular date string
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(date);
+  }).format(new Date(dateString));
 };
 
 const handleImageUpload = async (e) => {

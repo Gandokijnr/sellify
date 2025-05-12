@@ -190,31 +190,97 @@ watch(
   { deep: true }
 );
 
+// iPhone models and specifications data
+const iPhoneModels = {
+  "iPhone 15": [
+    { value: "iPhone 15", label: "iPhone 15" },
+    { value: "iPhone 15 Plus", label: "iPhone 15 Plus" },
+    { value: "iPhone 15 Pro", label: "iPhone 15 Pro" },
+    { value: "iPhone 15 Pro Max", label: "iPhone 15 Pro Max" }
+  ],
+  "iPhone 14": [
+    { value: "iPhone 14", label: "iPhone 14" },
+    { value: "iPhone 14 Plus", label: "iPhone 14 Plus" },
+    { value: "iPhone 14 Pro", label: "iPhone 14 Pro" },
+    { value: "iPhone 14 Pro Max", label: "iPhone 14 Pro Max" }
+  ],
+  "iPhone 13": [
+    { value: "iPhone 13", label: "iPhone 13" },
+    { value: "iPhone 13 Mini", label: "iPhone 13 Mini" },
+    { value: "iPhone 13 Pro", label: "iPhone 13 Pro" },
+    { value: "iPhone 13 Pro Max", label: "iPhone 13 Pro Max" }
+  ],
+  "iPhone 12": [
+    { value: "iPhone 12", label: "iPhone 12" },
+    { value: "iPhone 12 Mini", label: "iPhone 12 Mini" },
+    { value: "iPhone 12 Pro", label: "iPhone 12 Pro" },
+    { value: "iPhone 12 Pro Max", label: "iPhone 12 Pro Max" }
+  ]
+};
+
+const iPhoneStorage = [
+  { value: "64GB", label: "64GB" },
+  { value: "128GB", label: "128GB" },
+  { value: "256GB", label: "256GB" },
+  { value: "512GB", label: "512GB" },
+  { value: "1TB", label: "1TB" }
+];
+
+const iPhoneColors = [
+  { value: "Black", label: "Black" },
+  { value: "White", label: "White" },
+  { value: "Blue", label: "Blue" },
+  { value: "Red", label: "Red" },
+  { value: "Green", label: "Green" },
+  { value: "Purple", label: "Purple" },
+  { value: "Yellow", label: "Yellow" },
+  { value: "Gold", label: "Gold" },
+  { value: "Silver", label: "Silver" }
+];
+
 // Fields to display based on main category
 const categoryFields = computed(() => {
   if (!form.mainCategory) return [];
 
   switch (form.mainCategory) {
     case "Electronics":
+      const isiPhone = form.title.toLowerCase().includes('iphone');
       return [
         { name: "title", label: "Title", type: "text", required: true },
-        { name: "model", label: "Model", type: "text", required: true },
-        {
-          name: "specifications",
-          label: "Specifications",
-          type: "textarea",
-          required: false,
-        },
-        { name: "brand", label: "Brand", type: "text", required: true },
-
-        {
-          name: "condition",
-          label: "Condition",
+        { 
+          name: "model", 
+          label: "Model", 
           type: "select",
-          options: ["New", "Used"],
-          required: true,
+          options: isiPhone ? Object.values(iPhoneModels).flat() : [],
+          required: true 
+        },
+        { 
+          name: "storage", 
+          label: "Storage", 
+          type: "select",
+          options: iPhoneStorage,
+          required: isiPhone 
+        },
+        { 
+          name: "color", 
+          label: "Color", 
+          type: "select",
+          options: iPhoneColors,
+          required: isiPhone 
+        },
+        { 
+          name: "condition", 
+          label: "Condition", 
+          type: "select",
+          options: [
+            { value: "new", label: "New" },
+            { value: "used", label: "Used" },
+            { value: "refurbished", label: "Refurbished" }
+          ],
+          required: true 
         },
         { name: "price", label: "Price", type: "number", required: true },
+        { name: "description", label: "Description", type: "textarea", required: true }
       ];
     case "Real Estate":
       return [
@@ -765,43 +831,9 @@ onMounted(() => {
                 <div class="font-medium">{{ displayCategoryPath }}</div>
               </div>
 
-              <!-- Title -->
-              <!-- <div class="mb-4">
-                <label for="title" class="block text-gray-700 font-medium mb-2"
-                  >Title*</label
-                >
-                <input
-                  type="text"
-                  id="title"
-                  v-model="form.title"
-                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-                  placeholder="Product title"
-                  required
-                />
-              </div>
-
-              <-- Price -->
-              <!-- <div class="mb-4">
-                <label for="price" class="block text-gray-700 font-medium mb-2"
-                  >Price*</label
-                >
-                <input
-                  type="number"
-                  id="price"
-                  v-model="form.price"
-                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-                  placeholder="Enter price"
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div> -->
-
-              <!-- Condition -->
-              <!-- <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-2"
-                  >Condition</label
-                >
+              <!-- Form Fields -->
+              <div v-if="showConditionField" class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Condition*</label>
                 <div class="flex space-x-4">
                   <label class="inline-flex items-center">
                     <input
@@ -822,7 +854,7 @@ onMounted(() => {
                     <span class="ml-2">Used</span>
                   </label>
                 </div>
-              </div> -->
+              </div>
 
               <!-- Category-specific fields -->
               <div
