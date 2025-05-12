@@ -46,6 +46,17 @@ const authStore = useAuthStore();
 const subscriptionStore = useSubscriptionStore();
 
 // Check if user has active subscription
+const formatPhoneNumber = (phoneNumber) => {
+  if (!phoneNumber) return '';
+  // Remove any non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  // Add +254 for Kenyan numbers if not present
+  if (cleaned.startsWith('7') || cleaned.startsWith('1')) {
+    return `+254${cleaned}`;
+  }
+  return cleaned;
+};
+
 const isUserListingWithActiveSubscription = computed(() => {
   if (!authStore.user) return false;
   return subscriptionStore.subscription?.status === 'active';
@@ -277,10 +288,11 @@ const handleSortChange = (event) => {
             <div class="font-bold text-green-600 text-sm sm:text-lg">
               {{ listing.price }}
             </div>
+            
             <button
               v-if="showCallSeller"
               class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
-              @click.stop="emit('callSeller', listing.phoneNumber)"
+              @click.stop="emit('callSeller', formatPhoneNumber(listing.phoneNumber))"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

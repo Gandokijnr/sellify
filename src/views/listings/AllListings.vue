@@ -175,10 +175,12 @@ function callSeller(phone) {
       closeOnClick: false,
       pauseOnFocusLoss: true,
     });
+
     router.push("/profile");
     return;
   }
   window.location.href = `tel:${phone}`;
+  console.log("phone",phone);
 }
 
 function viewListing(id) {
