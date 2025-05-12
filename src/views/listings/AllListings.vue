@@ -180,7 +180,6 @@ function callSeller(phone) {
     return;
   }
   window.location.href = `tel:${phone}`;
-  console.log("phone",phone);
 }
 
 function viewListing(id) {
@@ -260,12 +259,16 @@ function initializeScrollAnimations() {
 
           <!-- Listings Grid -->
           <ListingsGrid
-            :listings="filteredListings || []"
+            :listings="filteredListings"
             :loading="loading"
-            v-model:searchQuery="searchQuery"
-            v-model:selectedCategory="selectedCategory"
+            :search-query="searchQuery"
+            :selected-category="selectedCategory"
+            :show-header="false"
+            :show-sort="false"
+            :show-call-seller="true"
             @viewListing="viewListing"
             @callSeller="callSeller"
+            class="mt-4"
           />
         </div>
       </div>

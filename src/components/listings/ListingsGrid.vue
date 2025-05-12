@@ -288,7 +288,7 @@ const handleSortChange = (event) => {
             <div class="font-bold text-green-600 text-sm sm:text-lg">
               {{ listing.price }}
             </div>
-            
+
             <button
               v-if="showCallSeller"
               class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
