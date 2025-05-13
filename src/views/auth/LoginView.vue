@@ -149,7 +149,41 @@ const rememberMe = ref(false);
 const loading = ref(false);
 const error = ref(null);
 
+// Load saved email and remember me state from localStorage
+const loadSavedCredentials = () => {
+  const savedEmail = localStorage.getItem('lastLoginEmail');
+  const savedRememberMe = localStorage.getItem('rememberMe') === 'true';
+  
+  if (savedEmail) {
+    email.value = savedEmail;
+    rememberMe.value = savedRememberMe;
+  }
+};
+
 onMounted(async () => {
+  // Load saved credentials
+  loadSavedCredentials();
+  
+  // Check if we should try to auto-login
+  if (rememberMe.value && email.value) {
+    const savedToken = localStorage.getItem('auth');
+    if (savedToken) {
+      try {
+        loading.value = true;
+        await authStore.initAuth();
+        if (authStore.isAuthenticated) {
+          toast.success('Welcome back!');
+          router.push('/');
+          return;
+        }
+      } catch (err) {
+        console.error('Auto-login error:', err);
+      } finally {
+        loading.value = false;
+      }
+    }
+  }
+  
   try {
     await authStore.initAuth();
 
@@ -193,6 +227,15 @@ const handleSignIn = async () => {
       email: email.value,
       password: password.value,
     });
+
+    // Save email and remember me state if checked
+    if (rememberMe.value) {
+      localStorage.setItem('lastLoginEmail', email.value);
+      localStorage.setItem('rememberMe', 'true');
+    } else {
+      localStorage.removeItem('lastLoginEmail');
+      localStorage.removeItem('rememberMe');
+    }
 
     toast.success("Logged in successfully!", {
       timeout: 3000,
