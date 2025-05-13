@@ -30,7 +30,6 @@ const selectedLocation = ref("");
 const areRequiredFieldsFilled = computed(() => {
   return categoryFields.value
     .filter((field) => field.required)
-    .every((field) => !!form[field.name]);
 });
 
 // Available options for dropdowns
@@ -633,9 +632,15 @@ const handleCategoryChange = (categoryPath) => {
 };
 
 onMounted(() => {
-  if (!authStore.user?.phoneNumber) {
+  // Check if required profile fields are complete
+  const requiredFields = ["phoneNumber"];
+  const isProfileComplete = requiredFields.every(
+    field => authStore.user?.[field]?.trim()
+  );
+
+  if (!isProfileComplete) {
     toast.warning(
-      "Please complete your profile information before creating listings",
+      "Please complete your profile information (phone number) before creating listings",
       {
         timeout: 5000,
         closeOnClick: false,
