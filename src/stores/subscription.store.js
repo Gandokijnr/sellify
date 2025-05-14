@@ -12,29 +12,62 @@ export const useSubscriptionStore = defineStore('subscription', {
     billingPeriod: 'monthly', // 'monthly' or 'yearly'
     plans: [
       {
+        id: 'free',
+        name: 'Free Tier',
+        price: 0,
+        yearlyPrice: 0,
+        features: [
+          '3 Free Listings/Month',
+          'Watermarked AI Optimization',
+          '1-2 Fraud Alerts/Month',
+          'Basic Support',
+          'Try Before You Buy'
+        ],
+        isFree: true
+      },
+      {
         id: 'basic',
         name: 'Basic Plan',
-        price: 2500, // Monthly price in NGN
-        yearlyPrice: 24000, // Yearly price (20% discount)
+        price: 3000, // Monthly price in NGN (₦3,000-5,000 range)
+        yearlyPrice: 30000, // ~17% discount for yearly
         features: [
-          'Unlimited listings',
-          '30-day subscription',
-          'Basic analytics',
-          '24/7 support'
-        ]
+          'Unlimited Listings',
+          'Basic Analytics Dashboard',
+          'Social Media Auto-Share',
+          '1 Free Boost Monthly',
+          'Basic Fraud Detection',
+          'Email Support'
+        ],
+        isFree: false,
+        isPopular: true,
+        targetAudience: 'Casual sellers & budget-conscious users',
+        boostIncluded: 1
       },
       {
         id: 'premium',
         name: 'Premium Plan',
-        price: 4500, // Monthly price in NGN
-        yearlyPrice: 43200, // Yearly price (20% discount)
+        price: 10000, // Monthly price in NGN (₦10,000-15,000 range)
+        yearlyPrice: 100000, // ~17% discount for yearly
         features: [
-          'Unlimited listings',
-          '30-day subscription',
-          'Advanced analytics',
-          'Priority support',
-          'Featured listings'
-        ]
+          'AI-Powered Optimization',
+          'Priority Visibility (72h top placement)',
+          'Cross-Post to Partner Platforms',
+          'Secure Escrow Payments',
+          '24/7 Dedicated Support',
+          'Advanced Market Insights',
+          'Customizable Storefront',
+          'Unlimited Listings & Boosts',
+          'Competitor Price Tracking',
+          'Peak Traffic Analytics'
+        ],
+        isFree: false,
+        isPopular: false,
+        targetAudience: 'Power sellers & small businesses',
+        boostIncluded: 'unlimited',
+        prioritySupport: true,
+        storefront: true,
+        escrowPayments: true,
+        crossPosting: true
       }
     ]
   }),

@@ -26,14 +26,7 @@ onBeforeMount(async () => {
         userProfile.value = userDoc.data();
 
         if (!userProfile.value.phoneNumber) {
-          toast.warning(
-            "Please verify your account by completing your profile",
-            {
-              timeout: 4000,
-              closeOnClick: false,
-              pauseOnFocusLoss: true,
-            }
-          );
+          console.log("Please update your profile");
         }
       }
     } catch (error) {
@@ -293,6 +286,12 @@ onUnmounted(() => {
                     >
                       View buyer requests
                     </router-link>
+                    <router-link
+                      to="/subscription"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Subscription
+                    </router-link>
                     <button
                       @click="authStore.logout"
                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -441,11 +440,13 @@ onUnmounted(() => {
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
             >My Ads</router-link
           > -->
+          
           <router-link
-            to="/saved"
+            to="/subscription"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
-            >Saved</router-link
           >
+            Subscription
+          </router-link>
           <button
             @click="authStore.logout"
             class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"

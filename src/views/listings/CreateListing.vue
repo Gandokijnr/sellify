@@ -219,6 +219,7 @@ const SamsungModels = {
   ],
   "Galaxy A Series": [
     { value: "Galaxy A54 5G", label: "Galaxy A54 5G" },
+    { value: "Galaxy A55 5G", label: "Galaxy A55 5G" },
     { value: "Galaxy A34 5G", label: "Galaxy A34 5G" },
     { value: "Galaxy A14 5G", label: "Galaxy A14 5G" },
   ],
@@ -235,6 +236,7 @@ const SamsungColors = [
   { value: "Phantom Black", label: "Phantom Black" },
   { value: "Cream", label: "Cream" },
   { value: "Green", label: "Green" },
+  { value: "Blue", label: "Blue" },
   { value: "Lavender", label: "Lavender" },
   { value: "Graphite", label: "Graphite" },
   { value: "Bora Purple", label: "Bora Purple" },
@@ -615,7 +617,7 @@ onMounted(() => {
 
   if (!isProfileComplete) {
     toast.warning(
-      "Please complete your profile information (phone number) before creating listings",
+      "Please complete your profile information before creating listings",
       {
         timeout: 5000,
         closeOnClick: false,
