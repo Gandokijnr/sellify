@@ -22,8 +22,8 @@ const emit = defineEmits([
   "selection-object",
 ]);
 
-// Support up to 3 levels of categories
-const selectedLevels = ref([null, null, null]);
+// Support up to 2 levels of categories (Main and Subcategory)
+const selectedLevels = ref([null, null]);
 const finalSelection = ref("");
 
 function getStructuredCategory() {
@@ -31,8 +31,7 @@ function getStructuredCategory() {
   const levels = selectedLevels.value.filter(Boolean);
   if (levels[0]) structure.mainCategory = levels[0];
   if (levels[1]) structure.subCategory = levels[1];
-  if (levels[2]) structure.subSubCategory = levels[2];
-  if (finalSelection.value) structure.leafCategory = finalSelection.value;
+  // No more sub-subcategory or leaf category
   return structure;
 }
 
@@ -62,50 +61,12 @@ const levelOptions = computed(() => {
   return options;
 });
 
-// Compute leaf options (array of items at the end of the selection)
-const leafOptions = computed(() => {
-  let currentLevel = props.categories;
-
-  // Navigate to the current branch based on selections
-  for (const level of selectedLevels.value) {
-    if (!level || !currentLevel[level]) return [];
-    currentLevel = currentLevel[level];
-  }
-
-  // If we have an array at the end, those are our leaf options
-  return Array.isArray(currentLevel) ? currentLevel : [];
-});
+// No more leaf options as we're only using main and subcategory
 
 // Track if we have a complete selection path (for validation)
 const isSelectionComplete = computed(() => {
-  if (selectedLevels.value[0] === null) return false;
-
-  let currentLevel = props.categories;
-  let depth = 0;
-
-  // Navigate to the deepest selected level
-  for (const level of selectedLevels.value) {
-    if (!level) break;
-
-    if (currentLevel[level]) {
-      currentLevel = currentLevel[level];
-      depth++;
-    } else {
-      break;
-    }
-  }
-
-  // If we've reached an array of leaf options, we need a final selection
-  if (Array.isArray(currentLevel)) {
-    return finalSelection.value !== "";
-  }
-
-  // If we've reached a terminal object (no more levels), we're complete
-  return (
-    typeof currentLevel === "object" &&
-    !Array.isArray(currentLevel) &&
-    Object.keys(currentLevel).length === 0
-  );
+  // Form is complete if both main category and subcategory are selected
+  return selectedLevels.value[0] !== null && selectedLevels.value[1] !== null;
 });
 
 // When a level changes, reset all subsequent levels
@@ -129,8 +90,7 @@ watch(
   { deep: true }
 );
 
-// When final selection changes, update output
-watch(finalSelection, updateCategoryString);
+// No need to watch final selection as we're not using it anymore
 
 // Emit validation state changes to parent
 watch(isSelectionComplete, (newVal) => {
@@ -138,10 +98,7 @@ watch(isSelectionComplete, (newVal) => {
 });
 
 function updateCategoryString() {
-  const parts = [
-    ...selectedLevels.value.filter(Boolean),
-    ...(finalSelection.value ? [finalSelection.value] : []),
-  ];
+  const parts = selectedLevels.value.filter(Boolean);
 
   const categoryString = parts.join(" > ");
   emit("update:modelValue", categoryString);
@@ -158,29 +115,11 @@ function initFromModelValue() {
   // Try to match the parts with our category structure
   let currentLevel = props.categories;
 
-  for (let i = 0; i < parts.length; i++) {
+  for (let i = 0; i < parts.length && i < selectedLevels.value.length; i++) {
     const part = parts[i];
-
-    // Check if we've reached the end
-    if (i === parts.length - 1) {
-      // Last part could be a leaf option
-      if (Array.isArray(currentLevel) && currentLevel.includes(part)) {
-        finalSelection.value = part;
-        break;
-      }
-      // Or it could be the last level of our hierarchy
-      else if (i < selectedLevels.value.length && currentLevel[part]) {
-        selectedLevels.value[i] = part;
-      }
-      break;
-    }
-
-    // Otherwise it should be a key in our object
     if (currentLevel[part]) {
-      if (i < selectedLevels.value.length) {
-        selectedLevels.value[i] = part;
-        currentLevel = currentLevel[part];
-      }
+      selectedLevels.value[i] = part;
+      currentLevel = currentLevel[part];
     } else {
       break; // Invalid path
     }
@@ -212,63 +151,23 @@ watch(() => props.modelValue, initFromModelValue, { immediate: true });
       </select>
     </div>
 
-    <!-- Additional Subcategory Levels -->
-    <div
-      v-for="(levelData, index) in levelOptions.slice(1)"
-      :key="`level-${index + 1}`"
-      class="mb-3"
-    >
+    <!-- Subcategory Level -->
+    <div v-if="levelOptions.length > 1" class="mb-3">
       <label class="block text-sm font-medium text-gray-700 mb-1">
-        {{
-          index === 0
-            ? "Subcategory"
-            : index === 1
-            ? "Sub-subcategory"
-            : `Level ${index + 2}`
-        }}
+        Subcategory
         <span class="text-red-500" v-if="required">*</span>
       </label>
       <select
-        v-model="selectedLevels[index + 1]"
+        v-model="selectedLevels[1]"
         class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
         :class="{
-          'border-red-500': required && selectedLevels[index + 1] === null,
+          'border-red-500': required && selectedLevels[1] === null,
         }"
         :required="required"
       >
-        <option :value="null" disabled>
-          {{
-            index === 0
-              ? "Select Subcategory"
-              : index === 1
-              ? "Select Sub-subcategory"
-              : `Select Level ${index + 2}`
-          }}
-        </option>
-        <option v-for="(_, key) in levelData" :key="key" :value="key">
+        <option :value="null" disabled>Select Subcategory</option>
+        <option v-for="(_, key) in levelOptions[1]" :key="key" :value="key">
           {{ key }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Leaf Options (Final Selection) -->
-    <div class="mb-3" v-if="leafOptions.length > 0">
-      <label class="block text-sm font-medium text-gray-700 mb-1">
-        Specific Type
-        <span class="text-red-500" v-if="required">*</span>
-      </label>
-      <select
-        v-model="finalSelection"
-        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-        :class="{
-          'border-red-500':
-            required && leafOptions.length > 0 && finalSelection === '',
-        }"
-        :required="required && leafOptions.length > 0"
-      >
-        <option value="" disabled>Select Specific Type</option>
-        <option v-for="option in leafOptions" :key="option" :value="option">
-          {{ option }}
         </option>
       </select>
     </div>
@@ -284,16 +183,10 @@ watch(() => props.modelValue, initFromModelValue, { immediate: true });
           <span class="bg-gray-100 px-2 py-1 rounded-lg">{{ level }}</span>
           <span
             class="mx-1 text-gray-400"
-            v-if="
-              index < selectedLevels.filter(Boolean).length - 1 ||
-              finalSelection
-            "
+            v-if="index < selectedLevels.filter(Boolean).length - 1"
             >›</span
           >
         </template>
-        <span v-if="finalSelection" class="bg-gray-100 px-2 py-1 rounded-lg">{{
-          finalSelection
-        }}</span>
         <span v-if="!isSelectionComplete" class="ml-2 text-orange-500 italic">
           (selection incomplete)
         </span>

@@ -91,34 +91,9 @@ const displayCategoryPath = computed(() => {
   return parts.join(" > ");
 });
 
-// Check if we've reached a leaf category
+// Check if we've selected both main category and subcategory
 const isLeafCategorySelected = computed(() => {
-  // Logic to determine if we're at a leaf node in the category hierarchy
-  if (!categoryStructure.mainCategory) return false;
-
-  const mainCat = categoriesData[categoryStructure.mainCategory];
-  if (!mainCat) return false;
-
-  if (!categoryStructure.subCategory) return false;
-  const subCat = mainCat[categoryStructure.subCategory];
-  if (!subCat) return false;
-
-  // If subCategory is an array, it means we've reached leaf level
-  if (Array.isArray(subCat)) {
-    return categoryStructure.leafCategory !== "";
-  }
-
-  // Otherwise, check if subSubCategory exists and is a leaf
-  if (!categoryStructure.subSubCategory) return false;
-  const subSubCat = subCat[categoryStructure.subSubCategory];
-  if (!subSubCat) return false;
-
-  // If we have array at subSubCategory level, check for leafCategory
-  if (Array.isArray(subSubCat)) {
-    return categoryStructure.leafCategory !== "";
-  }
-
-  return false;
+  return categoryStructure.mainCategory && categoryStructure.subCategory;
 });
 
 const form = reactive({
