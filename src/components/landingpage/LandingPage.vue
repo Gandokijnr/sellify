@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref, watch } from "vue";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
 import CategoryGrid from "@/components/categories/CategoryGrid.vue";
-
+import { Search, ArrowRight, Check, Shield, Phone, MessageSquare, Truck, Users, Lock, Award, Clock, ThumbsUp, Star } from 'lucide-vue-next';
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
@@ -108,21 +108,7 @@ function initializeScrollAnimations() {
                 v-model="searchQuery"
               />
               <span class="absolute left-4 top-4 text-gray-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-search"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.3-4.3" />
-                </svg>
+                <Search class="h-5 w-5" />
               </span>
               <button
                 class="absolute right-2 top-2 bg-green-700 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors shadow"
@@ -155,21 +141,7 @@ function initializeScrollAnimations() {
               class="flex items-center text-green-600 hover:text-green-700 cursor-pointer animate-on-scroll delay-1"
             >
               <span class="font-medium">View all</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-arrow-right ml-1"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
+              <ArrowRight class="h-4 w-4 ml-1" />
             </router-link>
           </div>
 
@@ -198,21 +170,7 @@ function initializeScrollAnimations() {
               <div
                 class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-search text-green-600"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.3-4.3" />
-                </svg>
+                <Shield class="h-6 w-6 text-green-600" />
               </div>
               <h3 class="text-lg font-medium mb-2">Find What You Need</h3>
               <p class="text-gray-600">
@@ -225,22 +183,7 @@ function initializeScrollAnimations() {
               <div
                 class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-phone text-green-600"
-                >
-                  <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-                  />
-                </svg>
+                <Phone class="h-6 w-6 text-green-600" />
               </div>
               <h3 class="text-lg font-medium mb-2">Contact the Seller</h3>
               <p class="text-gray-600">
@@ -253,22 +196,7 @@ function initializeScrollAnimations() {
               <div
                 class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-star text-green-600"
-                >
-                  <polygon
-                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                  />
-                </svg>
+                <Truck class="h-6 w-6 text-green-600" />
               </div>
               <h3 class="text-lg font-medium mb-2">Complete Your Purchase</h3>
               <p class="text-gray-600">
