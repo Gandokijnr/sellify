@@ -28,7 +28,7 @@
             <p>You don't have any saved listings yet.</p>
             <router-link
               to="/"
-              class="mt-2 inline-flex items-center text-jiji-primary hover:text-orange-700"
+              class="mt-2 inline-flex items-center text-jiji-primary hover:text-teal-700"
             >
               Browse listings
             </router-link>

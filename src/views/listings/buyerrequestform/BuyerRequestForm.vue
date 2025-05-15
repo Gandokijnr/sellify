@@ -224,7 +224,7 @@ const getStepIcon = (step) => {
               <div class="flex-1">
                 <div class="h-2 bg-gray-200 rounded-full">
                   <div
-                    class="h-2 bg-green-600 rounded-full transition-all duration-300"
+                    class="h-2 bg-teal-600 rounded-full transition-all duration-300"
                     :style="{ width: `${progress}%` }"
                   ></div>
                 </div>
@@ -238,7 +238,7 @@ const getStepIcon = (step) => {
                   :class="[
                     'rounded-full h-6 w-6 flex items-center justify-center border-2 mx-auto mb-1',
                     currentStep >= step
-                      ? 'bg-green-600 border-green-600 text-white'
+                      ? 'bg-teal-600 border-teal-600 text-white'
                       : 'border-gray-300 text-gray-400',
                   ]"
                 >
@@ -247,7 +247,7 @@ const getStepIcon = (step) => {
                 <div
                   class="text-center mt-1 text-xs"
                   :class="{
-                    'font-medium text-green-600': currentStep === step,
+                    'font-medium text-teal-600': currentStep === step,
                   }"
                 >
                   {{ ["Details", "Budget", "Review"][step - 1] }}
@@ -276,7 +276,7 @@ const getStepIcon = (step) => {
                   id="title"
                   v-model="form.title"
                   :class="[
-                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors',
+                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors',
                     validationErrors.title
                       ? 'border-red-300 bg-red-50'
                       : 'border-gray-300',
@@ -307,7 +307,7 @@ const getStepIcon = (step) => {
                     :class="[
                       'cursor-pointer p-3 rounded-lg border-2 flex items-center transition-all',
                       form.category === category.value
-                        ? 'border-green-500 bg-green-50 text-green-700'
+                        ? 'border-teal-500 bg-teal-50 text-teal-700'
                         : 'border-gray-200 hover:border-gray-300',
                     ]"
                   >
@@ -356,7 +356,7 @@ const getStepIcon = (step) => {
                   v-model="form.description"
                   rows="5"
                   :class="[
-                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors',
+                    'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors',
                     validationErrors.description
                       ? 'border-red-300 bg-red-50'
                       : 'border-gray-300',
@@ -379,10 +379,10 @@ const getStepIcon = (step) => {
             <div v-if="currentStep === 2">
               <!-- Budget Tips -->
               <div
-                class="mb-5 bg-green-50 rounded-lg p-4 border border-green-100"
+                class="mb-5 bg-teal-50 rounded-lg p-4 border border-teal-100"
               >
                 <div class="flex">
-                  <div class="mr-3 text-green-500">
+                  <div class="mr-3 text-teal-500">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5"
@@ -399,7 +399,7 @@ const getStepIcon = (step) => {
                     </svg>
                   </div>
                   <div>
-                    <p class="text-sm text-green-800">
+                    <p class="text-sm text-teal-800">
                       Setting a realistic budget range helps sellers know if
                       they can meet your needs.
                     </p>
@@ -425,7 +425,7 @@ const getStepIcon = (step) => {
                         id="minBudget"
                         v-model="form.minBudget"
                         :class="[
-                          'w-full pl-8 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500',
+                          'w-full pl-8 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500',
                           validationErrors.minBudget
                             ? 'border-red-300 bg-red-50'
                             : 'border-gray-300',
@@ -454,7 +454,7 @@ const getStepIcon = (step) => {
                         id="maxBudget"
                         v-model="form.maxBudget"
                         :class="[
-                          'w-full pl-8 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500',
+                          'w-full pl-8 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500',
                           validationErrors.maxBudget
                             ? 'border-red-300 bg-red-50'
                             : 'border-gray-300',
@@ -497,7 +497,7 @@ const getStepIcon = (step) => {
                     id="state"
                     v-model="selectedState"
                     :class="[
-                      'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500',
+                      'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500',
                       validationErrors.location
                         ? 'border-red-300 bg-red-50'
                         : 'border-gray-300',
@@ -522,7 +522,7 @@ const getStepIcon = (step) => {
                   <select
                     id="lga"
                     v-model="selectedLGA"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                   >
                     <option value="" disabled selected>Select LGA</option>
                     <option
@@ -546,7 +546,7 @@ const getStepIcon = (step) => {
                   <select
                     id="area"
                     v-model="selectedArea"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                   >
                     <option value="" disabled selected>Select Area</option>
                     <option
@@ -586,7 +586,7 @@ const getStepIcon = (step) => {
                       type="radio"
                       v-model="form.contactMethod"
                       value="phone"
-                      class="form-radio text-green-500 h-5 w-5"
+                      class="form-radio text-teal-500 h-5 w-5"
                     />
                     <span class="ml-2 text-gray-700">Phone</span>
                   </label>
@@ -597,7 +597,7 @@ const getStepIcon = (step) => {
                       type="radio"
                       v-model="form.contactMethod"
                       value="email"
-                      class="form-radio text-green-500 h-5 w-5"
+                      class="form-radio text-teal-500 h-5 w-5"
                     />
                     <span class="ml-2 text-gray-700">Email</span>
                   </label>
@@ -662,12 +662,12 @@ const getStepIcon = (step) => {
               <!-- Terms & Conditions -->
               <div class="mb-6">
                 <div
-                  class="bg-yellow-50 rounded-lg p-4 border border-yellow-100 text-sm text-yellow-800"
+                  class="bg-teal-50 rounded-lg p-4 border border-teal-100 text-sm text-teal-800"
                 >
                   <p class="flex items-start">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 mr-2 flex-shrink-0 text-yellow-600"
+                      class="h-5 w-5 mr-2 flex-shrink-0 text-teal-600"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -726,7 +726,7 @@ const getStepIcon = (step) => {
               <!-- Next/Submit Button -->
               <button
                 type="submit"
-                class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:opacity-50 disabled:pointer-events-none"
+                class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center disabled:opacity-50 disabled:pointer-events-none"
                 :disabled="isLoading"
               >
                 <span v-if="isLoading" class="mr-2">

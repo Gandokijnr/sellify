@@ -35,7 +35,7 @@ const handleNavigate = () => {
     :to="{ name: 'chat', params: { conversationId: chat.id } }"
     class="flex items-center p-4 md:p-6 hover:bg-gray-700 dark:hover:bg-gray-750 transition-colors cursor-pointer relative"
     :class="{
-      'bg-green-100 dark:bg-green-900/20': getUnreadCount(chat, authStore.user?.uid) > 0,
+      'bg-teal-100 dark:bg-teal-900/20': getUnreadCount(chat, authStore.user?.uid) > 0,
     }"
     @click="handleNavigate"
   >
@@ -49,7 +49,7 @@ const handleNavigate = () => {
         />
         <span
           v-if="getUnreadCount(chat, authStore.user?.uid) > 0"
-          class="absolute -top-1 -right-1 bg-green-500 text-white rounded-full px-2 py-0.5 text-xs font-bold"
+          class="absolute -top-1 -right-1 bg-teal-500 text-white rounded-full px-2 py-0.5 text-xs font-bold"
         >
           {{ getUnreadCount(chat, authStore.user?.uid) }}
         </span>
@@ -61,7 +61,7 @@ const handleNavigate = () => {
         {{ getInitials(otherUser?.displayName) }}
         <span
           v-if="getUnreadCount(chat, authStore.user?.uid) > 0"
-          class="absolute -top-1 -right-1 bg-green-500 text-white rounded-full px-2 py-0.5 text-xs font-bold"
+          class="absolute -top-1 -right-1 bg-teal-500 text-white rounded-full px-2 py-0.5 text-xs font-bold"
         >
           {{ getUnreadCount(chat, authStore.user?.uid) }}
         </span>
@@ -85,7 +85,7 @@ const handleNavigate = () => {
           <span
             class="text-sm text-gray-500 dark:text-gray-400"
             :class="{
-              'font-medium text-green-600 dark:text-green-400':
+              'font-medium text-teal-600 dark:text-teal-400':
                 getUnreadCount(chat, authStore.user?.uid) > 0,
             }"
           >

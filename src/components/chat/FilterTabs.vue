@@ -23,7 +23,7 @@ const handleFilterChange = (filter) => {
       :class="[
         'px-4 py-2 rounded-full text-sm font-medium transition-colors',
         activeFilter === 'all'
-          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+          ? 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100'
           : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600',
       ]"
     >
@@ -34,7 +34,7 @@ const handleFilterChange = (filter) => {
       :class="[
         'px-4 py-2 rounded-full text-sm font-medium transition-colors',
         activeFilter === 'unread'
-          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+          ? 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100'
           : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600',
       ]"
     >
@@ -45,7 +45,7 @@ const handleFilterChange = (filter) => {
       :class="[
         'px-4 py-2 rounded-full text-sm font-medium transition-colors',
         activeFilter === 'recent'
-          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+          ? 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100'
           : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600',
       ]"
     >

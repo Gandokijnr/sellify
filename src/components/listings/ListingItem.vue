@@ -12,7 +12,7 @@
         <div class="min-w-0 flex-1">
           <router-link
             :to="`/seller/listings/${listing.id}`"
-            class="text-sm font-medium text-jiji-primary hover:text-orange-700 truncate"
+            class="text-sm font-medium text-jiji-primary hover:text-teal-700 truncate"
           >
             {{ listing.title }}
           </router-link>
@@ -35,7 +35,7 @@
         </span>
         <button
           @click="$emit('edit', listing.id)"
-          class="text-jiji-primary hover:text-orange-700 flex"
+          class="text-jiji-primary hover:text-teal-700 flex"
         >
           <PencilIcon class="h-5 w-5" />
           Edit
@@ -73,9 +73,9 @@ const props = defineProps({
 
 const statusClasses = computed(() => {
   return {
-    active: "bg-green-100 text-green-800",
-    sold: "bg-purple-100 text-purple-800",
-    pending: "bg-yellow-100 text-yellow-800",
+    active: "bg-teal-100 text-teal-800",
+    sold: "bg-teal-100 text-teal-800",
+    pending: "bg-teal-100 text-teal-800",
     draft: "bg-gray-100 text-gray-800",
   }[props.listing.status];
 });

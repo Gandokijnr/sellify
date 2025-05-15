@@ -347,7 +347,7 @@ onMounted(() => {
           <div class="flex items-center">
             <router-link
               to="/chats"
-              class="mr-4 text-green-600 hover:text-green-700 dark:text-green-400"
+              class="mr-4 text-teal-600 hover:text-teal-700 dark:text-teal-400"
             >
               &lt; Back to chats
             </router-link>
@@ -408,7 +408,7 @@ onMounted(() => {
           <!-- Loading State -->
           <div v-if="loading" class="flex justify-center items-center h-full">
             <div
-              class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"
+              class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"
             ></div>
           </div>
 
@@ -470,7 +470,7 @@ onMounted(() => {
                 :class="[
                   'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
                   message.senderId === currentUserId
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                    ? 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100'
                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
                 ]"
               >
@@ -499,14 +499,14 @@ onMounted(() => {
               v-model="newMessage"
               @keydown.enter.except.prevent="sendMessage"
               placeholder="Type your message..."
-              class="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              class="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               rows="1"
               :disabled="sending"
             ></textarea>
             <button
               type="submit"
               :disabled="!newMessage.trim() || sending"
-              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <span v-if="sending">Sending...</span>
               <span v-else>Send</span>

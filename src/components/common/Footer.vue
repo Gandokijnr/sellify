@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
         <div>
-          <h3 class="font-bold text-xl mb-4 text-green-600">Selify</h3>
+          <h3 class="font-bold text-xl mb-4 text-teal-600">Selify</h3>
           <p class="text-gray-600">
             The largest marketplace in Nigeria where buying and selling is made
             easy.
@@ -15,20 +15,20 @@
           <h4 class="font-medium text-gray-800 mb-4">About</h4>
           <ul class="space-y-2">
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600"
+              <a href="#" class="text-gray-600 hover:text-teal-600"
                 >About Selify</a
               >
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600">Careers</a>
+              <a href="#" class="text-gray-600 hover:text-teal-600">Careers</a>
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600"
+              <a href="#" class="text-gray-600 hover:text-teal-600"
                 >Terms & Conditions</a
               >
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600"
+              <a href="#" class="text-gray-600 hover:text-teal-600"
                 >Privacy Policy</a
               >
             </li>
@@ -39,22 +39,22 @@
           <h4 class="font-medium text-gray-800 mb-4">Support</h4>
           <ul class="space-y-2">
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600"
+              <a href="#" class="text-gray-600 hover:text-teal-600"
                 >Help Center</a
               >
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600"
+              <a href="#" class="text-gray-600 hover:text-teal-600"
                 >Safety Tips</a
               >
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600"
+              <a href="#" class="text-gray-600 hover:text-teal-600"
                 >Contact Us</a
               >
             </li>
             <li>
-              <a href="#" class="text-gray-600 hover:text-green-600"
+              <a href="#" class="text-gray-600 hover:text-teal-600"
                 >Report a Problem</a
               >
             </li>

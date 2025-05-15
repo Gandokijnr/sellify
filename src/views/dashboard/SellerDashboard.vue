@@ -8,7 +8,7 @@
           <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
           <router-link
             to="/seller/listings/create"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-700 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-700 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
           >
             <PlusIcon class="-ml-1 mr-2 h-5 w-5" />
             New Listing
@@ -18,7 +18,7 @@
         <!-- Loading State -->
         <div v-if="loading" class="flex justify-center py-12">
           <div
-            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"
+            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600"
           ></div>
         </div>
 
@@ -48,14 +48,14 @@
         <!-- Success alert -->
         <div
           v-if="successMessage"
-          class="bg-green-50 border-l-4 border-green-400 p-4 mb-6"
+          class="bg-teal-50 border-l-4 border-teal-400 p-4 mb-6"
         >
           <div class="flex">
             <div class="flex-shrink-0">
-              <CheckCircleIcon class="h-5 w-5 text-green-400" />
+              <CheckCircleIcon class="h-5 w-5 text-teal-400" />
             </div>
             <div class="ml-3">
-              <p class="text-sm text-green-700">
+              <p class="text-sm text-teal-700">
                 {{ successMessage }}
               </p>
             </div>
@@ -78,19 +78,19 @@
               title="Active Listings"
               :value="stats.activeListings"
               icon="CheckCircleIcon"
-              color="bg-green-500"
+              color="bg-teal-500"
             />
             <DashboardCard
               title="Messages"
               :value="stats.messages"
               icon="ChatAltIcon"
-              color="bg-indigo-500"
+              color="bg-teal-500"
             />
             <DashboardCard
               title="Total Views"
               :value="stats.totalViews"
               icon="EyeIcon"
-              color="bg-purple-500"
+              color="bg-teal-500"
             />
           </div>
 
@@ -138,7 +138,7 @@
               <p class="text-gray-500">You haven't created any listings yet.</p>
               <router-link
                 to="/seller/listings/create"
-                class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-700 hover:bg-orange-700"
+                class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-700 hover:bg-teal-700"
               >
                 Create your first listing
               </router-link>
@@ -158,7 +158,7 @@
             >
               <router-link
                 to="/listings"
-                class="text-sm font-medium text-jiji-primary hover:text-orange-700"
+                class="text-sm font-medium text-jiji-primary hover:text-teal-700"
               >
                 View all listings →
               </router-link>

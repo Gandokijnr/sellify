@@ -245,8 +245,8 @@ const filteredRequests = computed(() => {
 
 // Function to determine budget display class based on budget amount
 function getBudgetClass(maxBudget) {
-  if (maxBudget >= 1000) return "text-green-600";
-  if (maxBudget >= 500) return "text-green-600";
+  if (maxBudget >= 1000) return "text-teal-600";
+  if (maxBudget >= 500) return "text-teal-600";
   return "text-gray-600";
 }
 </script>
@@ -273,7 +273,7 @@ function getBudgetClass(maxBudget) {
               v-model="searchQuery"
               type="text"
               placeholder="Search requests..."
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
             />
             <div class="absolute left-3 top-2.5 text-gray-400">
               <svg
@@ -297,7 +297,7 @@ function getBudgetClass(maxBudget) {
           <div class="w-full md:w-48">
             <select
               v-model="selectedCategory"
-              class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
             >
               <option
                 v-for="category in categories"
@@ -313,7 +313,7 @@ function getBudgetClass(maxBudget) {
           <div class="w-full md:w-48">
             <select
               v-model="sortOption"
-              class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
             >
               <option value="newest">Newest First</option>
               <option value="expiringSoon">Expiring Soon</option>
@@ -327,7 +327,7 @@ function getBudgetClass(maxBudget) {
       <!-- Loading State -->
       <div v-if="isLoading" class="flex justify-center my-12">
         <div
-          class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"
+          class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"
         ></div>
       </div>
 
@@ -370,7 +370,7 @@ function getBudgetClass(maxBudget) {
             class="px-5 py-4 border-b border-gray-100 flex justify-between items-center"
           >
             <span
-              class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-100 text-green-800"
+              class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800"
             >
               {{ request.category }}
             </span>
@@ -459,7 +459,7 @@ function getBudgetClass(maxBudget) {
           <div class="px-5 py-4 bg-gray-50 border-t border-gray-100">
             <button
               @click="contactBuyer(request)"
-              class="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-200 flex items-center justify-center font-medium"
+              class="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition duration-200 flex items-center justify-center font-medium"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -532,7 +532,7 @@ function getBudgetClass(maxBudget) {
           <!-- Loading State -->
           <div v-if="loadingContact" class="flex justify-center py-6">
             <div
-              class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"
+              class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"
             ></div>
           </div>
 
@@ -540,7 +540,7 @@ function getBudgetClass(maxBudget) {
           <div v-else-if="!authStore.user" class="py-6 text-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-12 w-12 mx-auto text-yellow-500"
+              class="h-12 w-12 mx-auto text-teal-500"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -556,7 +556,7 @@ function getBudgetClass(maxBudget) {
             <p class="mt-2 text-gray-600">Please log in to contact the buyer</p>
             <button
               @click="router.push('/login')"
-              class="mt-4 w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              class="mt-4 w-full py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
             >
               Login Now
             </button>
@@ -681,7 +681,7 @@ function getBudgetClass(maxBudget) {
             <div class="grid grid-cols-2 gap-3">
               <button
                 @click="dialPhoneNumber(contactDetails.phone)"
-                class="py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center"
+                class="py-2 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center justify-center"
                 :disabled="
                   !contactDetails.phone ||
                   contactDetails.phone === 'Not provided'
@@ -711,7 +711,7 @@ function getBudgetClass(maxBudget) {
 
               <button
                 @click="sendEmail(contactDetails.email)"
-                class="py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center"
+                class="py-2 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center justify-center"
                 :disabled="
                   !contactDetails.email ||
                   contactDetails.email === 'Not provided'
@@ -742,12 +742,12 @@ function getBudgetClass(maxBudget) {
 
             <!-- Tips -->
             <div
-              class="mt-4 p-3 bg-green-50 rounded-lg text-sm text-green-800 border border-green-100"
+              class="mt-4 p-3 bg-teal-50 rounded-lg text-sm text-teal-800 border border-teal-100"
             >
               <div class="flex">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 mr-2 text-green-500 flex-shrink-0"
+                  class="h-5 w-5 mr-2 text-teal-500 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

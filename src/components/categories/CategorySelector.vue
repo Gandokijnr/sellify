@@ -187,10 +187,10 @@ watch(() => props.modelValue, initFromModelValue, { immediate: true });
             >›</span
           >
         </template>
-        <span v-if="!isSelectionComplete" class="ml-2 text-orange-500 italic">
+        <span v-if="!isSelectionComplete" class="ml-2 text-teal-500 italic">
           (selection incomplete)
         </span>
-        <span v-else class="ml-2 text-green-500 flex items-center">
+        <span v-else class="ml-2 text-teal-500 flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4 mr-1"

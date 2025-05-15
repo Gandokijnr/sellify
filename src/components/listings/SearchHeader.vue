@@ -18,7 +18,7 @@ const emit = defineEmits(["update:searchQuery"]);
 </script>
 
 <template>
-  <div class="bg-green-700 text-white">
+  <div class="bg-teal-700 text-white">
     <div class="container mx-auto px-4 py-12 md:py-16">
       <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl md:text-4xl font-bold mb-6 animate-on-scroll">

@@ -250,7 +250,7 @@ function initializeScrollAnimations() {
 
     <main>
       <!-- Hero Section -->
-      <div class="bg-green-700 text-white">
+      <div class="bg-teal-700 text-white">
         <div class="container mx-auto px-4 py-12 md:py-16">
           <div class="max-w-4xl mx-auto">
             <div class="relative max-w-xl animate-on-scroll delay-2">

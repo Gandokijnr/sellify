@@ -10,7 +10,7 @@
     />
     <button
       @click="$emit('search')"
-      class="absolute right-0 top-0 h-full px-4 text-white bg-jiji-primary rounded-r-md hover:bg-orange-700 focus:outline-none transition-colors"
+      class="absolute right-0 top-0 h-full px-4 text-white bg-jiji-primary rounded-r-md hover:bg-teal-700 focus:outline-none transition-colors"
       aria-label="Search"
     >
       <svg

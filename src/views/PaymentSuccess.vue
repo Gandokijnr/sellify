@@ -4,7 +4,7 @@
       <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-500 rounded-full mx-auto mb-5 animate-spin"></div>
       <p>Verifying payment...</p>
     </div>
-    <div v-else-if="success" class="text-center max-w-md mx-auto p-8 rounded-lg bg-green-100 text-green-800">
+    <div v-else-if="success" class="text-center max-w-md mx-auto p-8 rounded-lg bg-teal-100 text-teal-800">
       <h2 class="text-xl font-bold mb-2">Payment Successful!</h2>
       <p>Your subscription has been activated.</p>
       <p>Redirecting you to create listing...</p>

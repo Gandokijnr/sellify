@@ -249,7 +249,7 @@ onMounted(() => {
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div
-          class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600 mb-2"
+          class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600 mb-2"
         ></div>
         <p class="text-gray-500">Loading listing details...</p>
       </div>
@@ -269,7 +269,7 @@ onMounted(() => {
           <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-2">
               <li>
-                <router-link to="/" class="text-green-600 hover:text-green-700"
+                <router-link to="/" class="text-teal-600 hover:text-teal-700"
                   >Home</router-link
                 >
               </li>
@@ -282,7 +282,7 @@ onMounted(() => {
                     name: 'listings',
                     query: { category: listing.category },
                   }"
-                  class="text-green-600 hover:text-green-700"
+                  class="text-teal-600 hover:text-teal-700"
                 >
                   {{ listing.category }}
                 </router-link>
@@ -322,7 +322,7 @@ onMounted(() => {
                 class="aspect-square rounded-md overflow-hidden border-2"
                 :class="
                   activeImage === index
-                    ? 'border-green-500'
+                    ? 'border-teal-500'
                     : 'border-transparent'
                 "
               >
@@ -336,7 +336,7 @@ onMounted(() => {
               <button
                 v-if="listing.images.length > 4 && !showAllImages"
                 @click="showAllImages = true"
-                class="aspect-square rounded-md border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-green-300 hover:text-green-500"
+                class="aspect-square rounded-md border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-teal-300 hover:text-teal-500"
               >
                 <span class="text-sm"
                   >+{{ listing.images.length - 4 }} more</span
@@ -351,7 +351,7 @@ onMounted(() => {
               <h1 class="text-2xl font-bold">{{ listing.title }}</h1>
               <span
                 v-if="listing.featured"
-                class="bg-green-500 text-white text-xs px-2 py-1 rounded ml-2"
+                class="bg-teal-500 text-white text-xs px-2 py-1 rounded ml-2"
               >
                 Featured
               </span>
@@ -381,7 +381,7 @@ onMounted(() => {
             </div>
 
             <div class="mb-6">
-              <span class="text-3xl font-bold text-green-600">{{
+              <span class="text-3xl font-bold text-teal-600">{{
                 listing.price
               }}</span>
               <span v-if="listing.negotiable" class="ml-2 text-sm text-gray-500"
@@ -393,7 +393,7 @@ onMounted(() => {
             <div class="grid grid-cols-2 gap-3 mb-8">
               <button
                 @click="callSeller"
-                class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-colors"
+                class="bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-colors"
                 :disabled="!sellerInfo?.phoneNumber"
               >
                 <svg
@@ -418,7 +418,7 @@ onMounted(() => {
               <button
                 @click="openChatModal"
                 :disabled="chatLoading || isUserSeller"
-                class="bg-white border border-green-600 text-green-600 hover:bg-green-50 py-3 px-4 rounded-lg flex items-center justify-center transition-colors"
+                class="bg-white border border-teal-600 text-teal-600 hover:bg-teal-50 py-3 px-4 rounded-lg flex items-center justify-center transition-colors"
                 :class="{ 'opacity-50 cursor-not-allowed': isUserSeller }"
               >
                 <svg
@@ -440,7 +440,7 @@ onMounted(() => {
                 </svg>
                 <div
                   v-else
-                  class="animate-spin h-5 w-5 mr-2 border-2 border-green-600 border-t-transparent rounded-full"
+                  class="animate-spin h-5 w-5 mr-2 border-2 border-teal-600 border-t-transparent rounded-full"
                 ></div>
                 Chat with Seller
               </button>
@@ -526,7 +526,7 @@ onMounted(() => {
               />
               <div
                 v-if="item.featured"
-                class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded"
+                class="absolute top-3 left-3 bg-teal-500 text-white text-xs px-2 py-1 rounded"
               >
                 Featured
               </div>
@@ -553,7 +553,7 @@ onMounted(() => {
                 </svg>
                 <span>{{ item.location }}</span>
               </div>
-              <div class="font-bold text-green-600 text-lg">
+              <div class="font-bold text-teal-600 text-lg">
                 {{ item.price }}
               </div>
             </div>
@@ -603,20 +603,20 @@ onMounted(() => {
                 />
                 <div>
                   <p class="font-medium line-clamp-1">{{ listing.title }}</p>
-                  <p class="text-green-600">{{ listing.price }}</p>
+                  <p class="text-teal-600">{{ listing.price }}</p>
                 </div>
               </div>
             </div>
             <textarea
               v-model="message"
               placeholder="Type your message here..."
-              class="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+              class="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500"
               rows="4"
             ></textarea>
             <button
               @click="sendMessageDirectly"
               :disabled="chatLoading || !message.trim()"
-              class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors disabled:bg-green-400 flex items-center justify-center"
+              class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg transition-colors disabled:bg-teal-400 flex items-center justify-center"
             >
               <div
                 v-if="chatLoading"

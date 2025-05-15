@@ -13,23 +13,23 @@
       <div class="relative w-32 h-32 mb-8 sm:w-36 sm:h-36 md:w-40 md:h-40">
         <!-- Outer spinning ring -->
         <div
-          class="absolute w-full h-full rounded-full border-4 border-green-100 opacity-30"
+          class="absolute w-full h-full rounded-full border-4 border-teal-100 opacity-30"
         ></div>
 
         <!-- Spinning gradient circles -->
         <div
-          class="absolute w-full h-full rounded-full border-4 border-transparent border-t-green-600 border-r-green-500 animate-spin"
+          class="absolute w-full h-full rounded-full border-4 border-transparent border-t-teal-600 border-r-teal-500 animate-spin"
           style="animation-duration: 2s"
         ></div>
         <div
-          class="absolute w-full h-full rounded-full border-4 border-transparent border-t-green-500 border-r-green-400 animate-spin"
+          class="absolute w-full h-full rounded-full border-4 border-transparent border-t-teal-500 border-r-teal-400 animate-spin"
           style="animation-duration: 1.7s; animation-delay: 0.2s"
         ></div>
 
         <!-- Pulsing center -->
         <div class="absolute inset-0 flex items-center justify-center">
           <div
-            class="w-20 h-20 rounded-full bg-gradient-to-br bg-green-600 animate-pulse flex items-center justify-center"
+            class="w-20 h-20 rounded-full bg-gradient-to-br bg-teal-600 animate-pulse flex items-center justify-center"
           >
             <div class="text-2xl font-bold text-white">
               <slot name="logo-text">Selify</slot>
@@ -41,13 +41,13 @@
       <!-- Progress bar -->
       <div class="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
         <div
-          class="h-full bg-gradient-to-r bg-green-600 transition-all duration-50"
+          class="h-full bg-gradient-to-r bg-teal-600 transition-all duration-50"
           :style="{ width: `${progress}%` }"
         ></div>
       </div>
 
       <!-- Optional loading text -->
-      <div class="mt-3 text-green-800 font-medium text-sm">
+      <div class="mt-3 text-teal-800 font-medium text-sm">
         <slot name="loading-text">Loading your experience...</slot>
       </div>
     </div>
@@ -59,7 +59,7 @@
         v-for="i in 12"
         :key="i"
         class="absolute rounded-full opacity-60"
-        :class="[i % 2 === 0 ? 'bg-green-300' : 'bg-green-200']"
+        :class="[i % 2 === 0 ? 'bg-teal-300' : 'bg-teal-200']"
         :style="particleStyle(i)"
       ></div>
     </div>
@@ -112,7 +112,7 @@ const particleStyle = (i) => {
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
     animationDelay: `${i * 0.3}s`,
-    animation: "floatGreen 20s infinite ease-in-out",
+    animation: "floatteal 20s infinite ease-in-out",
     borderRadius: isLeaf ? "50% 50% 50% 0" : "50%",
     transform: isLeaf ? `rotate(${i * 30}deg)` : "",
   };
@@ -123,7 +123,7 @@ const addStylesheet = () => {
   const style = document.createElement("style");
   style.id = "selify-loader-styles";
   style.textContent = `
-    @keyframes floatGreen {
+    @keyframes floatteal {
       0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
       25% { transform: translateY(-30px) translateX(15px) rotate(5deg); }
       50% { transform: translateY(10px) translateX(-20px) rotate(-5deg); }

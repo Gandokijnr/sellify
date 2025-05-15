@@ -195,8 +195,8 @@ const iPhoneColors = [
   { value: "Blue", label: "Blue" },
   { value: "Red", label: "Red" },
   { value: "Green", label: "Green" },
-  { value: "Purple", label: "Purple" },
-  { value: "Yellow", label: "Yellow" },
+  { value: "teal", label: "teal" },
+  { value: "teal", label: "teal" },
   { value: "Gold", label: "Gold" },
   { value: "Silver", label: "Silver" }
 ];
@@ -239,7 +239,7 @@ const SamsungColors = [
   { value: "Blue", label: "Blue" },
   { value: "Lavender", label: "Lavender" },
   { value: "Graphite", label: "Graphite" },
-  { value: "Bora Purple", label: "Bora Purple" },
+  { value: "Bora teal", label: "Bora teal" },
 ];
 
 // Google Pixel models and specifications data
@@ -579,17 +579,17 @@ const cancel = () => {
 
 const dragover = (e) => {
   e.preventDefault();
-  e.currentTarget.classList.add("border-jiji-primary", "bg-orange-50");
+  e.currentTarget.classList.add("border-jiji-primary", "bg-teal-50");
 };
 
 const dragleave = (e) => {
   e.preventDefault();
-  e.currentTarget.classList.remove("border-jiji-primary", "bg-orange-50");
+  e.currentTarget.classList.remove("border-jiji-primary", "bg-teal-50");
 };
 
 const dropFiles = (e) => {
   e.preventDefault();
-  e.currentTarget.classList.remove("border-jiji-primary", "bg-orange-50");
+  e.currentTarget.classList.remove("border-jiji-primary", "bg-teal-50");
   const files = e.dataTransfer.files;
   handleImageUpload({ target: { files } });
 };

@@ -244,7 +244,7 @@ function initializeScrollAnimations() {
         <div
           v-for="(category, index) in displayCategories"
           :key="category.id"
-          class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer animate-on-scroll relative"
+          class="bg-white rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-sm border border-gray-100 hover:shadow-md hover:border-teal-200 transition-all cursor-pointer animate-on-scroll relative"
           :class="`delay-${index % 3}`"
           @click="navigateToCategory(category)"
         >

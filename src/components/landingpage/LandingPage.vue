@@ -88,7 +88,7 @@ function initializeScrollAnimations() {
     <Navbar />
 
     <main>
-      <div class="bg-green-700 text-white">
+      <div class="bg-teal-700 text-white">
         <div class="container mx-auto px-4 py-16 md:py-24">
           <div class="max-w-3xl mx-auto text-center">
             <h1
@@ -111,7 +111,7 @@ function initializeScrollAnimations() {
                 <Search class="h-5 w-5" />
               </span>
               <button
-                class="absolute right-2 top-2 bg-green-700 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors shadow"
+                class="absolute right-2 top-2 bg-teal-700 text-white py-2 px-6 rounded-lg hover:bg-teal-600 transition-colors shadow"
                 @click="$router.push(`/listings?query=${searchQuery}`)"
               >
                 Search
@@ -138,7 +138,7 @@ function initializeScrollAnimations() {
 
             <router-link
               :to="{ name: 'listings' }"
-              class="flex items-center text-green-600 hover:text-green-700 cursor-pointer animate-on-scroll delay-1"
+              class="flex items-center text-teal-600 hover:text-teal-700 cursor-pointer animate-on-scroll delay-1"
             >
               <span class="font-medium">View all</span>
               <ArrowRight class="h-4 w-4 ml-1" />
@@ -168,9 +168,9 @@ function initializeScrollAnimations() {
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="text-center animate-on-scroll">
               <div
-                class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                class="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
-                <Shield class="h-6 w-6 text-green-600" />
+                <Shield class="h-6 w-6 text-teal-600" />
               </div>
               <h3 class="text-lg font-medium mb-2">Find What You Need</h3>
               <p class="text-gray-600">
@@ -181,9 +181,9 @@ function initializeScrollAnimations() {
 
             <div class="text-center animate-on-scroll delay-1">
               <div
-                class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                class="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
-                <Phone class="h-6 w-6 text-green-600" />
+                <Phone class="h-6 w-6 text-teal-600" />
               </div>
               <h3 class="text-lg font-medium mb-2">Contact the Seller</h3>
               <p class="text-gray-600">
@@ -194,9 +194,9 @@ function initializeScrollAnimations() {
 
             <div class="text-center animate-on-scroll delay-2">
               <div
-                class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                class="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
               >
-                <Truck class="h-6 w-6 text-green-600" />
+                <Truck class="h-6 w-6 text-teal-600" />
               </div>
               <h3 class="text-lg font-medium mb-2">Complete Your Purchase</h3>
               <p class="text-gray-600">
@@ -208,7 +208,7 @@ function initializeScrollAnimations() {
       </div>
 
       <!-- CTA Section -->
-      <div class="bg-green-50 py-12">
+      <div class="bg-teal-50 py-12">
         <div class="container mx-auto px-4">
           <div class="max-w-3xl mx-auto text-center">
             <h2 class="text-2xl md:text-3xl font-bold mb-4 animate-on-scroll">
@@ -222,7 +222,7 @@ function initializeScrollAnimations() {
               :to="
                 authStore.isAuthenticated ? '/seller/listings/create' : '/login'
               "
-              class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-medium transition-colors shadow-sm animate-on-scroll delay-2"
+              class="bg-teal-600 text-white px-8 py-3 rounded-lg hover:bg-teal-700 font-medium transition-colors shadow-sm animate-on-scroll delay-2"
             >
               Post Your Ad Now
             </router-link>

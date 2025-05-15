@@ -60,7 +60,7 @@ onUnmounted(() => {
 <template>
   <header class="bg-white shadow-sm sticky top-0 z-50">
     <!-- Top Bar -->
-    <div class="bg-green-600 text-white text-sm tilt-in">
+    <div class="bg-teal-600 text-white text-sm tilt-in">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-8">
           <div class="flex space-x-4">
@@ -76,7 +76,7 @@ onUnmounted(() => {
                   authStore.isAuthenticated &&
                   (!userProfile || !userProfile.phoneNumber)
                 "
-                class="ml-1 text-yellow-300 text-xs"
+                class="ml-1 text-teal-300 text-xs"
                 title="Complete your profile to sell"
               >
                 (!)
@@ -130,7 +130,7 @@ onUnmounted(() => {
 
           <router-link
             :to="authStore.isAuthenticated ? '/chats' : '/login'"
-            class="flex-col items-center text-gray-600 hover:text-green-600 relative"
+            class="flex-col items-center text-gray-600 hover:text-teal-600 relative"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -170,7 +170,7 @@ onUnmounted(() => {
                       }}
                       <span
                         v-if="userProfile && !userProfile.phoneNumber"
-                        class="text-yellow-500 text-xs ml-1"
+                        class="text-teal-500 text-xs ml-1"
                         title="Profile incomplete"
                       >
                         (!)
@@ -185,8 +185,8 @@ onUnmounted(() => {
                         class="w-8 h-8 rounded-full object-cover border-2"
                         :class="
                           userProfile?.phoneNumber
-                            ? 'border-green-100'
-                            : 'border-yellow-100'
+                            ? 'border-teal-100'
+                            : 'border-teal-100'
                         "
                       />
                       <div
@@ -194,8 +194,8 @@ onUnmounted(() => {
                         class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2"
                         :class="
                           userProfile?.phoneNumber
-                            ? 'border-green-100'
-                            : 'border-yellow-100'
+                            ? 'border-teal-100'
+                            : 'border-teal-100'
                         "
                       >
                         <svg
@@ -222,7 +222,7 @@ onUnmounted(() => {
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4 text-green-500"
+                          class="h-4 w-4 text-teal-500"
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >
@@ -241,7 +241,7 @@ onUnmounted(() => {
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4 text-yellow-500"
+                          class="h-4 w-4 text-teal-500"
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >
@@ -269,7 +269,7 @@ onUnmounted(() => {
                       My Profile
                       <span
                         v-if="!userProfile?.phoneNumber"
-                        class="ml-1 text-yellow-500 text-xs"
+                        class="ml-1 text-teal-500 text-xs"
                       >
                         (!)
                       </span>
@@ -305,13 +305,13 @@ onUnmounted(() => {
             <template v-else>
               <router-link
                 to="/login"
-                class="hidden md:inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 hover:text-green-600"
+                class="hidden md:inline-flex items-center px-3 py-1 text-sm font-medium text-gray-700 hover:text-teal-600"
               >
                 Sign in
               </router-link>
               <router-link
                 to="/register"
-                class="hidden md:inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-gray-700"
+                class="hidden md:inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-gray-700"
               >
                 Sign up
               </router-link>
@@ -321,7 +321,7 @@ onUnmounted(() => {
           <!-- Mobile menu button -->
           <button
             @click="toggleMobileMenu"
-            class="md:hidden text-gray-500 hover:text-green-600 focus:outline-none"
+            class="md:hidden text-gray-500 hover:text-teal-600 focus:outline-none"
           >
             <div class="relative">
               <img
@@ -331,8 +331,8 @@ onUnmounted(() => {
                 class="w-8 h-8 rounded-full object-cover border-2"
                 :class="
                   userProfile?.phoneNumber
-                    ? 'border-green-100'
-                    : 'border-yellow-100'
+                    ? 'border-teal-100'
+                    : 'border-teal-100'
                 "
               />
               <div
@@ -340,8 +340,8 @@ onUnmounted(() => {
                 class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2"
                 :class="
                   userProfile?.phoneNumber
-                    ? 'border-green-100'
-                    : 'border-yellow-100'
+                    ? 'border-teal-100'
+                    : 'border-teal-100'
                 "
               >
                 <svg
@@ -366,7 +366,7 @@ onUnmounted(() => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-3 w-3 text-green-500"
+                  class="h-3 w-3 text-teal-500"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -383,7 +383,7 @@ onUnmounted(() => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-3 w-3 text-yellow-500"
+                  class="h-3 w-3 text-teal-500"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -415,41 +415,41 @@ onUnmounted(() => {
         <template v-if="authStore.isAuthenticated && authStore.user">
           <router-link
             to="/seller/dashboard"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
             >Dashboard</router-link
           >
           <router-link
             to="/profile"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
             >Profile</router-link
           >
           <router-link
             to="/buyer/requests"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
           >
             Submit Product Request
           </router-link>
           <router-link
             to="/buyer/requests/list"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
           >
             View buyer requests
           </router-link>
           <!-- <router-link
             to="/my-ads"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
             >My Ads</router-link
           > -->
           
           <router-link
             to="/subscription"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
           >
             Subscription
           </router-link>
           <button
             @click="authStore.logout"
-            class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
           >
             Logout
           </button>
@@ -457,12 +457,12 @@ onUnmounted(() => {
         <template v-else>
           <router-link
             to="/login"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
             >Sign in</router-link
           >
           <router-link
             to="/register"
-            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50"
+            class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
             >Sign up</router-link
           >
         </template>

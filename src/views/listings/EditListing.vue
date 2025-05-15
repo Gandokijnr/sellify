@@ -6,7 +6,7 @@
         <div class="bg-white rounded-lg shadow overflow-hidden">
           <!-- Loading State -->
           <div v-if="loading" class="p-8 flex justify-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600"></div>
           </div>
 
           <div v-else>
@@ -50,7 +50,7 @@
                           type="number"
                           step="0.01"
                           min="0"
-                          class="block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                          class="block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500"
                           required
                         />
                       </div>
@@ -62,7 +62,7 @@
                       <select
                         id="status"
                         v-model="form.status"
-                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                         required
                       >
                         <option value="active">Active</option>
@@ -77,7 +77,7 @@
                         id="description"
                         v-model="form.description"
                         rows="4"
-                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                         required
                       ></textarea>
                     </div>
@@ -89,13 +89,13 @@
                   <button
                     type="button"
                     @click="cancel"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    class="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                   >
                     Update Listing
                   </button>

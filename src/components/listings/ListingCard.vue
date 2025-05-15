@@ -11,13 +11,13 @@
         />
         <div
           v-if="listing.isVerified"
-          class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded"
+          class="absolute top-2 left-2 bg-teal-500 text-white text-xs px-2 py-1 rounded"
         >
           Verified
         </div>
         <div
           v-if="listing.isSponsored"
-          class="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded"
+          class="absolute top-2 right-2 bg-teal-500 text-white text-xs px-2 py-1 rounded"
         >
           Sponsored
         </div>

@@ -4,14 +4,14 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="bg-white rounded-lg shadow overflow-hidden">
         <!-- Profile Header -->
-        <div class="bg-green-600 px-6 py-4">
+        <div class="bg-teal-600 px-6 py-4">
           <h1 class="text-white text-xl font-semibold">My Profile</h1>
         </div>
 
         <!-- Loading State -->
         <div v-if="loading" class="p-8 flex justify-center">
           <div
-            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"
+            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600"
           ></div>
         </div>
 
@@ -58,7 +58,7 @@
                 />
                 <label
                   for="profile-upload"
-                  class="absolute bottom-0 right-0 bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-colors cursor-pointer"
+                  class="absolute bottom-0 right-0 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700 transition-colors cursor-pointer"
                   title="Update profile photo"
                 >
                   <svg
@@ -96,13 +96,13 @@
 
             <div class="w-full md:w-2/3">
               <div
-                class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6"
+                class="bg-teal-50 border-l-4 border-teal-400 p-4 mb-6"
                 v-if="!profileData.isProfileComplete"
               >
                 <div class="flex items-start">
                   <div class="flex-shrink-0">
                     <svg
-                      class="h-5 w-5 text-yellow-400"
+                      class="h-5 w-5 text-teal-400"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -114,7 +114,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm text-yellow-700">
+                    <p class="text-sm text-teal-700">
                       Your profile is incomplete. Please fill in all the
                       required fields.
                     </p>
@@ -123,13 +123,13 @@
               </div>
 
               <div
-                class="bg-green-50 border-l-4 border-green-400 p-4 mb-6"
+                class="bg-teal-50 border-l-4 border-teal-400 p-4 mb-6"
                 v-if="profileData.isProfileComplete"
               >
                 <div class="flex items-start">
                   <div class="flex-shrink-0">
                     <svg
-                      class="h-5 w-5 text-green-400"
+                      class="h-5 w-5 text-teal-400"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -141,7 +141,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm text-green-700">
+                    <p class="text-sm text-teal-700">
                       Your profile is complete! You can now start listing items.
                     </p>
                   </div>
@@ -157,7 +157,7 @@
                 <button
                   @click="editMode = true"
                   v-if="!editMode"
-                  class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  class="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                 >
                   Edit Profile
                 </button>
@@ -165,13 +165,13 @@
                 <div v-if="editMode" class="flex gap-2">
                   <button
                     @click="saveProfile"
-                    class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    class="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                   >
                     Save Changes
                   </button>
                   <button
                     @click="cancelEdit"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                   >
                     Cancel
                   </button>
@@ -200,7 +200,7 @@
                     id="displayName"
                     v-model="profileData.displayName"
                     type="text"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                   />
                   <div v-else class="text-gray-900">
                     {{ profileData.displayName || "Not set" }}
@@ -219,7 +219,7 @@
                     id="phoneNumber"
                     v-model="profileData.phoneNumber"
                     type="tel"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                   />
                   <div v-else class="text-gray-900">
                     {{ profileData.phoneNumber || "Not set" }}
@@ -238,7 +238,7 @@
                     id="address"
                     v-model="profileData.address"
                     rows="3"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                   ></textarea>
                   <div v-else class="text-gray-900">
                     {{ profileData.address || "Not set" }}
@@ -257,7 +257,7 @@
                     id="zip"
                     v-model="profileData.zip"
                     type="text"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                   />
                   <div v-else class="text-gray-900">
                     {{ profileData.zip || "Not set" }}
@@ -287,7 +287,7 @@
                       <select
                         id="state"
                         v-model="selectedState"
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                         required
                       >
                         <option value="" disabled selected>Select State</option>
@@ -309,7 +309,7 @@
                       <select
                         id="lga"
                         v-model="selectedLGA"
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                         required
                       >
                         <option value="" disabled selected>Select LGA</option>
@@ -333,7 +333,7 @@
                       <select
                         id="specific-location"
                         v-model="selectedLocation"
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       >
                         <option value="" disabled selected>
                           Select Location
@@ -371,7 +371,7 @@
               <div class="flex items-center justify-between mb-4">
                 <h4 class="text-gray-700">Current Plan</h4>
                 <span class="px-3 py-1 text-sm font-medium rounded-full" :class="{
-                  'bg-green-100 text-green-800': profileData.subscription.isActive,
+                  'bg-teal-100 text-teal-800': profileData.subscription.isActive,
                   'bg-gray-100 text-gray-800': !profileData.subscription.isActive
                 }">
                   {{ profileData.subscription.plan }}
@@ -408,9 +408,9 @@
                         !profileData.emailNotifications
                     "
                     :class="[
-                      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+                      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500',
                       profileData.emailNotifications
-                        ? 'bg-green-600'
+                        ? 'bg-teal-600'
                         : 'bg-gray-200',
                     ]"
                   >
@@ -442,9 +442,9 @@
                       profileData.publicProfile = !profileData.publicProfile
                     "
                     :class="[
-                      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+                      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500',
                       profileData.publicProfile
-                        ? 'bg-green-600'
+                        ? 'bg-teal-600'
                         : 'bg-gray-200',
                     ]"
                   >
@@ -516,7 +516,7 @@
                       id="currentPassword"
                       v-model="passwordData.currentPassword"
                       type="password"
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                     />
                   </div>
                   <div>
@@ -529,7 +529,7 @@
                       id="newPassword"
                       v-model="passwordData.newPassword"
                       type="password"
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                     />
                   </div>
                   <div>
@@ -542,7 +542,7 @@
                       id="confirmPassword"
                       v-model="passwordData.confirmPassword"
                       type="password"
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500"
                     />
                   </div>
                 </div>
@@ -552,13 +552,13 @@
           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               @click="changePassword"
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-teal-600 text-base font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Update Password
             </button>
             <button
               @click="showChangePasswordModal = false"
-              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Cancel
             </button>
@@ -573,7 +573,7 @@
       :class="[
         'fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-lg max-w-sm transition-all duration-300 transform',
         notification.type === 'success'
-          ? 'bg-green-600 text-white'
+          ? 'bg-teal-600 text-white'
           : 'bg-red-600 text-white',
         notification.show
           ? 'translate-y-0 opacity-100'

@@ -179,7 +179,7 @@ const handleSortChange = (event) => {
     <!-- Loading State -->
     <div v-if="loading" class="text-center py-12">
       <div
-        class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600 mb-2"
+        class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-600 mb-2"
       ></div>
       <p class="text-gray-500">Loading listings...</p>
     </div>
@@ -218,7 +218,7 @@ const handleSortChange = (event) => {
           emit('update:searchQuery', '');
           emit('update:selectedCategory', 'all');
         "
-        class="text-green-600 hover:text-green-700 font-medium"
+        class="text-teal-600 hover:text-teal-700 font-medium"
       >
         Clear filters
       </button>
@@ -244,13 +244,13 @@ const handleSortChange = (event) => {
 
           <div
             v-if="listing.featured"
-            class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded"
+            class="absolute top-3 left-3 bg-teal-500 text-white text-xs px-2 py-1 rounded"
           >
             Featured
           </div>
           <div
             v-if="listing.isSponsored"
-            class="absolute top-3 right-3 bg-orange-500 text-white text-xs px-2 py-1 rounded"
+            class="absolute top-3 right-3 bg-teal-500 text-white text-xs px-2 py-1 rounded"
           >
             Sponsored
           </div>
@@ -285,13 +285,13 @@ const handleSortChange = (event) => {
             <span class="line-clamp-1">{{ listing.location }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <div class="font-bold text-green-600 text-sm sm:text-lg">
+            <div class="font-bold text-teal-600 text-sm sm:text-lg">
               {{ listing.price }}
             </div>
 
             <button
               v-if="showCallSeller"
-              class="bg-green-100 hover:bg-green-200 text-green-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
+              class="bg-teal-100 hover:bg-teal-200 text-teal-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
               @click.stop="emit('callSeller', formatPhoneNumber(listing.phoneNumber))"
             >
               <svg

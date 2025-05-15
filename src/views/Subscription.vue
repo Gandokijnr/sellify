@@ -1,11 +1,11 @@
 <template>
   <Navbar />
-  <div class="bg-gradient-to-b from-green-50 to-white min-h-screen pb-16">
+  <div class="bg-gradient-to-b from-teal-50 to-white min-h-screen pb-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
       <!-- Header section -->
       <div class="text-center max-w-3xl mx-auto mb-16">
         <h1
-          class="text-4xl font-extrabold text-green-900 sm:text-5xl sm:tracking-tight lg:text-6xl"
+          class="text-4xl font-extrabold text-teal-900 sm:text-5xl sm:tracking-tight lg:text-6xl"
         >
           Choose Your Plan
         </h1>
@@ -23,7 +23,7 @@
             :class="[
               'relative py-2 px-6 rounded-full text-sm font-medium focus:outline-none transition-colors',
               billingPeriod === 'monthly'
-                ? 'bg-white shadow-sm text-green-700'
+                ? 'bg-white shadow-sm text-teal-700'
                 : 'text-gray-700 hover:text-gray-900',
             ]"
           >
@@ -34,12 +34,12 @@
             :class="[
               'relative py-2 px-6 rounded-full text-sm font-medium focus:outline-none transition-colors',
               billingPeriod === 'yearly'
-                ? 'bg-white shadow-sm text-green-700'
+                ? 'bg-white shadow-sm text-teal-700'
                 : 'text-gray-700 hover:text-gray-900',
             ]"
           >
             Yearly
-            <span class="ml-1 text-xs text-green-600 font-semibold"
+            <span class="ml-1 text-xs text-teal-600 font-semibold"
               >Save 20%</span
             >
           </button>
@@ -57,14 +57,14 @@
             'relative rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl',
             'flex flex-col h-full',
             plan.isPopular
-              ? 'border-2 border-green-500 transform md:scale-105 z-10 shadow-xl'
+              ? 'border-2 border-teal-500 transform md:scale-105 z-10 shadow-xl'
               : 'border border-gray-200 shadow-lg',
           ]"
         >
           <!-- Popular badge -->
           <div
             v-if="plan.isPopular"
-            class="absolute top-0 inset-x-0 bg-gradient-to-r from-green-500 to-green-600 text-white text-center py-2 text-xs font-medium tracking-wider"
+            class="absolute top-0 inset-x-0 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-center py-2 text-xs font-medium tracking-wider"
           >
             MOST POPULAR
           </div>
@@ -74,11 +74,11 @@
             :class="[
               'p-8 text-center',
               plan.isPopular
-                ? 'bg-gradient-to-r from-green-600 to-green-700 text-white'
+                ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white'
                 : 'bg-white',
               plan.isPopular && 'pt-12',
               plan.isFree
-                ? 'bg-gradient-to-r from-green-600 to-green-700 text-white'
+                ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white'
                 : '',
             ]"
           >
@@ -94,9 +94,9 @@
               :class="[
                 'text-sm mb-4',
                 plan.isPopular
-                  ? 'text-green-100'
+                  ? 'text-teal-100'
                   : plan.isFree
-                  ? 'text-green-100'
+                  ? 'text-teal-100'
                   : 'text-gray-500',
               ]"
             >
@@ -108,7 +108,7 @@
                   'text-5xl font-extrabold tracking-tight',
                   plan.isPopular || plan.isFree
                     ? 'text-white'
-                    : 'text-green-600',
+                    : 'text-teal-600',
                 ]"
               >
                 ₦{{ plan.price }}
@@ -117,9 +117,9 @@
                 :class="[
                   'ml-1 text-xl font-medium mb-1',
                   plan.isPopular
-                    ? 'text-green-100'
+                    ? 'text-teal-100'
                     : plan.isFree
-                    ? 'text-green-100'
+                    ? 'text-teal-100'
                     : 'text-gray-500',
                 ]"
               >
@@ -130,7 +130,7 @@
               v-if="billingPeriod === 'yearly'"
               :class="[
                 'mt-2 text-sm',
-                plan.isPopular ? 'text-green-100' : 'text-gray-400',
+                plan.isPopular ? 'text-teal-100' : 'text-gray-400',
               ]"
             >
               Save 20% with annual billing
@@ -142,7 +142,7 @@
             <p
               :class="[
                 'font-medium text-sm uppercase mb-4 tracking-wider',
-                plan.isPopular ? 'text-green-600' : 'text-gray-500',
+                plan.isPopular ? 'text-teal-600' : 'text-gray-500',
               ]"
             >
               What's included
@@ -156,7 +156,7 @@
                 <svg
                   :class="[
                     'h-5 w-5 mt-0.5 mr-3 flex-shrink-0',
-                    plan.isPopular ? 'text-green-500' : 'text-green-400',
+                    plan.isPopular ? 'text-teal-500' : 'text-teal-400',
                   ]"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
@@ -200,13 +200,13 @@
             <!-- Special highlights -->
             <div
               v-if="plan.id === 'premium'"
-              class="mt-6 p-4 bg-green-50 rounded-lg border border-green-100"
+              class="mt-6 p-4 bg-teal-50 rounded-lg border border-teal-100"
             >
-              <h4 class="font-medium text-green-800 mb-2">Premium Perks</h4>
-              <ul class="space-y-2 text-sm text-green-700">
+              <h4 class="font-medium text-teal-800 mb-2">Premium Perks</h4>
+              <ul class="space-y-2 text-sm text-teal-700">
                 <li class="flex items-start">
                   <svg
-                    class="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                    class="h-4 w-4 text-teal-500 mr-2 mt-0.5 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -220,7 +220,7 @@
                 </li>
                 <li class="flex items-start">
                   <svg
-                    class="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                    class="h-4 w-4 text-teal-500 mr-2 mt-0.5 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -234,7 +234,7 @@
                 </li>
                 <li class="flex items-start">
                   <svg
-                    class="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                    class="h-4 w-4 text-teal-500 mr-2 mt-0.5 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -259,10 +259,10 @@
                 'w-full py-4 px-8 rounded-lg text-center font-medium text-base transition-all',
                 'focus:outline-none focus:ring-2 focus:ring-offset-2',
                 isSubscribed(plan)
-                  ? 'bg-green-500 text-white cursor-not-allowed'
+                  ? 'bg-teal-500 text-white cursor-not-allowed'
                   : plan.isPopular
-                  ? 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200 focus:ring-green-500',
+                  ? 'bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-500'
+                  : 'bg-teal-100 text-teal-700 hover:bg-teal-200 focus:ring-teal-500',
               ]"
             >
               <div class="flex items-center justify-center">
@@ -285,7 +285,7 @@
             </button>
             <p
               v-if="isSubscribed(plan)"
-              class="mt-2 text-sm text-center text-green-600"
+              class="mt-2 text-sm text-center text-teal-600"
             >
               Your subscription is active
             </p>

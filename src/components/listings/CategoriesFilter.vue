@@ -29,7 +29,7 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
       <select
         :value="selectedCategory"
         @change="emit('update:selectedCategory', $event.target.value)"
-        class="block p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
+        class="block p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none"
       >
         <option
           v-for="category in categories"
@@ -58,7 +58,7 @@ const formatNumber = (num) => num?.toLocaleString() || "0";
           @click="emit('update:selectedCategory', category.name)"
           class="flex items-center p-2 rounded-lg cursor-pointer transition-colors"
           :class="{
-            'bg-green-100 text-green-700': selectedCategory === category.name,
+            'bg-teal-100 text-teal-700': selectedCategory === category.name,
             'hover:bg-gray-100': selectedCategory !== category.name,
           }"
         >

@@ -23,7 +23,7 @@
       <div class="text-sm">
         <router-link
           :to="link || '#'"
-          class="font-medium text-jiji-primary hover:text-orange-700"
+          class="font-medium text-jiji-primary hover:text-teal-700"
         >
           View all
         </router-link>
@@ -48,7 +48,7 @@ defineProps({
   },
   color: {
     type: String,
-    default: "bg-indigo-500",
+    default: "bg-teal-500",
   },
   link: {
     type: String,

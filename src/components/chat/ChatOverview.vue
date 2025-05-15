@@ -186,7 +186,7 @@ onUnmounted(() => {
             <h1
               class="text-2xl font-semibold text-gray-800 dark:text-white flex items-center"
             >
-              <MessageSquare class="h-6 w-6 mr-2 text-green-500" />
+              <MessageSquare class="h-6 w-6 mr-2 text-teal-500" />
               Your Conversations
             </h1>
 
@@ -235,7 +235,7 @@ onUnmounted(() => {
               Previous
             </button>
             <button
-              class="px-4 py-2 bg-green-500 text-white rounded text-sm font-medium hover:bg-green-600 transition-colors"
+              class="px-4 py-2 bg-teal-500 text-white rounded text-sm font-medium hover:bg-teal-600 transition-colors"
             >
               Next
             </button>
