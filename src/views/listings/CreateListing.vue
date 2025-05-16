@@ -1,777 +1,850 @@
 <script setup>
-  import { ref, computed, watch, reactive } from "vue";
-  import { onMounted } from "vue";
-  import { useRouter } from "vue-router";
-  import Navbar from "@/components/common/Navbar.vue";
-  import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-  import { db } from "@/firebase";
-  import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
-  import axios from "axios";
-  import { useAuthStore } from "@/stores/auth";
-  import { useSubscriptionStore } from "@/stores/subscription.store";
-  import { useToast } from "vue-toastification";
-  import nigeriaLocations from "@/stores/location";
-  import CategorySelector from "@/components/categories/CategorySelector.vue";
-  import categoriesData from "@/stores/data/categorise";
-  import { 
-    iPhoneModels, iPhoneStorage, iPhoneColors,
-    SamsungModels, SamsungStorage, SamsungColors,
-    GooglePixelModels, GooglePixelStorage, GooglePixelColors,
-    computerBrands, AppleComputerModels, DellComputerModels,
-    HPComputerModels, LenovoComputerModels, AsusComputerModels,
-    MicrosoftComputerModels, AcerComputerModels, MSIComputerModels,
-    SamsungComputerModels, computerRAM, computerStorage,
-    computerProcessors, computerGraphicsCards, computerOS
-  } from "@/stores/models/deviceModels";
+import { ref, computed, watch, reactive } from "vue";
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+import Navbar from "@/components/common/Navbar.vue";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/firebase";
+import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
+import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
+import { useSubscriptionStore } from "@/stores/subscription.store";
+import { useToast } from "vue-toastification";
+import nigeriaLocations from "@/stores/location";
+import CategorySelector from "@/components/categories/CategorySelector.vue";
+import categoriesData from "@/stores/data/categorise";
+import {
+  iPhoneModels,
+  iPhoneStorage,
+  iPhoneColors,
+  SamsungModels,
+  SamsungStorage,
+  SamsungColors,
+  GooglePixelModels,
+  GooglePixelStorage,
+  GooglePixelColors,
+  computerBrands,
+  AppleComputerModels,
+  DellComputerModels,
+  HPComputerModels,
+  LenovoComputerModels,
+  AsusComputerModels,
+  MicrosoftComputerModels,
+  AcerComputerModels,
+  MSIComputerModels,
+  SamsungComputerModels,
+  computerRAM,
+  computerStorage,
+  computerProcessors,
+  computerGraphicsCards,
+  computerOS,
+} from "@/stores/models/deviceModels";
 
-  const router = useRouter();
-  const isLoading = ref(false);
-  const errorMessage = ref("");
-  const authStore = useAuthStore();
-  const subscriptionStore = useSubscriptionStore();
-  const toast = useToast();
-  const currentStep = ref("category"); // Start with category selection step
+const router = useRouter();
+const isLoading = ref(false);
+const errorMessage = ref("");
+const authStore = useAuthStore();
+const subscriptionStore = useSubscriptionStore();
+const toast = useToast();
+const currentStep = ref("category"); // Start with category selection step
 
 // Location-related refs
-  const selectedState = ref("");
-  const selectedLGA = ref("");
-  const selectedLocation = ref("");
+const selectedState = ref("");
+const selectedLGA = ref("");
+const selectedLocation = ref("");
 
-  const areRequiredFieldsFilled = computed(() => {
-    return categoryFields.value
-      .filter((field) => field.required)
-  });
+const areRequiredFieldsFilled = computed(() => {
+  return categoryFields.value.filter((field) => field.required);
+});
 
-  // Available options for dropdowns
-  const availableStates = ref(Object.keys(nigeriaLocations));
-  const availableLGAs = computed(() => {
-    if (!selectedState.value) return [];
-    return Object.keys(nigeriaLocations[selectedState.value] || {});
-  });
-  const availableLocations = computed(() => {
-    if (!selectedState.value || !selectedLGA.value) return [];
-    return nigeriaLocations[selectedState.value]?.[selectedLGA.value] || [];
-  });
+// Available options for dropdowns
+const availableStates = ref(Object.keys(nigeriaLocations));
+const availableLGAs = computed(() => {
+  if (!selectedState.value) return [];
+  return Object.keys(nigeriaLocations[selectedState.value] || {});
+});
+const availableLocations = computed(() => {
+  if (!selectedState.value || !selectedLGA.value) return [];
+  return nigeriaLocations[selectedState.value]?.[selectedLGA.value] || [];
+});
 
-  // Reset dependent dropdowns when parent selection changes
-  watch(selectedState, () => {
-    selectedLGA.value = "";
-    selectedLocation.value = "";
-  });
+// Reset dependent dropdowns when parent selection changes
+watch(selectedState, () => {
+  selectedLGA.value = "";
+  selectedLocation.value = "";
+});
 
-  watch(selectedLGA, () => {
-    selectedLocation.value = "";
-  });
+watch(selectedLGA, () => {
+  selectedLocation.value = "";
+});
 
-  // Computed property to get full location string
-  const fullLocation = computed(() => {
-    if (!selectedState.value) return "";
+// Computed property to get full location string
+const fullLocation = computed(() => {
+  if (!selectedState.value) return "";
 
-    let locationParts = [selectedState.value];
+  let locationParts = [selectedState.value];
 
-    if (selectedLGA.value) {
-      locationParts.push(selectedLGA.value);
+  if (selectedLGA.value) {
+    locationParts.push(selectedLGA.value);
 
-      if (selectedLocation.value) {
-        locationParts.push(selectedLocation.value);
+    if (selectedLocation.value) {
+      locationParts.push(selectedLocation.value);
+    }
+  }
+
+  return locationParts.join(", ");
+});
+
+// Enhanced category structure
+const categoryStructure = reactive({
+  mainCategory: "",
+  subCategory: "",
+});
+
+// For displaying the full category path
+const displayCategoryPath = computed(() => {
+  const parts = [];
+  if (categoryStructure.mainCategory)
+    parts.push(categoryStructure.mainCategory);
+  if (categoryStructure.subCategory) parts.push(categoryStructure.subCategory);
+  return parts.join(" > ");
+});
+
+// Check if we've selected both main category and subcategory
+const isLeafCategorySelected = computed(() => {
+  return categoryStructure.mainCategory && categoryStructure.subCategory;
+});
+
+const form = reactive({
+  title: "",
+  description: "",
+  price: "",
+  condition: "used",
+  location: "",
+  images: [],
+  isSponsored: false,
+
+  // Category fields stored separately
+  mainCategory: "",
+  subCategory: "",
+
+  // Category-specific fields
+  // Electronics
+  brand: "",
+  model: "",
+  specifications: "",
+  storage: "",
+  color: "",
+  processor: "",
+  ram: "",
+  graphicsCard: "",
+  screenSize: "",
+  operatingSystem: "",
+
+  // Real Estate
+  propertySize: "",
+  bedrooms: "",
+  bathrooms: "",
+
+  // Vehicles
+  year: "",
+  mileage: "",
+  transmission: "",
+  fuelType: "",
+
+  // Fashion
+  size: "",
+  color: "",
+  material: "",
+
+  // Furniture
+  dimensions: "",
+  material: "",
+  style: "",
+
+  // Jobs
+  salary: "",
+  employmentType: "",
+  experienceLevel: "",
+});
+
+const updateCategoryStructure = (structuredCategory) => {
+  // Update the structure with the values from the component
+  categoryStructure.mainCategory = structuredCategory.mainCategory || "";
+  categoryStructure.subCategory = structuredCategory.subCategory || "";
+};
+
+// Update form's category fields when categoryStructure changes
+watch(
+  categoryStructure,
+  (newValue) => {
+    form.mainCategory = newValue.mainCategory;
+    form.subCategory = newValue.subCategory;
+  },
+  { deep: true }
+);
+
+// Fields to display based on main category
+const categoryFields = computed(() => {
+  if (!form.mainCategory) return [];
+
+  // Check if the category path contains "computers" or "laptops"
+  const isComputerCategory =
+    displayCategoryPath.value.toLowerCase().includes("computer") ||
+    displayCategoryPath.value.toLowerCase().includes("laptop") ||
+    displayCategoryPath.value.toLowerCase().includes("desktop");
+
+  // Check if the category path contains "mobile phones"
+  const isMobilePhoneCategory =
+    displayCategoryPath.value.toLowerCase().includes("mobile phone") ||
+    displayCategoryPath.value.toLowerCase().includes("smartphone");
+
+  if (isComputerCategory) {
+    const brand = form.brand;
+    const isApple = brand === "Apple";
+    const isDell = brand === "Dell";
+    const isHP = brand === "HP";
+    const isLenovo = brand === "Lenovo";
+    const isAsus = brand === "Asus";
+    const isMicrosoft = brand === "Microsoft";
+    const isAcer = brand === "Acer";
+    const isMSI = brand === "MSI";
+    const isSamsung = brand === "Samsung";
+    const isOther = brand === "Other";
+
+    // Initialize model field
+    let modelField = {
+      name: "model",
+      label: "Model",
+      type: "select",
+      options: [],
+      required: true,
+    };
+
+    // Set model options based on selected brand
+    if (isApple) {
+      modelField.options = AppleComputerModels;
+    } else if (isDell) {
+      modelField.options = DellComputerModels;
+    } else if (isHP) {
+      modelField.options = HPComputerModels;
+    } else if (isLenovo) {
+      modelField.options = LenovoComputerModels;
+    } else if (isAsus) {
+      modelField.options = AsusComputerModels;
+    } else if (isMicrosoft) {
+      modelField.options = MicrosoftComputerModels;
+    } else if (isAcer) {
+      modelField.options = AcerComputerModels;
+    } else if (isMSI) {
+      modelField.options = MSIComputerModels;
+    } else if (isSamsung) {
+      modelField.options = SamsungComputerModels;
+    } else if (isOther) {
+      modelField.type = "text";
+      modelField.options = undefined;
+    } else {
+      modelField.required = false;
+    }
+
+    return [
+      {
+        name: "brand",
+        label: "Brand",
+        type: "select",
+        options: computerBrands,
+        required: true,
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      modelField,
+      {
+        name: "processor",
+        label: "Processor",
+        type: "select",
+        options: computerProcessors,
+        required: false,
+      },
+      {
+        name: "ram",
+        label: "RAM",
+        type: "select",
+        options: computerRAM,
+        required: false,
+      },
+      {
+        name: "storage",
+        label: "Storage",
+        type: "select",
+        options: computerStorage,
+        required: false,
+      },
+      {
+        name: "graphicsCard",
+        label: "Graphics Card",
+        type: "select",
+        options: computerGraphicsCards,
+        required: false,
+      },
+      {
+        name: "screenSize",
+        label: "Screen Size",
+        type: "text",
+        required: false,
+      },
+      {
+        name: "operatingSystem",
+        label: "Operating System",
+        type: "select",
+        options: computerOS,
+        required: false,
+      },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (isMobilePhoneCategory || form.mainCategory === "Electronics") {
+    const brand = form.brand;
+    const isApple = brand === "Apple";
+    const isSamsung = brand === "Samsung";
+    const isGoogle = brand === "Google";
+    const isOther = brand === "Other";
+
+    // Initialize model, storage, color fields
+    let modelField = {
+      name: "model",
+      label: "Model",
+      type: "select",
+      options: [],
+      required: true,
+    };
+
+    let storageField = {
+      name: "storage",
+      label: "Storage",
+      type: "select",
+      options: [],
+      required: true,
+    };
+
+    let colorField = {
+      name: "color",
+      label: "Color",
+      type: "select",
+      options: [],
+      required: true,
+    };
+
+    if (isApple) {
+      modelField.options = Object.values(iPhoneModels).flat();
+      storageField.options = iPhoneStorage;
+      colorField.options = iPhoneColors;
+    } else if (isSamsung) {
+      modelField.options = Object.values(SamsungModels).flat();
+      storageField.options = SamsungStorage;
+      colorField.options = SamsungColors;
+    } else if (isGoogle) {
+      modelField.options = Object.values(GooglePixelModels).flat();
+      storageField.options = GooglePixelStorage;
+      colorField.options = GooglePixelColors;
+    } else if (isOther) {
+      // For 'Other' brands, use text inputs
+      modelField.type = "text";
+      modelField.options = undefined;
+      storageField.type = "text";
+      colorField.type = "text";
+    } else {
+      // Default case, maybe brand not selected yet
+      modelField.required = false;
+      storageField.required = false;
+      colorField.required = false;
+    }
+
+    return [
+      {
+        name: "brand",
+        label: "Brand",
+        type: "select",
+        options: [
+          { value: "Apple", label: "Apple" },
+          { value: "Samsung", label: "Samsung" },
+          { value: "Google", label: "Google" },
+          { value: "Other", label: "Other" },
+        ],
+        required: true,
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      modelField,
+      storageField,
+      colorField,
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (form.mainCategory === "Vehicles") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "year", label: "Year", type: "number", required: true },
+      {
+        name: "mileage",
+        label: "Mileage (km)",
+        type: "number",
+        required: true,
+      },
+      {
+        name: "transmission",
+        label: "Transmission",
+        type: "select",
+        options: [
+          { value: "Automatic", label: "Automatic" },
+          { value: "Manual", label: "Manual" },
+          { value: "Semi-Automatic", label: "Semi-Automatic" },
+        ],
+        required: true,
+      },
+      {
+        name: "fuelType",
+        label: "Fuel Type",
+        type: "select",
+        options: [
+          { value: "Petrol", label: "Petrol" },
+          { value: "Diesel", label: "Diesel" },
+          { value: "Electric", label: "Electric" },
+          { value: "Hybrid", label: "Hybrid" },
+        ],
+        required: true,
+      },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (form.mainCategory === "Real Estate") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      {
+        name: "propertySize",
+        label: "Property Size (sq ft)",
+        type: "number",
+        required: true,
+      },
+      { name: "bedrooms", label: "Bedrooms", type: "number", required: true },
+      { name: "bathrooms", label: "Bathrooms", type: "number", required: true },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "under construction", label: "Under Construction" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (form.mainCategory === "Fashion") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "size", label: "Size", type: "text", required: true },
+      { name: "color", label: "Color", type: "text", required: true },
+      { name: "material", label: "Material", type: "text", required: false },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (form.mainCategory === "Furniture") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      {
+        name: "dimensions",
+        label: "Dimensions",
+        type: "text",
+        required: false,
+      },
+      { name: "material", label: "Material", type: "text", required: false },
+      { name: "style", label: "Style", type: "text", required: false },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (form.mainCategory === "Jobs") {
+    return [
+      { name: "title", label: "Job Title", type: "text", required: true },
+      { name: "salary", label: "Salary", type: "text", required: false },
+      {
+        name: "employmentType",
+        label: "Employment Type",
+        type: "select",
+        options: [
+          { value: "Full-time", label: "Full-time" },
+          { value: "Part-time", label: "Part-time" },
+          { value: "Contract", label: "Contract" },
+          { value: "Temporary", label: "Temporary" },
+          { value: "Internship", label: "Internship" },
+        ],
+        required: true,
+      },
+      {
+        name: "experienceLevel",
+        label: "Experience Level",
+        type: "select",
+        options: [
+          { value: "Entry Level", label: "Entry Level" },
+          { value: "Mid Level", label: "Mid Level" },
+          { value: "Senior Level", label: "Senior Level" },
+          { value: "Executive", label: "Executive" },
+        ],
+        required: true,
+      },
+      {
+        name: "description",
+        label: "Job Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else {
+    // Default fields for other categories
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  }
+});
+
+// Add a computed property to determine if we should show the condition field
+const showConditionField = computed(() => {
+  // Categories where condition makes sense
+  const conditionCategories = [
+    "Electronics",
+    "Vehicles",
+    "Fashion",
+    "Furniture",
+    "Mobile Phones",
+    "Computers & Laptops",
+    "TV & DVD Equipment",
+    "Home Appliances",
+  ];
+
+  // Check if the main category or any subcategory contains these terms
+  return conditionCategories.some(
+    (category) =>
+      form.mainCategory.includes(category) ||
+      form.subCategory.includes(category) ||
+      form.subSubCategory.includes(category) ||
+      form.leafCategory.includes(category)
+  );
+});
+
+// Update form location when any location selection changes
+watch(fullLocation, (newLocation) => {
+  form.location = newLocation;
+});
+
+const previewImages = ref([]);
+
+const handleImageUpload = (e) => {
+  const files = e.target.files;
+  for (let i = 0; i < files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImages.value.push(e.target.result);
+      form.images.push(files[i]);
+    };
+    reader.readAsDataURL(files[i]);
+  }
+};
+
+const removeImage = (index) => {
+  previewImages.value.splice(index, 1);
+  form.images.splice(index, 1);
+};
+
+const uploadToCloudinary = async (imageFile) => {
+  const cloudName = cloudinaryConfig.cloudName;
+  const uploadPreset = cloudinaryConfig.uploadPreset;
+
+  const formData = new FormData();
+  formData.append("file", imageFile);
+  formData.append("upload_preset", uploadPreset);
+
+  try {
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data.secure_url;
+  } catch (error) {
+    console.error(
+      "Detailed Cloudinary error:",
+      error.response ? error.response.data : error
+    );
+    throw error;
+  }
+};
+
+const uploadImages = async () => {
+  const imageUrls = [];
+  try {
+    for (const imageFile of form.images) {
+      const downloadURL = await uploadToCloudinary(imageFile);
+      if (downloadURL) {
+        imageUrls.push(downloadURL);
       }
     }
 
-    return locationParts.join(", ");
-  });
+    if (imageUrls.length === 0) {
+      throw new Error("No images were successfully uploaded");
+    }
 
-  // Enhanced category structure
-  const categoryStructure = reactive({
-    mainCategory: "",
-    subCategory: "",
-  });
+    return imageUrls;
+  } catch (error) {
+    console.error("Error in uploadImages:", error);
+    throw error;
+  }
+};
 
-  // For displaying the full category path
-  const displayCategoryPath = computed(() => {
-    const parts = [];
-    if (categoryStructure.mainCategory)
-      parts.push(categoryStructure.mainCategory);
-    if (categoryStructure.subCategory) parts.push(categoryStructure.subCategory);
-    return parts.join(" > ");
-  });
+const submitForm = async () => {
+  // Validate that a state is selected
+  if (!selectedState.value) {
+    toast.error("Please select a state", {
+      timeout: 3000,
+    });
+    return;
+  }
 
-  // Check if we've selected both main category and subcategory
-  const isLeafCategorySelected = computed(() => {
-    return categoryStructure.mainCategory && categoryStructure.subCategory;
-  });
+  if (!authStore.user?.phoneNumber) {
+    router.push("/profile");
+    return;
+  }
 
-  const form = reactive({
-    title: "",
-    description: "",
-    price: "",
-    condition: "used",
-    location: "",
-    images: [],
-    isSponsored: false,
+  try {
+    isLoading.value = true;
 
-    // Category fields stored separately
-    mainCategory: "",
-    subCategory: "",
+    const imageUrls = await uploadImages();
 
-    // Category-specific fields
-    // Electronics
-    brand: "",
-    model: "",
-    specifications: "",
-    storage: "",
-    color: "",
-    processor: "",
-    ram: "",
-    graphicsCard: "",
-    screenSize: "",
-    operatingSystem: "",
+    if (!imageUrls || imageUrls.length === 0) {
+      throw new Error("Failed to upload images");
+    }
 
-    // Real Estate
-    propertySize: "",
-    bedrooms: "",
-    bathrooms: "",
+    // Create base listing data with separate category fields
+    const listingData = {
+      title: form.title,
+      description: form.description,
+      price: parseFloat(form.price),
+      mainCategory: form.mainCategory,
+      subCategory: form.subCategory,
+      subSubCategory: form.subSubCategory,
+      leafCategory: form.leafCategory,
+      // Include full category path for easier querying/filtering
+      categoryPath: displayCategoryPath.value,
+      condition: form.condition,
+      location: form.location,
+      images: imageUrls,
+      userId: authStore.user.uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      status: "active",
+      views: 0,
+    };
 
-    // Vehicles
-    year: "",
-    mileage: "",
-    transmission: "",
-    fuelType: "",
+    // Check if user has an active subscription
+    await subscriptionStore.fetchSubscription(authStore.user.uid);
+    const hasActiveSubscription =
+      subscriptionStore.subscription?.status === "active";
 
-    // Fashion
-    size: "",
-    color: "",
-    material: "",
+    // Set isSponsored based on subscription status
+    listingData.isSponsored = hasActiveSubscription;
 
-    // Furniture
-    dimensions: "",
-    material: "",
-    style: "",
+    // Add category-specific fields
+    categoryFields.value.forEach((field) => {
+      if (form[field.name]) {
+        listingData[field.name] = form[field.name];
+      }
+    });
 
-    // Jobs
-    salary: "",
-    employmentType: "",
-    experienceLevel: "",
-  });
+    // Check if any required fields are undefined before adding to Firestore
+    Object.entries(listingData).forEach(([key, value]) => {
+      if (value === undefined) {
+        console.error(`Field ${key} is undefined`);
+      }
+    });
 
-  const updateCategoryStructure = (structuredCategory) => {
-    // Update the structure with the values from the component
-    categoryStructure.mainCategory = structuredCategory.mainCategory || "";
-    categoryStructure.subCategory = structuredCategory.subCategory || "";
-  };
+    const docRef = await addDoc(collection(db, "listings"), listingData);
+    toast.success("Listing created successfully!", {
+      timeout: 3000,
+    });
+    // Redirect to dashboard
+    router.push("/seller/dashboard");
+  } catch (error) {
+    console.error("Error creating listing:", error);
+    toast.error("Failed to create listing. Please try again.", {
+      timeout: 5000,
+      closeOnClick: false,
+      pauseOnFocusLoss: true,
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-  // Update form's category fields when categoryStructure changes
-  watch(
-    categoryStructure,
-    (newValue) => {
-      form.mainCategory = newValue.mainCategory;
-      form.subCategory = newValue.subCategory;
-    },
-    { deep: true }
+const goToStep = (step) => {
+  // Only allow going to details if a leaf category is selected
+  if (step === "details" && !isLeafCategorySelected.value) {
+    toast.warning("Please select a specific category before continuing", {
+      timeout: 3000,
+    });
+    return;
+  }
+
+  currentStep.value = step;
+};
+
+const cancel = () => {
+  router.push("/seller/dashboard");
+};
+
+const dragover = (e) => {
+  e.preventDefault();
+  e.currentTarget.classList.add("border-jiji-primary", "bg-teal-50");
+};
+
+const dragleave = (e) => {
+  e.preventDefault();
+  e.currentTarget.classList.remove("border-jiji-primary", "bg-teal-50");
+};
+
+const dropFiles = (e) => {
+  e.preventDefault();
+  e.currentTarget.classList.remove("border-jiji-primary", "bg-teal-50");
+  const files = e.dataTransfer.files;
+  handleImageUpload({ target: { files } });
+};
+
+// Handle category selection change
+const handleCategoryChange = (categoryPath) => {
+  if (!categoryPath) return;
+
+  // Split the full path into parts
+  const parts = categoryPath.split(" > ");
+
+  // Reset the category structure
+  categoryStructure.mainCategory = parts[0] || "";
+  categoryStructure.subCategory = parts[1] || "";
+  categoryStructure.subSubCategory = parts[2] || "";
+  categoryStructure.leafCategory = parts[3] || "";
+};
+
+onMounted(() => {
+  // Check if required profile fields are complete
+  const requiredFields = ["phoneNumber"];
+  const isProfileComplete = requiredFields.every((field) =>
+    authStore.user?.[field]?.trim()
   );
 
-  // Fields to display based on main category
-  const categoryFields = computed(() => {
-    if (!form.mainCategory) return [];
-
-    // Check if the category path contains "computers" or "laptops"
-    const isComputerCategory = displayCategoryPath.value.toLowerCase().includes("computer") || 
-                              displayCategoryPath.value.toLowerCase().includes("laptop") ||
-                              displayCategoryPath.value.toLowerCase().includes("desktop");
-
-    // Check if the category path contains "mobile phones"
-    const isMobilePhoneCategory = displayCategoryPath.value.toLowerCase().includes("mobile phone") || 
-                                displayCategoryPath.value.toLowerCase().includes("smartphone");
-
-    if (isComputerCategory) {
-      const brand = form.brand;
-      const isApple = brand === 'Apple';
-      const isDell = brand === 'Dell';
-      const isHP = brand === 'HP';
-      const isLenovo = brand === 'Lenovo';
-      const isAsus = brand === 'Asus';
-      const isMicrosoft = brand === 'Microsoft';
-      const isAcer = brand === 'Acer';
-      const isMSI = brand === 'MSI';
-      const isSamsung = brand === 'Samsung';
-      const isOther = brand === 'Other';
-
-      // Initialize model field
-      let modelField = { 
-        name: "model", 
-        label: "Model", 
-        type: "select",
-        options: [],
-        required: true 
-      };
-
-      // Set model options based on selected brand
-      if (isApple) {
-        modelField.options = AppleComputerModels;
-      } else if (isDell) {
-        modelField.options = DellComputerModels;
-      } else if (isHP) {
-        modelField.options = HPComputerModels;
-      } else if (isLenovo) {
-        modelField.options = LenovoComputerModels;
-      } else if (isAsus) {
-        modelField.options = AsusComputerModels;
-      } else if (isMicrosoft) {
-        modelField.options = MicrosoftComputerModels;
-      } else if (isAcer) {
-        modelField.options = AcerComputerModels;
-      } else if (isMSI) {
-        modelField.options = MSIComputerModels;
-      } else if (isSamsung) {
-        modelField.options = SamsungComputerModels;
-      } else if (isOther) {
-        modelField.type = "text";
-        modelField.options = undefined;
-      } else {
-        modelField.required = false;
-      }
-
-      return [
-        { 
-          name: "brand", 
-          label: "Brand", 
-          type: "select",
-          options: computerBrands,
-          required: true 
-        },
-        { name: "title", label: "Title", type: "text", required: true },
-        modelField,
-        { 
-          name: "processor", 
-          label: "Processor", 
-          type: "select",
-          options: computerProcessors,
-          required: false 
-        },
-        { 
-          name: "ram", 
-          label: "RAM", 
-          type: "select",
-          options: computerRAM,
-          required: false 
-        },
-        { 
-          name: "storage", 
-          label: "Storage", 
-          type: "select",
-          options: computerStorage,
-          required: false 
-        },
-        { 
-          name: "graphicsCard", 
-          label: "Graphics Card", 
-          type: "select",
-          options: computerGraphicsCards,
-          required: false 
-        },
-        { 
-          name: "screenSize", 
-          label: "Screen Size", 
-          type: "text",
-          required: false 
-        },
-        { 
-          name: "operatingSystem", 
-          label: "Operating System", 
-          type: "select",
-          options: computerOS,
-          required: false 
-        },
-        { 
-          name: "condition", 
-          label: "Condition", 
-          type: "select",
-          options: [
-            { value: "new", label: "New" },
-            { value: "used", label: "Used" },
-            { value: "refurbished", label: "Refurbished" }
-          ],
-          required: true 
-        },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    } else if (isMobilePhoneCategory || form.mainCategory === "Electronics") {
-      const brand = form.brand;
-      const isApple = brand === 'Apple';
-      const isSamsung = brand === 'Samsung';
-      const isGoogle = brand === 'Google';
-      const isOther = brand === 'Other';
-
-      // Initialize model, storage, color fields
-      let modelField = { 
-        name: "model", 
-        label: "Model", 
-        type: "select",
-        options: [],
-        required: true 
-      };
-
-      let storageField = { 
-        name: "storage", 
-        label: "Storage", 
-        type: "select",
-        options: [],
-        required: true 
-      };
-
-      let colorField = { 
-        name: "color", 
-        label: "Color", 
-        type: "select",
-        options: [],
-        required: true 
-      };
-
-      if (isApple) {
-        modelField.options = Object.values(iPhoneModels).flat();
-        storageField.options = iPhoneStorage;
-        colorField.options = iPhoneColors;
-      } else if (isSamsung) {
-        modelField.options = Object.values(SamsungModels).flat();
-        storageField.options = SamsungStorage;
-        colorField.options = SamsungColors;
-      } else if (isGoogle) {
-        modelField.options = Object.values(GooglePixelModels).flat();
-        storageField.options = GooglePixelStorage;
-        colorField.options = GooglePixelColors;
-      } else if (isOther) {
-        // For 'Other' brands, use text inputs
-        modelField.type = "text";
-        modelField.options = undefined;
-        storageField.type = "text";
-        colorField.type = "text";
-      } else {
-        // Default case, maybe brand not selected yet
-        modelField.required = false;
-        storageField.required = false;
-        colorField.required = false;
-      }
-
-      return [
-        { 
-          name: "brand", 
-          label: "Brand", 
-          type: "select",
-          options: [
-            { value: "Apple", label: "Apple" },
-            { value: "Samsung", label: "Samsung" },
-            { value: "Google", label: "Google" },
-            { value: "Other", label: "Other" }
-          ],
-          required: true 
-        },
-        { name: "title", label: "Title", type: "text", required: true },
-        modelField,
-        storageField,
-        colorField,
-        { 
-          name: "condition", 
-          label: "Condition", 
-          type: "select",
-          options: [
-            { value: "new", label: "New" },
-            { value: "used", label: "Used" },
-            { value: "refurbished", label: "Refurbished" }
-          ],
-          required: true 
-        },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    } else if (form.mainCategory === "Vehicles") {
-      return [
-        { name: "title", label: "Title", type: "text", required: true },
-        { name: "year", label: "Year", type: "number", required: true },
-        { name: "mileage", label: "Mileage (km)", type: "number", required: true },
-        { 
-          name: "transmission", 
-          label: "Transmission", 
-          type: "select",
-          options: [
-            { value: "Automatic", label: "Automatic" },
-            { value: "Manual", label: "Manual" },
-            { value: "Semi-Automatic", label: "Semi-Automatic" }
-          ],
-          required: true 
-        },
-        { 
-          name: "fuelType", 
-          label: "Fuel Type", 
-          type: "select",
-          options: [
-            { value: "Petrol", label: "Petrol" },
-            { value: "Diesel", label: "Diesel" },
-            { value: "Electric", label: "Electric" },
-            { value: "Hybrid", label: "Hybrid" }
-          ],
-          required: true 
-        },
-        { 
-          name: "condition", 
-          label: "Condition", 
-          type: "select",
-          options: [
-            { value: "new", label: "New" },
-            { value: "used", label: "Used" },
-            { value: "refurbished", label: "Refurbished" }
-          ],
-          required: true 
-        },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    } else if (form.mainCategory === "Real Estate") {
-      return [
-        { name: "title", label: "Title", type: "text", required: true },
-        { name: "propertySize", label: "Property Size (sq ft)", type: "number", required: true },
-        { name: "bedrooms", label: "Bedrooms", type: "number", required: true },
-        { name: "bathrooms", label: "Bathrooms", type: "number", required: true },
-        { 
-          name: "condition", 
-          label: "Condition", 
-          type: "select",
-          options: [
-            { value: "new", label: "New" },
-            { value: "used", label: "Used" },
-            { value: "under construction", label: "Under Construction" }
-          ],
-          required: true 
-        },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    } else if (form.mainCategory === "Fashion") {
-      return [
-        { name: "title", label: "Title", type: "text", required: true },
-        { name: "size", label: "Size", type: "text", required: true },
-        { name: "color", label: "Color", type: "text", required: true },
-        { name: "material", label: "Material", type: "text", required: false },
-        { 
-          name: "condition", 
-          label: "Condition", 
-          type: "select",
-          options: [
-            { value: "new", label: "New" },
-            { value: "used", label: "Used" }
-          ],
-          required: true 
-        },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    } else if (form.mainCategory === "Furniture") {
-      return [
-        { name: "title", label: "Title", type: "text", required: true },
-        { name: "dimensions", label: "Dimensions", type: "text", required: false },
-        { name: "material", label: "Material", type: "text", required: false },
-        { name: "style", label: "Style", type: "text", required: false },
-        { 
-          name: "condition", 
-          label: "Condition", 
-          type: "select",
-          options: [
-            { value: "new", label: "New" },
-            { value: "used", label: "Used" },
-            { value: "refurbished", label: "Refurbished" }
-          ],
-          required: true 
-        },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    } else if (form.mainCategory === "Jobs") {
-      return [
-        { name: "title", label: "Job Title", type: "text", required: true },
-        { name: "salary", label: "Salary", type: "text", required: false },
-        { 
-          name: "employmentType", 
-          label: "Employment Type", 
-          type: "select",
-          options: [
-            { value: "Full-time", label: "Full-time" },
-            { value: "Part-time", label: "Part-time" },
-            { value: "Contract", label: "Contract" },
-            { value: "Temporary", label: "Temporary" },
-            { value: "Internship", label: "Internship" }
-          ],
-          required: true 
-        },
-        { 
-          name: "experienceLevel", 
-          label: "Experience Level", 
-          type: "select",
-          options: [
-            { value: "Entry Level", label: "Entry Level" },
-            { value: "Mid Level", label: "Mid Level" },
-            { value: "Senior Level", label: "Senior Level" },
-            { value: "Executive", label: "Executive" }
-          ],
-          required: true 
-        },
-        { name: "description", label: "Job Description", type: "textarea", required: true }
-      ];
-    } else {
-      // Default fields for other categories
-      return [
-        { name: "title", label: "Title", type: "text", required: true },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    }
-  });
-
-  // Add a computed property to determine if we should show the condition field
-  const showConditionField = computed(() => {
-    // Categories where condition makes sense
-    const conditionCategories = [
-      "Electronics",
-      "Vehicles",
-      "Fashion",
-      "Furniture",
-      "Mobile Phones",
-      "Computers & Laptops",
-      "TV & DVD Equipment",
-      "Home Appliances",
-    ];
-
-    // Check if the main category or any subcategory contains these terms
-    return conditionCategories.some(
-      (category) =>
-        form.mainCategory.includes(category) ||
-        form.subCategory.includes(category) ||
-        form.subSubCategory.includes(category) ||
-        form.leafCategory.includes(category)
-    );
-  });
-
-  // Update form location when any location selection changes
-  watch(fullLocation, (newLocation) => {
-    form.location = newLocation;
-  });
-
-  const previewImages = ref([]);
-
-  const handleImageUpload = (e) => {
-    const files = e.target.files;
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        previewImages.value.push(e.target.result);
-        form.images.push(files[i]);
-      };
-      reader.readAsDataURL(files[i]);
-    }
-  };
-
-  const removeImage = (index) => {
-    previewImages.value.splice(index, 1);
-    form.images.splice(index, 1);
-  };
-
-  const uploadToCloudinary = async (imageFile) => {
-    const cloudName = cloudinaryConfig.cloudName;
-    const uploadPreset = cloudinaryConfig.uploadPreset;
-
-    const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("upload_preset", uploadPreset);
-
-    try {
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      return response.data.secure_url;
-    } catch (error) {
-      console.error(
-        "Detailed Cloudinary error:",
-        error.response ? error.response.data : error
-      );
-      throw error;
-    }
-  };
-
-  const uploadImages = async () => {
-    const imageUrls = [];
-    try {
-      for (const imageFile of form.images) {
-        const downloadURL = await uploadToCloudinary(imageFile);
-        if (downloadURL) {
-          imageUrls.push(downloadURL);
-        }
-      }
-
-      if (imageUrls.length === 0) {
-        throw new Error("No images were successfully uploaded");
-      }
-
-      return imageUrls;
-    } catch (error) {
-      console.error("Error in uploadImages:", error);
-      throw error;
-    }
-  };
-
-  const submitForm = async () => {
-    // Validate that a state is selected
-    if (!selectedState.value) {
-      toast.error("Please select a state", {
-        timeout: 3000,
-      });
-      return;
-    }
-
-    if (!authStore.user?.phoneNumber) {
-      router.push("/profile");
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-
-      const imageUrls = await uploadImages();
-
-      if (!imageUrls || imageUrls.length === 0) {
-        throw new Error("Failed to upload images");
-      }
-
-      // Create base listing data with separate category fields
-      const listingData = {
-        title: form.title,
-        description: form.description,
-        price: parseFloat(form.price),
-        mainCategory: form.mainCategory,
-        subCategory: form.subCategory,
-        subSubCategory: form.subSubCategory,
-        leafCategory: form.leafCategory,
-        // Include full category path for easier querying/filtering
-        categoryPath: displayCategoryPath.value,
-        condition: form.condition,
-        location: form.location,
-        images: imageUrls,
-        userId: authStore.user.uid,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        status: "active",
-        views: 0,
-      };
-
-      // Check if user has an active subscription
-      await subscriptionStore.fetchSubscription(authStore.user.uid);
-      const hasActiveSubscription = subscriptionStore.subscription?.status === 'active';
-
-      // Set isSponsored based on subscription status
-      listingData.isSponsored = hasActiveSubscription;
-
-      // Add category-specific fields
-      categoryFields.value.forEach((field) => {
-        if (form[field.name]) {
-          listingData[field.name] = form[field.name];
-        }
-      });
-
-      // Check if any required fields are undefined before adding to Firestore
-      Object.entries(listingData).forEach(([key, value]) => {
-        if (value === undefined) {
-          console.error(`Field ${key} is undefined`);
-        }
-      });
-
-      const docRef = await addDoc(collection(db, "listings"), listingData);
-      toast.success("Listing created successfully!", {
-        timeout: 3000,
-      });
-      // Redirect to dashboard
-      router.push("/seller/dashboard");
-    } catch (error) {
-      console.error("Error creating listing:", error);
-      toast.error("Failed to create listing. Please try again.", {
+  if (!isProfileComplete) {
+    toast.warning(
+      "Please complete your profile information before creating listings",
+      {
         timeout: 5000,
         closeOnClick: false,
         pauseOnFocusLoss: true,
-      });
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  const goToStep = (step) => {
-    // Only allow going to details if a leaf category is selected
-    if (step === "details" && !isLeafCategorySelected.value) {
-      toast.warning("Please select a specific category before continuing", {
-        timeout: 3000,
-      });
-      return;
-    }
-
-    currentStep.value = step;
-  };
-
-  const cancel = () => {
-    router.push("/seller/dashboard");
-  };
-
-  const dragover = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.add("border-jiji-primary", "bg-teal-50");
-  };
-
-  const dragleave = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove("border-jiji-primary", "bg-teal-50");
-  };
-
-  const dropFiles = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove("border-jiji-primary", "bg-teal-50");
-    const files = e.dataTransfer.files;
-    handleImageUpload({ target: { files } });
-  };
-
-  // Handle category selection change
-  const handleCategoryChange = (categoryPath) => {
-    if (!categoryPath) return;
-
-    // Split the full path into parts
-    const parts = categoryPath.split(" > ");
-
-    // Reset the category structure
-    categoryStructure.mainCategory = parts[0] || "";
-    categoryStructure.subCategory = parts[1] || "";
-    categoryStructure.subSubCategory = parts[2] || "";
-    categoryStructure.leafCategory = parts[3] || "";
-  };
-
-  onMounted(() => {
-    // Check if required profile fields are complete
-    const requiredFields = ["phoneNumber"];
-    const isProfileComplete = requiredFields.every(
-      field => authStore.user?.[field]?.trim()
+      }
     );
-
-    if (!isProfileComplete) {
-      toast.warning(
-        "Please complete your profile information before creating listings",
-        {
-          timeout: 5000,
-          closeOnClick: false,
-          pauseOnFocusLoss: true,
-        }
-      );
-      router.push("/profile");
-    }
-  });
+    router.push("/profile");
+  }
+});
 </script>
 
 <template>
@@ -932,7 +1005,9 @@
 
               <!-- Form Fields -->
               <div v-if="showConditionField" class="mb-4">
-                <label class="block text-gray-700 font-medium mb-2">Condition*</label>
+                <label class="block text-gray-700 font-medium mb-2"
+                  >Condition*</label
+                >
                 <div class="flex space-x-4">
                   <label class="inline-flex items-center">
                     <input
@@ -1010,7 +1085,6 @@
                   </option>
                 </select>
               </div>
-
             </div>
 
             <div class="flex justify-between mt-8">

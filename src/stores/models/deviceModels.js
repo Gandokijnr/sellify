@@ -6,13 +6,13 @@ export const iPhoneModels = {
     { value: "iPhone 15", label: "iPhone 15" },
     { value: "iPhone 15 Plus", label: "iPhone 15 Plus" },
     { value: "iPhone 15 Pro", label: "iPhone 15 Pro" },
-    { value: "iPhone 15 Pro Max", label: "iPhone 15 Pro Max" }
+    { value: "iPhone 15 Pro Max", label: "iPhone 15 Pro Max" },
   ],
   "iPhone 14": [
     { value: "iPhone 14", label: "iPhone 14" },
     { value: "iPhone 14 Plus", label: "iPhone 14 Plus" },
     { value: "iPhone 14 Pro", label: "iPhone 14 Pro" },
-    { value: "iPhone 14 Pro Max", label: "iPhone 14 Pro Max" }
+    { value: "iPhone 14 Pro Max", label: "iPhone 14 Pro Max" },
   ],
 };
 
@@ -21,7 +21,7 @@ export const iPhoneStorage = [
   { value: "128GB", label: "128GB" },
   { value: "256GB", label: "256GB" },
   { value: "512GB", label: "512GB" },
-  { value: "1TB", label: "1TB" }
+  { value: "1TB", label: "1TB" },
 ];
 
 export const iPhoneColors = [
@@ -32,7 +32,7 @@ export const iPhoneColors = [
   { value: "Green", label: "Green" },
   { value: "teal", label: "teal" },
   { value: "Gold", label: "Gold" },
-  { value: "Silver", label: "Silver" }
+  { value: "Silver", label: "Silver" },
 ];
 
 // Samsung models and specifications data
@@ -119,7 +119,7 @@ export const computerBrands = [
   { value: "Acer", label: "Acer" },
   { value: "MSI", label: "MSI" },
   { value: "Samsung", label: "Samsung" },
-  { value: "Other", label: "Other" }
+  { value: "Other", label: "Other" },
 ];
 
 // Apple Computer Models
@@ -136,7 +136,7 @@ export const AppleComputerModels = [
   { value: "iMac 24-inch M1", label: "iMac 24-inch M1" },
   { value: "iMac 24-inch M3", label: "iMac 24-inch M3" },
   { value: "Mac Studio M2", label: "Mac Studio M2" },
-  { value: "Mac Pro", label: "Mac Pro" }
+  { value: "Mac Pro", label: "Mac Pro" },
 ];
 
 // Dell Computer Models
@@ -154,7 +154,7 @@ export const DellComputerModels = [
   { value: "Alienware m18", label: "Alienware m18" },
   { value: "Alienware x16", label: "Alienware x16" },
   { value: "OptiPlex Desktop", label: "OptiPlex Desktop" },
-  { value: "Precision Desktop", label: "Precision Desktop" }
+  { value: "Precision Desktop", label: "Precision Desktop" },
 ];
 
 // HP Computer Models
@@ -172,7 +172,7 @@ export const HPComputerModels = [
   { value: "ProBook 450", label: "ProBook 450" },
   { value: "Victus 15", label: "Victus 15" },
   { value: "HP All-in-One", label: "HP All-in-One" },
-  { value: "HP Desktop", label: "HP Desktop" }
+  { value: "HP Desktop", label: "HP Desktop" },
 ];
 
 // Lenovo Computer Models
@@ -190,7 +190,7 @@ export const LenovoComputerModels = [
   { value: "Legion 7", label: "Legion 7" },
   { value: "Legion Pro 5", label: "Legion Pro 5" },
   { value: "ThinkCentre Desktop", label: "ThinkCentre Desktop" },
-  { value: "IdeaCentre Desktop", label: "IdeaCentre Desktop" }
+  { value: "IdeaCentre Desktop", label: "IdeaCentre Desktop" },
 ];
 
 // Asus Computer Models
@@ -208,7 +208,7 @@ export const AsusComputerModels = [
   { value: "ProArt StudioBook 16", label: "ProArt StudioBook 16" },
   { value: "ExpertBook B9", label: "ExpertBook B9" },
   { value: "ROG Desktop", label: "ROG Desktop" },
-  { value: "ASUS Desktop", label: "ASUS Desktop" }
+  { value: "ASUS Desktop", label: "ASUS Desktop" },
 ];
 
 // Microsoft Computer Models
@@ -221,7 +221,7 @@ export const MicrosoftComputerModels = [
   { value: "Surface Pro 10", label: "Surface Pro 10" },
   { value: "Surface Go 3", label: "Surface Go 3" },
   { value: "Surface Go 4", label: "Surface Go 4" },
-  { value: "Surface Studio", label: "Surface Studio" }
+  { value: "Surface Studio", label: "Surface Studio" },
 ];
 
 // Acer Computer Models
@@ -239,7 +239,7 @@ export const AcerComputerModels = [
   { value: "Chromebook Spin", label: "Chromebook Spin" },
   { value: "TravelMate", label: "TravelMate" },
   { value: "Acer Desktop", label: "Acer Desktop" },
-  { value: "Predator Desktop", label: "Predator Desktop" }
+  { value: "Predator Desktop", label: "Predator Desktop" },
 ];
 
 // MSI Computer Models
@@ -257,7 +257,7 @@ export const MSIComputerModels = [
   { value: "Crosshair", label: "Crosshair" },
   { value: "Titan GT", label: "Titan GT" },
   { value: "MSI Desktop", label: "MSI Desktop" },
-  { value: "MSI All-in-One", label: "MSI All-in-One" }
+  { value: "MSI All-in-One", label: "MSI All-in-One" },
 ];
 
 // Samsung Computer Models
@@ -271,7 +271,7 @@ export const SamsungComputerModels = [
   { value: "Galaxy Book Flex", label: "Galaxy Book Flex" },
   { value: "Galaxy Book Ion", label: "Galaxy Book Ion" },
   { value: "Galaxy Chromebook", label: "Galaxy Chromebook" },
-  { value: "Galaxy Book Go", label: "Galaxy Book Go" }
+  { value: "Galaxy Book Go", label: "Galaxy Book Go" },
 ];
 
 // Computer RAM options
@@ -282,7 +282,7 @@ export const computerRAM = [
   { value: "24GB", label: "24GB" },
   { value: "32GB", label: "32GB" },
   { value: "64GB", label: "64GB" },
-  { value: "128GB", label: "128GB" }
+  { value: "128GB", label: "128GB" },
 ];
 
 // Computer Storage options
@@ -296,7 +296,7 @@ export const computerStorage = [
   { value: "1TB HDD", label: "1TB HDD" },
   { value: "2TB HDD", label: "2TB HDD" },
   { value: "4TB HDD", label: "4TB HDD" },
-  { value: "Dual Storage", label: "Dual Storage" }
+  { value: "Dual Storage", label: "Dual Storage" },
 ];
 
 // Computer CPU options
@@ -315,7 +315,7 @@ export const computerProcessors = [
   { value: "Apple M2 Max", label: "Apple M2 Max" },
   { value: "Apple M3", label: "Apple M3" },
   { value: "Apple M3 Pro", label: "Apple M3 Pro" },
-  { value: "Apple M3 Max", label: "Apple M3 Max" }
+  { value: "Apple M3 Max", label: "Apple M3 Max" },
 ];
 
 // Computer Graphics Card options
@@ -334,7 +334,7 @@ export const computerGraphicsCards = [
   { value: "AMD Radeon RX 7700", label: "AMD Radeon RX 7700" },
   { value: "AMD Radeon RX 7600", label: "AMD Radeon RX 7600" },
   { value: "AMD Radeon RX 6900", label: "AMD Radeon RX 6900" },
-  { value: "AMD Radeon RX 6800", label: "AMD Radeon RX 6800" }
+  { value: "AMD Radeon RX 6800", label: "AMD Radeon RX 6800" },
 ];
 
 // Computer Operating System options
@@ -345,5 +345,5 @@ export const computerOS = [
   { value: "Chrome OS", label: "Chrome OS" },
   { value: "Linux", label: "Linux" },
   { value: "Ubuntu", label: "Ubuntu" },
-  { value: "No Operating System", label: "No Operating System" }
+  { value: "No Operating System", label: "No Operating System" },
 ];

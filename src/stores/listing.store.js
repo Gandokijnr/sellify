@@ -24,7 +24,6 @@ export const useListingsStore = defineStore("listings", {
   actions: {
     async createListing(listingData) {
       try {
-
         // Upload images first
         const imageUrls = await Promise.all(
           listingData.images.map(async (file) => {
@@ -44,12 +43,12 @@ export const useListingsStore = defineStore("listings", {
           createdAt: new Date(),
           userId: this.authStore.user.uid,
           isFreeListing: !hasFreeListing,
-          paymentStatus: hasFreeListing ? 'paid' : 'free'
+          paymentStatus: hasFreeListing ? "paid" : "free",
         });
 
         return docRef.id;
       } catch (error) {
-        console.error('Listing creation failed:', error);
+        console.error("Listing creation failed:", error);
         throw error;
       }
     },

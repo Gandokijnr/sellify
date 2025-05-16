@@ -412,7 +412,7 @@ const nigeriaLocations = {
       "Osusu",
       "Umuogor",
       "Egbelu",
-      "Abayi"
+      "Abayi",
     ],
     "Aba South": [
       "Aba Town",
@@ -424,7 +424,7 @@ const nigeriaLocations = {
       "Abayi",
       "Ohabiam",
       "Ndiegoro",
-      "Asa"
+      "Asa",
     ],
     "Umuahia North": [
       "Umuahia",
@@ -436,7 +436,7 @@ const nigeriaLocations = {
       "Amuzukwu",
       "Okwuta",
       "Umudike",
-      "Isieke"
+      "Isieke",
     ],
     "Umuahia South": [
       "Apumiri",
@@ -448,7 +448,7 @@ const nigeriaLocations = {
       "Ohokobe",
       "Amakama",
       "Uzuakoli",
-      "Ahiaeke"
+      "Ahiaeke",
     ],
   },
   Adamawa: {
@@ -462,7 +462,7 @@ const nigeriaLocations = {
       "Limawa",
       "Nasarawo",
       "Rumde",
-      "Yelwa"
+      "Yelwa",
     ],
     "Yola South": [
       "Yola Town",
@@ -474,7 +474,7 @@ const nigeriaLocations = {
       "Bole",
       "Njoboliyo",
       "Vunoklang",
-      "Damare"
+      "Damare",
     ],
     Mubi: [
       "Mubi Town",
@@ -486,7 +486,7 @@ const nigeriaLocations = {
       "Kolere",
       "Wurobohari",
       "Chibluk",
-      "Muchalla"
+      "Muchalla",
     ],
     Ganye: [
       "Ganye Town",
@@ -498,7 +498,7 @@ const nigeriaLocations = {
       "Sabon Gari",
       "Sugu",
       "Wuro Bokki",
-      "Yebbi"
+      "Yebbi",
     ],
   },
   "Akwa Ibom": {
@@ -517,7 +517,7 @@ const nigeriaLocations = {
       "Use Offot",
       "Ifa",
       "Eket Road",
-      "Udoudoma Avenue"
+      "Udoudoma Avenue",
     ],
     "Ikot Ekpene": [
       "Ikot Ekpene Town",
@@ -529,7 +529,7 @@ const nigeriaLocations = {
       "Obot Akara",
       "Essien Udim",
       "Mbioto",
-      "Abiakpo"
+      "Abiakpo",
     ],
     Eket: [
       "Eket Town",
@@ -541,7 +541,7 @@ const nigeriaLocations = {
       "Marina",
       "Afia Nsit",
       "Mkpok",
-      "Atabong"
+      "Atabong",
     ],
     Oron: [
       "Oron Town",
@@ -553,7 +553,7 @@ const nigeriaLocations = {
       "Enwang",
       "Ebughu",
       "Uda",
-      "Eyoabasi"
+      "Eyoabasi",
     ],
   },
   Anambra: {
@@ -567,7 +567,7 @@ const nigeriaLocations = {
       "Ezinato",
       "Agu-Awka",
       "Ifite-Awka",
-      "Umudioka"
+      "Umudioka",
     ],
     "Onitsha North": [
       "Onitsha GRA",
@@ -579,7 +579,7 @@ const nigeriaLocations = {
       "Trans-Nkisi",
       "Marine",
       "Uru",
-      "Niger Bridge-Head"
+      "Niger Bridge-Head",
     ],
     "Onitsha South": [
       "Fegge",
@@ -591,7 +591,7 @@ const nigeriaLocations = {
       "Harbor Industrial Layout",
       "Nkpor",
       "Obosi",
-      "Iyiowa"
+      "Iyiowa",
     ],
     "Nnewi North": [
       "Nnewi Central",
@@ -603,7 +603,7 @@ const nigeriaLocations = {
       "Ichi",
       "Nnewichi",
       "Edoji",
-      "Ukpor"
+      "Ukpor",
     ],
   },
   Bauchi: {
@@ -617,11 +617,11 @@ const nigeriaLocations = {
       "Dutsen Tanshi",
       "Yelwa",
       "Dan Amar",
-      "Ibrahim Bako"
+      "Ibrahim Bako",
     ],
     Azare: [
       "Azare Central",
-      "Bakin Kura", 
+      "Bakin Kura",
       "Gadiya",
       "Katagum",
       "Bulkachuwa",
@@ -629,7 +629,7 @@ const nigeriaLocations = {
       "Madara",
       "Chinade",
       "Sakwa",
-      "Disina"
+      "Disina",
     ],
   },
   Bayelsa: {
@@ -648,7 +648,7 @@ const nigeriaLocations = {
       "Okaka",
       "Etegwe",
       "Yenizue Gene",
-      "Tombia"
+      "Tombia",
     ],
     Brass: [
       "Twon-Brass",
@@ -660,7 +660,7 @@ const nigeriaLocations = {
       "Liama",
       "Okumbiribeleu",
       "Sangana",
-      "Obiata"
+      "Obiata",
     ],
   },
   Benue: {
@@ -679,7 +679,7 @@ const nigeriaLocations = {
       "Nyima",
       "Mission Ward",
       "Gyado Villa",
-      "Fiidi"
+      "Fiidi",
     ],
     Gboko: [
       "Gboko Town",
@@ -691,7 +691,7 @@ const nigeriaLocations = {
       "Mbayion",
       "Mbakper",
       "Ameladu",
-      "Genyi"
+      "Genyi",
     ],
   },
   Borno: {
@@ -710,7 +710,7 @@ const nigeriaLocations = {
       "Shehuri North",
       "Shehuri South",
       "Monday Market",
-      "Gwange"
+      "Gwange",
     ],
     Bama: [
       "Bama Town",
@@ -722,7 +722,7 @@ const nigeriaLocations = {
       "Abbaram",
       "Kumshe",
       "Bama Central",
-      "Kasugula"
+      "Kasugula",
     ],
   },
   "Cross River": {
@@ -741,7 +741,7 @@ const nigeriaLocations = {
       "Ikot Ansa",
       "Satellite Town",
       "Akim",
-      "Parliamentary"
+      "Parliamentary",
     ],
     "Calabar South": [
       "Anantigha",
@@ -753,7 +753,7 @@ const nigeriaLocations = {
       "Diamond",
       "Goldie",
       "White House",
-      "Ekpo Abasi"
+      "Ekpo Abasi",
     ],
     Ikom: [
       "Ikom Urban",
@@ -765,7 +765,7 @@ const nigeriaLocations = {
       "Olulumo",
       "Ikom Central",
       "Abinti",
-      "Okuni"
+      "Okuni",
     ],
   },
   Delta: {
@@ -784,7 +784,7 @@ const nigeriaLocations = {
       "Okere",
       "Ajamimogha",
       "Alders Town",
-      "Ogunu"
+      "Ogunu",
     ],
     Asaba: [
       "Asaba GRA",
@@ -801,7 +801,7 @@ const nigeriaLocations = {
       "Isieke",
       "Ezenei Avenue",
       "Jesus Saves",
-      "Umuagu"
+      "Umuagu",
     ],
     "Uvwie (Effurun)": [
       "Effurun GRA",
@@ -813,7 +813,7 @@ const nigeriaLocations = {
       "Ugboroke",
       "Ugbomro",
       "Okuokoko",
-      "Osubi"
+      "Osubi",
     ],
     Sapele: [
       "Sapele GRA",
@@ -825,7 +825,7 @@ const nigeriaLocations = {
       "Ajogodo",
       "Ugbeyiyi",
       "Uruakpa",
-      "Aladja"
+      "Aladja",
     ],
   },
   Ebonyi: {
@@ -844,7 +844,7 @@ const nigeriaLocations = {
       "Udemezue",
       "Achara",
       "Amike-Aba",
-      "Ngodo"
+      "Ngodo",
     ],
     Afikpo: [
       "Afikpo Town",
@@ -856,7 +856,7 @@ const nigeriaLocations = {
       "Akpoha",
       "Ugwuegu",
       "Enohia",
-      "Owutu"
+      "Owutu",
     ],
   },
   Edo: {
@@ -880,7 +880,7 @@ const nigeriaLocations = {
       "Upper Sakponba",
       "Textile Mill Road",
       "Ogbe",
-      "Ibiwe"
+      "Ibiwe",
     ],
     Auchi: [
       "Auchi Town",
@@ -892,7 +892,7 @@ const nigeriaLocations = {
       "Afashio",
       "Ivhiunone",
       "Iyora",
-      "Iyekhei"
+      "Iyekhei",
     ],
     Ekpoma: [
       "Ekpoma Town",
@@ -904,7 +904,7 @@ const nigeriaLocations = {
       "Idoa",
       "Ikhideu",
       "Uke",
-      "Uhiele"
+      "Uhiele",
     ],
   },
   Ekiti: {
@@ -923,7 +923,7 @@ const nigeriaLocations = {
       "Ijigbo",
       "Oke-Iyinmi",
       "Falegan",
-      "Mojere"
+      "Mojere",
     ],
     Ikere: [
       "Ikere Town",
@@ -935,7 +935,7 @@ const nigeriaLocations = {
       "Ogbonjana",
       "Amoye",
       "Araromi",
-      "Ilapetu"
+      "Ilapetu",
     ],
     Ikole: [
       "Ikole Town",
@@ -947,7 +947,7 @@ const nigeriaLocations = {
       "Ipao",
       "Itapaji",
       "Ayebode",
-      "Odo-Ayedun"
+      "Odo-Ayedun",
     ],
   },
   Enugu: {
@@ -966,7 +966,7 @@ const nigeriaLocations = {
       "Artisan",
       "Ngwo",
       "New Layout",
-      "Obiagu"
+      "Obiagu",
     ],
     "Enugu South": [
       "Achara Layout",
@@ -983,7 +983,7 @@ const nigeriaLocations = {
       "Heritage Estate",
       "Obeagu",
       "Topland",
-      "Goshen"
+      "Goshen",
     ],
     Nsukka: [
       "Nsukka Town",
@@ -995,7 +995,7 @@ const nigeriaLocations = {
       "Ajuona",
       "Obukpa",
       "Ikpuiga",
-      "Ede-Oballa"
+      "Ede-Oballa",
     ],
   },
   Gombe: {
@@ -1014,7 +1014,7 @@ const nigeriaLocations = {
       "Yelenguruza",
       "Barunde",
       "Kumbia-Kumbia",
-      "New Mile 3"
+      "New Mile 3",
     ],
     Billiri: [
       "Billiri Town",
@@ -1026,7 +1026,7 @@ const nigeriaLocations = {
       "Kalmai",
       "Pandin",
       "Tudu",
-      "Lapandi"
+      "Lapandi",
     ],
   },
   Imo: {
@@ -1045,7 +1045,7 @@ const nigeriaLocations = {
       "Egbeada",
       "Works Layout",
       "Federal Housing",
-      "Umuguma"
+      "Umuguma",
     ],
   },
   Jigawa: {
@@ -1054,131 +1054,451 @@ const nigeriaLocations = {
     Gumel: ["Gumel GRA", "Garin Gabas", "Garin Yamma", "Kogin Garu", "Hammado"],
     Ringim: ["Ringim Central", "Yandaka", "Daushe", "Yakasai", "Chai-Chai"],
   },
-  
+
   Kaduna: {
-    "Kaduna North": ["Kaduna GRA", "Unguwan Rimi", "Malali", "Kabala Costain", "Unguwan Sarki", "Badiko"],
-    "Kaduna South": ["Barnawa", "Television", "Sabon Tasha", "Narayi", "Gonin Gora", "Ungwan Sunday"],
-    Zaria: ["Zaria City", "Samaru", "Sabon Gari", "Wusasa", "Kongo", "Tudun Wada"],
-    Kafanchan: ["Kafanchan GRA", "Ungwan Masara", "Ungwan Fari", "Katsit", "Zipak", "Garaje"]
+    "Kaduna North": [
+      "Kaduna GRA",
+      "Unguwan Rimi",
+      "Malali",
+      "Kabala Costain",
+      "Unguwan Sarki",
+      "Badiko",
+    ],
+    "Kaduna South": [
+      "Barnawa",
+      "Television",
+      "Sabon Tasha",
+      "Narayi",
+      "Gonin Gora",
+      "Ungwan Sunday",
+    ],
+    Zaria: [
+      "Zaria City",
+      "Samaru",
+      "Sabon Gari",
+      "Wusasa",
+      "Kongo",
+      "Tudun Wada",
+    ],
+    Kafanchan: [
+      "Kafanchan GRA",
+      "Ungwan Masara",
+      "Ungwan Fari",
+      "Katsit",
+      "Zipak",
+      "Garaje",
+    ],
   },
-  
+
   Kano: {
-    "Kano Municipal": ["Kano GRA", "Nasarawa", "Fagge", "Sabon Gari", "Kurna", "Sharada"],
-    "Kano Fagge": ["Fagge GRA", "Sabongari", "Rijiyar Lemo", "Court Road", "Brigade"],
+    "Kano Municipal": [
+      "Kano GRA",
+      "Nasarawa",
+      "Fagge",
+      "Sabon Gari",
+      "Kurna",
+      "Sharada",
+    ],
+    "Kano Fagge": [
+      "Fagge GRA",
+      "Sabongari",
+      "Rijiyar Lemo",
+      "Court Road",
+      "Brigade",
+    ],
     "Kano Dala": ["Bakin Ruwa", "Kabuwaya", "Gobirawa", "Unguwar Gini", "Dala"],
-    "Kano Gwale": ["Gwale", "Dorayi", "Kofar Mazugal", "Kabuga", "Galadanci"]
+    "Kano Gwale": ["Gwale", "Dorayi", "Kofar Mazugal", "Kabuga", "Galadanci"],
   },
-  
+
   Katsina: {
-    Katsina: ["Katsina GRA", "Kofar Kaura", "Kofar Kwaya", "Layout", "Kofar Durbi", "Kofar Marusa"],
-    Daura: ["Daura GRA", "Kalgo", "Kusugu", "Sabon Sara", "Kofar Arewa", "Zango"],
-    Funtua: ["Funtua GRA", "Makera", "Tudun Wada", "Sabuwar Unguwa", "Low-cost", "Unguwar Ibrahim"],
-    Jibia: ["Jibia Central", "Mazanya", "Ungwar Malamai", "Ungwar Dole", "Kaura"]
+    Katsina: [
+      "Katsina GRA",
+      "Kofar Kaura",
+      "Kofar Kwaya",
+      "Layout",
+      "Kofar Durbi",
+      "Kofar Marusa",
+    ],
+    Daura: [
+      "Daura GRA",
+      "Kalgo",
+      "Kusugu",
+      "Sabon Sara",
+      "Kofar Arewa",
+      "Zango",
+    ],
+    Funtua: [
+      "Funtua GRA",
+      "Makera",
+      "Tudun Wada",
+      "Sabuwar Unguwa",
+      "Low-cost",
+      "Unguwar Ibrahim",
+    ],
+    Jibia: [
+      "Jibia Central",
+      "Mazanya",
+      "Ungwar Malamai",
+      "Ungwar Dole",
+      "Kaura",
+    ],
   },
-  
+
   Kebbi: {
-    "Birnin Kebbi": ["Birnin Kebbi GRA", "Badariya", "Nassarawa", "Tudun Wada", "Gesse", "Rafin Atiku"],
-    Argungu: ["Argungu GRA", "Zoramawa", "Kokani", "Kashin Zama", "Gazari", "Filin Jirgi"],
+    "Birnin Kebbi": [
+      "Birnin Kebbi GRA",
+      "Badariya",
+      "Nassarawa",
+      "Tudun Wada",
+      "Gesse",
+      "Rafin Atiku",
+    ],
+    Argungu: [
+      "Argungu GRA",
+      "Zoramawa",
+      "Kokani",
+      "Kashin Zama",
+      "Gazari",
+      "Filin Jirgi",
+    ],
     Yauri: ["Yauri GRA", "Tondi", "Yelwa", "Jijima", "Nasarawa", "Kyauru"],
-    Zuru: ["Zuru GRA", "Dabai", "Senchi", "Bedi", "Manga", "Rikoto"]
+    Zuru: ["Zuru GRA", "Dabai", "Senchi", "Bedi", "Manga", "Rikoto"],
   },
-  
+
   Kogi: {
-    Lokoja: ["Lokoja GRA", "Adankolo", "Felele", "Ganaja", "Phase 1", "Phase 2"],
+    Lokoja: [
+      "Lokoja GRA",
+      "Adankolo",
+      "Felele",
+      "Ganaja",
+      "Phase 1",
+      "Phase 2",
+    ],
     Okene: ["Okene GRA", "Agassa", "Idoji", "Bariki", "Ikuehi", "Ori-Apata"],
-    Kabba: ["Kabba GRA", "Asuta", "Odolu", "Okenyi", "Ayetoro-Gbede", "Inoziomi"],
-    Idah: ["Idah GRA", "Ukwaja", "Ega", "Sabon Gari", "Igalogba", "Angwa"]
+    Kabba: [
+      "Kabba GRA",
+      "Asuta",
+      "Odolu",
+      "Okenyi",
+      "Ayetoro-Gbede",
+      "Inoziomi",
+    ],
+    Idah: ["Idah GRA", "Ukwaja", "Ega", "Sabon Gari", "Igalogba", "Angwa"],
   },
-  
+
   Kwara: {
     Ilorin: ["Ilorin GRA", "Adewole", "Tanke", "Gaa Akanbi", "Oloje", "Fate"],
     Offa: ["Offa GRA", "Igbonna", "Balogun", "Shawo", "Popo", "Olorin"],
-    Lafiagi: ["Lafiagi Central", "Gbugbu", "Chikanda", "Tsonga", "Buhari", "Emma"],
-    Patigi: ["Patigi GRA", "Kpada", "Lade", "Sakpefu", "Rogun", "Dzwaegi"]
+    Lafiagi: [
+      "Lafiagi Central",
+      "Gbugbu",
+      "Chikanda",
+      "Tsonga",
+      "Buhari",
+      "Emma",
+    ],
+    Patigi: ["Patigi GRA", "Kpada", "Lade", "Sakpefu", "Rogun", "Dzwaegi"],
   },
-  
+
   Nasarawa: {
-    Lafia: ["Lafia GRA", "Millionaires Quarters", "Bukan Sidi", "Tudun Gwandara", "Ombi 1", "Ombi 2"],
-    Keffi: ["Keffi GRA", "Angwan Rimi", "Tsohon Tasha", "Sabon Gari", "Angwan Waje", "Masaka"],
+    Lafia: [
+      "Lafia GRA",
+      "Millionaires Quarters",
+      "Bukan Sidi",
+      "Tudun Gwandara",
+      "Ombi 1",
+      "Ombi 2",
+    ],
+    Keffi: [
+      "Keffi GRA",
+      "Angwan Rimi",
+      "Tsohon Tasha",
+      "Sabon Gari",
+      "Angwan Waje",
+      "Masaka",
+    ],
     Akwanga: ["Akwanga GRA", "Gudi", "Andaha", "Ningo", "Gwanje", "Moro"],
-    Nasarawa: ["Nasarawa GRA", "Tammah", "Laminga", "Udenin Gida", "Loko", "Udege"]
+    Nasarawa: [
+      "Nasarawa GRA",
+      "Tammah",
+      "Laminga",
+      "Udenin Gida",
+      "Loko",
+      "Udege",
+    ],
   },
-  
+
   Niger: {
     Minna: ["Minna GRA", "Tunga", "Bosso", "Maitumbi", "Kpakungu", "Chanchaga"],
     Bida: ["Bida GRA", "Dokodza", "Masaga", "Wadata", "Mayaki", "Kyari"],
-    Suleja: ["Suleja GRA", "Bagama", "Kurmin Sarki", "Hashimi", "Rafin Sanyi", "Madalla"],
-    Kontagora: ["Kontagora GRA", "Tunga Kawo", "Unguwar Yamma", "Masama", "Tunga Giwa", "Maduwari"]
+    Suleja: [
+      "Suleja GRA",
+      "Bagama",
+      "Kurmin Sarki",
+      "Hashimi",
+      "Rafin Sanyi",
+      "Madalla",
+    ],
+    Kontagora: [
+      "Kontagora GRA",
+      "Tunga Kawo",
+      "Unguwar Yamma",
+      "Masama",
+      "Tunga Giwa",
+      "Maduwari",
+    ],
   },
-  
+
   Ogun: {
-    "Abeokuta South": ["Abeokuta GRA", "Ibara", "Oke Ilewo", "Kuto", "Isale Igbein", "Itoko"],
+    "Abeokuta South": [
+      "Abeokuta GRA",
+      "Ibara",
+      "Oke Ilewo",
+      "Kuto",
+      "Isale Igbein",
+      "Itoko",
+    ],
     "Ado-Odo/Ota": ["Ota", "Sango", "Ijoko", "Iju", "Ilogbo", "Atan"],
-    "Ijebu-Ode": ["Ijebu-Ode GRA", "Folagbade", "Oke-Aje", "Italapo", "Igbeba", "Mobalufon"],
-    Sagamu: ["Sagamu GRA", "Sabo", "Makun", "Ijagba", "Ode-Lemo", "Sotubo"]
+    "Ijebu-Ode": [
+      "Ijebu-Ode GRA",
+      "Folagbade",
+      "Oke-Aje",
+      "Italapo",
+      "Igbeba",
+      "Mobalufon",
+    ],
+    Sagamu: ["Sagamu GRA", "Sabo", "Makun", "Ijagba", "Ode-Lemo", "Sotubo"],
   },
-  
+
   Ondo: {
-    "Akure South": ["Akure GRA", "Alagbaka", "Oba Ile", "Ijapo", "Oke Aro", "Fanibi"],
+    "Akure South": [
+      "Akure GRA",
+      "Alagbaka",
+      "Oba Ile",
+      "Ijapo",
+      "Oke Aro",
+      "Fanibi",
+    ],
     Ondo: ["Ondo GRA", "Surulere", "Fagun", "Yaba", "Valentino", "Mobil"],
     Owo: ["Owo GRA", "Ijebu", "Iselu", "Imola", "Ehinogbe", "Idashen"],
-    Ilaje: ["Igbokoda", "Mahin", "Ugbo", "Ayetoro", "Zion Pepe", "Orioke"]
+    Ilaje: ["Igbokoda", "Mahin", "Ugbo", "Ayetoro", "Zion Pepe", "Orioke"],
   },
-  
+
   Osun: {
-    Osogbo: ["Osogbo GRA", "Alekuwodo", "Okefia", "Oke Baale", "Oja Oba", "Isale Osun"],
-    "Ile-Ife": ["Ife GRA", "Lagere", "Mayfair", "Eleyele", "Modakeke", "Parakin"],
+    Osogbo: [
+      "Osogbo GRA",
+      "Alekuwodo",
+      "Okefia",
+      "Oke Baale",
+      "Oja Oba",
+      "Isale Osun",
+    ],
+    "Ile-Ife": [
+      "Ife GRA",
+      "Lagere",
+      "Mayfair",
+      "Eleyele",
+      "Modakeke",
+      "Parakin",
+    ],
     Ilesa: ["Ilesa GRA", "Okesa", "Imo", "Ijoka", "Iroye", "Ibala"],
-    Ede: ["Ede GRA", "Timi", "Alusekere", "Papa", "Agip", "Akoda"]
+    Ede: ["Ede GRA", "Timi", "Alusekere", "Papa", "Agip", "Akoda"],
   },
-  
+
   Oyo: {
-    "Ibadan North": ["Bodija", "Agodi GRA", "Ikolaba", "Sango", "Bashorun", "Mokola"],
-    "Ibadan South-West": ["Ring Road", "Challenge", "Oluyole", "Oke Ado", "Apata", "Alesinloye"],
-    Ogbomosho: ["Ogbomosho GRA", "Arowomole", "Oke Alapata", "Isale Ora", "Takie", "Caretaker"],
-    Oyo: ["Oyo GRA", "Akeetan", "Isale Oyo", "Awe", "Ilora", "Erelu"]
+    "Ibadan North": [
+      "Bodija",
+      "Agodi GRA",
+      "Ikolaba",
+      "Sango",
+      "Bashorun",
+      "Mokola",
+    ],
+    "Ibadan South-West": [
+      "Ring Road",
+      "Challenge",
+      "Oluyole",
+      "Oke Ado",
+      "Apata",
+      "Alesinloye",
+    ],
+    Ogbomosho: [
+      "Ogbomosho GRA",
+      "Arowomole",
+      "Oke Alapata",
+      "Isale Ora",
+      "Takie",
+      "Caretaker",
+    ],
+    Oyo: ["Oyo GRA", "Akeetan", "Isale Oyo", "Awe", "Ilora", "Erelu"],
   },
-  
+
   Plateau: {
-    "Jos North": ["Jos GRA", "Terminus", "Apata", "Jenta", "Laranto", "Tafawa Balewa"],
+    "Jos North": [
+      "Jos GRA",
+      "Terminus",
+      "Apata",
+      "Jenta",
+      "Laranto",
+      "Tafawa Balewa",
+    ],
     "Jos South": ["Bukuru", "Rayfield", "Kuru", "Vom", "Zawan", "Gyel"],
     Pankshin: ["Pankshin GRA", "Wokkos", "Chip", "Lankaku", "Dyis", "Kangshu"],
-    Shendam: ["Shendam GRA", "Yelwa", "Dokan Tofa", "Pangshak", "Demshin", "Dorok"]
+    Shendam: [
+      "Shendam GRA",
+      "Yelwa",
+      "Dokan Tofa",
+      "Pangshak",
+      "Demshin",
+      "Dorok",
+    ],
   },
-  
+
   Rivers: {
-    "Port Harcourt": ["Port Harcourt GRA", "D-Line", "Old GRA", "Rumuola", "Rumuokwuta", "Diobu"],
-    "Obio/Akpor": ["Rumuigbo", "Rumuokoro", "Rumuodara", "Woji", "Rumuokwurusi", "Elelenwo"],
+    "Port Harcourt": [
+      "Port Harcourt GRA",
+      "D-Line",
+      "Old GRA",
+      "Rumuola",
+      "Rumuokwuta",
+      "Diobu",
+    ],
+    "Obio/Akpor": [
+      "Rumuigbo",
+      "Rumuokoro",
+      "Rumuodara",
+      "Woji",
+      "Rumuokwurusi",
+      "Elelenwo",
+    ],
     Eleme: ["Eleme GRA", "Akpajo", "Aleto", "Agbonchia", "Ogale", "Onne"],
-    Bonny: ["Bonny GRA", "Finima", "Abalamabie", "Iwoma", "Akiama", "Orosikiri"]
+    Bonny: [
+      "Bonny GRA",
+      "Finima",
+      "Abalamabie",
+      "Iwoma",
+      "Akiama",
+      "Orosikiri",
+    ],
   },
-  
+
   Sokoto: {
-    "Sokoto North": ["Sokoto GRA", "Gawon Nama", "Arkilla", "Runjin Sambo", "Marina", "Kofar Atiku"],
-    "Sokoto South": ["Tudun Wada", "Old Airport", "Mabera", "Gagi", "Dundaye", "Kwanni"],
-    Tambuwal: ["Tambuwal GRA", "Dogon Daji", "Sanyinna", "Kaffe", "Bakaya", "Jabo"],
-    Illela: ["Illela GRA", "Gada", "Damba", "Kalmalo", "Kware", "Gwadabawa"]
+    "Sokoto North": [
+      "Sokoto GRA",
+      "Gawon Nama",
+      "Arkilla",
+      "Runjin Sambo",
+      "Marina",
+      "Kofar Atiku",
+    ],
+    "Sokoto South": [
+      "Tudun Wada",
+      "Old Airport",
+      "Mabera",
+      "Gagi",
+      "Dundaye",
+      "Kwanni",
+    ],
+    Tambuwal: [
+      "Tambuwal GRA",
+      "Dogon Daji",
+      "Sanyinna",
+      "Kaffe",
+      "Bakaya",
+      "Jabo",
+    ],
+    Illela: ["Illela GRA", "Gada", "Damba", "Kalmalo", "Kware", "Gwadabawa"],
   },
-  
+
   Taraba: {
-    Jalingo: ["Jalingo GRA", "Sabon Gari", "Kona", "Mayo Gwoi", "Kofai", "Magami"],
-    Wukari: ["Wukari GRA", "Puje", "Avyi", "Tsokundi", "Hospital Area", "Rafin Kada"],
+    Jalingo: [
+      "Jalingo GRA",
+      "Sabon Gari",
+      "Kona",
+      "Mayo Gwoi",
+      "Kofai",
+      "Magami",
+    ],
+    Wukari: [
+      "Wukari GRA",
+      "Puje",
+      "Avyi",
+      "Tsokundi",
+      "Hospital Area",
+      "Rafin Kada",
+    ],
     Zing: ["Zing GRA", "Monkin", "Yakoko", "Bitako", "Dadin Kowa", "Lamma"],
-    Bali: ["Bali GRA", "Gangdole", "Sabon Layi", "Teli", "Gazabu", "Sabongida"]
+    Bali: ["Bali GRA", "Gangdole", "Sabon Layi", "Teli", "Gazabu", "Sabongida"],
   },
-  
+
   Yobe: {
-    Damaturu: ["Damaturu GRA", "Nayi Nawa", "Pawari", "Abasha", "Gwange", "Nyanya"],
-    Potiskum: ["Potiskum GRA", "Arikime", "Doya", "Hausari", "Bolewa", "Mamudo"],
-    Gashua: ["Gashua GRA", "Zango", "Lawan Fannami", "Lawan Musa", "Sabon Gari", "Zango"],
-    Geidam: ["Geidam GRA", "Ashekri", "Kawuri", "Fulatari", "Dumburi", "Kelluri"]
+    Damaturu: [
+      "Damaturu GRA",
+      "Nayi Nawa",
+      "Pawari",
+      "Abasha",
+      "Gwange",
+      "Nyanya",
+    ],
+    Potiskum: [
+      "Potiskum GRA",
+      "Arikime",
+      "Doya",
+      "Hausari",
+      "Bolewa",
+      "Mamudo",
+    ],
+    Gashua: [
+      "Gashua GRA",
+      "Zango",
+      "Lawan Fannami",
+      "Lawan Musa",
+      "Sabon Gari",
+      "Zango",
+    ],
+    Geidam: [
+      "Geidam GRA",
+      "Ashekri",
+      "Kawuri",
+      "Fulatari",
+      "Dumburi",
+      "Kelluri",
+    ],
   },
-  
+
   Zamfara: {
-    Gusau: ["Gusau GRA", "Tudun Wada", "Sabon Gari", "Samaru", "Unguwar Dallatu", "Zawiyya"],
-    "Kaura Namoda": ["Kaura Namoda GRA", "Sabon Gari", "Kurya", "Nasarawa", "Maguru", "Yankaba"],
-    "Talata Mafara": ["Talata Mafara GRA", "Bakin Kasuwa", "Sabon Gari", "Mayanchi", "Ruwan Bore", "Garbadu"],
-    Anka: ["Anka GRA", "Bagega", "Sabon Gari", "Wuya", "Yar-Galma", "Barayar Zaki"]
+    Gusau: [
+      "Gusau GRA",
+      "Tudun Wada",
+      "Sabon Gari",
+      "Samaru",
+      "Unguwar Dallatu",
+      "Zawiyya",
+    ],
+    "Kaura Namoda": [
+      "Kaura Namoda GRA",
+      "Sabon Gari",
+      "Kurya",
+      "Nasarawa",
+      "Maguru",
+      "Yankaba",
+    ],
+    "Talata Mafara": [
+      "Talata Mafara GRA",
+      "Bakin Kasuwa",
+      "Sabon Gari",
+      "Mayanchi",
+      "Ruwan Bore",
+      "Garbadu",
+    ],
+    Anka: [
+      "Anka GRA",
+      "Bagega",
+      "Sabon Gari",
+      "Wuya",
+      "Yar-Galma",
+      "Barayar Zaki",
+    ],
   },
 };
 

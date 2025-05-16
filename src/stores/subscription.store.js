@@ -1,96 +1,96 @@
-import { defineStore } from 'pinia';
-import { collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
-import { paymentService } from '@/services/payment.service';
-import { useAuthStore } from '@/stores/auth';
+import { defineStore } from "pinia";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase";
+import { paymentService } from "@/services/payment.service";
+import { useAuthStore } from "@/stores/auth";
 
-export const useSubscriptionStore = defineStore('subscription', {
+export const useSubscriptionStore = defineStore("subscription", {
   state: () => ({
     subscription: null,
     loading: false,
     error: null,
-    billingPeriod: 'monthly', // 'monthly' or 'yearly'
+    billingPeriod: "monthly", // 'monthly' or 'yearly'
     plans: [
       {
-        id: 'free',
-        name: 'Free Tier',
+        id: "free",
+        name: "Free Tier",
         price: 0,
         yearlyPrice: 0,
         features: [
-          '3 Free Listings/Month',
-          'Watermarked AI Optimization',
-          '1-2 Fraud Alerts/Month',
-          'Basic Support',
-          'Try Before You Buy'
+          "3 Free Listings/Month",
+          "Watermarked AI Optimization",
+          "1-2 Fraud Alerts/Month",
+          "Basic Support",
+          "Try Before You Buy",
         ],
-        isFree: true
+        isFree: true,
       },
       {
-        id: 'basic',
-        name: 'Basic Plan',
+        id: "basic",
+        name: "Basic Plan",
         price: 3000, // Monthly price in NGN (₦3,000-5,000 range)
         yearlyPrice: 30000, // ~17% discount for yearly
         features: [
-          'Unlimited Listings',
-          'Basic Analytics Dashboard',
-          'Social Media Auto-Share',
-          '1 Free Boost Monthly',
-          'Basic Fraud Detection',
-          'Email Support'
+          "Unlimited Listings",
+          "Basic Analytics Dashboard",
+          "Social Media Auto-Share",
+          "1 Free Boost Monthly",
+          "Basic Fraud Detection",
+          "Email Support",
         ],
         isFree: false,
         isPopular: true,
-        targetAudience: 'Casual sellers & budget-conscious users',
-        boostIncluded: 1
+        targetAudience: "Casual sellers & budget-conscious users",
+        boostIncluded: 1,
       },
       {
-        id: 'premium',
-        name: 'Premium Plan',
+        id: "premium",
+        name: "Premium Plan",
         price: 10000, // Monthly price in NGN (₦10,000-15,000 range)
         yearlyPrice: 100000, // ~17% discount for yearly
         features: [
-          'AI-Powered Optimization',
-          'Priority Visibility (72h top placement)',
-          'Cross-Post to Partner Platforms',
-          'Secure Escrow Payments',
-          '24/7 Dedicated Support',
-          'Advanced Market Insights',
-          'Customizable Storefront',
-          'Unlimited Listings & Boosts',
-          'Competitor Price Tracking',
-          'Peak Traffic Analytics'
+          "AI-Powered Optimization",
+          "Priority Visibility (72h top placement)",
+          "Cross-Post to Partner Platforms",
+          "Secure Escrow Payments",
+          "24/7 Dedicated Support",
+          "Advanced Market Insights",
+          "Customizable Storefront",
+          "Unlimited Listings & Boosts",
+          "Competitor Price Tracking",
+          "Peak Traffic Analytics",
         ],
         isFree: false,
         isPopular: false,
-        targetAudience: 'Power sellers & small businesses',
-        boostIncluded: 'unlimited',
+        targetAudience: "Power sellers & small businesses",
+        boostIncluded: "unlimited",
         prioritySupport: true,
         storefront: true,
         escrowPayments: true,
-        crossPosting: true
-      }
-    ]
+        crossPosting: true,
+      },
+    ],
   }),
   getters: {
     currentPlans: (state) => {
-      return state.plans.map(plan => ({
+      return state.plans.map((plan) => ({
         ...plan,
-        price: state.billingPeriod === 'yearly' ? plan.yearlyPrice : plan.price,
-        duration: state.billingPeriod === 'yearly' ? 'year' : 'month'
+        price: state.billingPeriod === "yearly" ? plan.yearlyPrice : plan.price,
+        duration: state.billingPeriod === "yearly" ? "year" : "month",
       }));
-    }
+    },
   },
   actions: {
     async fetchSubscription(userId) {
       try {
         this.loading = true;
-        const docRef = doc(db, 'subscriptions', userId);
+        const docRef = doc(db, "subscriptions", userId);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
           this.subscription = {
             ...docSnap.data(),
-            id: docSnap.id
+            id: docSnap.id,
           };
         } else {
           this.subscription = null;
@@ -106,9 +106,9 @@ export const useSubscriptionStore = defineStore('subscription', {
       try {
         this.loading = true;
         const authStore = useAuthStore();
-        
+
         if (!authStore.user) {
-          throw new Error('User not authenticated');
+          throw new Error("User not authenticated");
         }
 
         // Initialize payment
@@ -118,16 +118,19 @@ export const useSubscriptionStore = defineStore('subscription', {
           {
             userId,
             planId: plan.id,
-            planName: plan.name
+            planName: plan.name,
           }
         );
 
         // Store plan info temporarily
-        localStorage.setItem('pending_subscription', JSON.stringify({
-          userId,
-          plan,
-          createdAt: new Date()
-        }));
+        localStorage.setItem(
+          "pending_subscription",
+          JSON.stringify({
+            userId,
+            plan,
+            createdAt: new Date(),
+          })
+        );
 
         // Redirect to payment
         window.location.href = paymentUrl;
@@ -141,13 +144,13 @@ export const useSubscriptionStore = defineStore('subscription', {
     async fetchSubscription(userId) {
       try {
         this.loading = true;
-        const docRef = doc(db, 'subscriptions', userId);
+        const docRef = doc(db, "subscriptions", userId);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
           this.subscription = {
             ...docSnap.data(),
-            id: docSnap.id
+            id: docSnap.id,
           };
         } else {
           this.subscription = null;
@@ -163,9 +166,9 @@ export const useSubscriptionStore = defineStore('subscription', {
       try {
         this.loading = true;
         const authStore = useAuthStore();
-        
+
         if (!authStore.user) {
-          throw new Error('User not authenticated');
+          throw new Error("User not authenticated");
         }
 
         // Initialize payment
@@ -175,16 +178,19 @@ export const useSubscriptionStore = defineStore('subscription', {
           {
             userId,
             planId: plan.id,
-            planName: plan.name
+            planName: plan.name,
           }
         );
 
         // Store plan info temporarily
-        localStorage.setItem('pending_subscription', JSON.stringify({
-          userId,
-          plan,
-          createdAt: new Date()
-        }));
+        localStorage.setItem(
+          "pending_subscription",
+          JSON.stringify({
+            userId,
+            plan,
+            createdAt: new Date(),
+          })
+        );
 
         // Redirect to payment
         window.location.href = paymentUrl;
@@ -199,37 +205,41 @@ export const useSubscriptionStore = defineStore('subscription', {
     async verifyAndActivateSubscription(reference) {
       try {
         this.loading = true;
-        const { success, metadata } = await paymentService.verifyPayment(reference);
+        const { success, metadata } = await paymentService.verifyPayment(
+          reference
+        );
 
         if (!success) {
-          throw new Error('Payment verification failed');
+          throw new Error("Payment verification failed");
         }
 
         const { userId, planId } = metadata;
-        const plan = this.plans.find(p => p.id === planId);
+        const plan = this.plans.find((p) => p.id === planId);
 
         if (!plan) {
-          throw new Error('Invalid subscription plan');
+          throw new Error("Invalid subscription plan");
         }
 
         // Create or update subscription
-        const subscriptionRef = doc(db, 'subscriptions', userId);
+        const subscriptionRef = doc(db, "subscriptions", userId);
         await setDoc(subscriptionRef, {
           userId,
           planId,
           planName: plan.name,
-          status: 'active',
+          status: "active",
           startDate: new Date(),
-          nextRenewalDate: new Date(Date.now() + (plan.id === 'premium' ? 60 : 30) * 24 * 60 * 60 * 1000),
+          nextRenewalDate: new Date(
+            Date.now() + (plan.id === "premium" ? 60 : 30) * 24 * 60 * 60 * 1000
+          ),
           paymentReference: reference,
-          createdAt: new Date()
+          createdAt: new Date(),
         });
 
         // Update user's subscription status
-        const userRef = doc(db, 'users', userId);
+        const userRef = doc(db, "users", userId);
         await updateDoc(userRef, {
           hasSubscription: true,
-          subscriptionPlan: plan.id
+          subscriptionPlan: plan.id,
         });
 
         await this.fetchSubscription(userId);
@@ -245,17 +255,17 @@ export const useSubscriptionStore = defineStore('subscription', {
     async cancelSubscription(userId) {
       try {
         this.loading = true;
-        const subscriptionRef = doc(db, 'subscriptions', userId);
+        const subscriptionRef = doc(db, "subscriptions", userId);
         await updateDoc(subscriptionRef, {
-          status: 'cancelled',
-          cancelledAt: new Date()
+          status: "cancelled",
+          cancelledAt: new Date(),
         });
 
         // Update user's subscription status
-        const userRef = doc(db, 'users', userId);
+        const userRef = doc(db, "users", userId);
         await updateDoc(userRef, {
           hasSubscription: false,
-          subscriptionPlan: null
+          subscriptionPlan: null,
         });
 
         await this.fetchSubscription(userId);
@@ -265,6 +275,6 @@ export const useSubscriptionStore = defineStore('subscription', {
       } finally {
         this.loading = false;
       }
-    }
-  }
+    },
+  },
 });

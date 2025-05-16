@@ -13,12 +13,12 @@ const routes = [
     path: "/subscription",
     name: "subscription",
     component: () => import("@/views/Subscription.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/payment-success",
     name: "payment-success",
-    component: () => import("@/views/PaymentSuccess.vue")
+    component: () => import("@/views/PaymentSuccess.vue"),
   },
   {
     path: "/login",
@@ -141,33 +141,38 @@ router.beforeEach(async (to, from, next) => {
 
   // Check if route requires authentication
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login');
+    next("/login");
     return;
   }
 
   // Check if user needs subscription for create-listing route
-  if (isAuthenticated && to.name === 'create-listing') {
+  if (isAuthenticated && to.name === "create-listing") {
     try {
       // Check if user has exceeded free listing limit
-      const userListings = await listingsStore.fetchUserListings(authStore.user.uid);
-      const hasFreeListing = userListings.some(listing => listing.isFreeListing);
+      const userListings = await listingsStore.fetchUserListings(
+        authStore.user.uid
+      );
+      const hasFreeListing = userListings.some(
+        (listing) => listing.isFreeListing
+      );
       const totalListings = userListings.length;
 
       // If user has used their free listing, require subscription
       if (totalListings >= 1) {
         // Check if user has active subscription
         await subscriptionStore.fetchSubscription(authStore.user.uid);
-        const hasActiveSubscription = subscriptionStore.subscription && 
-                                   subscriptionStore.subscription.status === 'active';
-        
+        const hasActiveSubscription =
+          subscriptionStore.subscription &&
+          subscriptionStore.subscription.status === "active";
+
         if (!hasActiveSubscription) {
-          next('/subscription');
+          next("/subscription");
           return;
         }
       }
     } catch (error) {
-      console.error('Subscription check failed:', error);
-      next('/subscription');
+      console.error("Subscription check failed:", error);
+      next("/subscription");
       return;
     }
   }
