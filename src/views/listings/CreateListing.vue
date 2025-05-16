@@ -116,6 +116,13 @@ const form = reactive({
   brand: "",
   model: "",
   specifications: "",
+  storage: "",
+  color: "",
+  processor: "",
+  ram: "",
+  graphicsCard: "",
+  screenSize: "",
+  operatingSystem: "",
 
   // Real Estate
   propertySize: "",
@@ -196,7 +203,6 @@ const iPhoneColors = [
   { value: "Red", label: "Red" },
   { value: "Green", label: "Green" },
   { value: "teal", label: "teal" },
-  { value: "teal", label: "teal" },
   { value: "Gold", label: "Gold" },
   { value: "Silver", label: "Silver" }
 ];
@@ -274,109 +280,599 @@ const GooglePixelColors = [
   { value: "Sorta Sunny", label: "Sorta Sunny" },
 ];
 
+// Computer brands and specs
+const computerBrands = [
+  { value: "Apple", label: "Apple" },
+  { value: "Dell", label: "Dell" },
+  { value: "HP", label: "HP" },
+  { value: "Lenovo", label: "Lenovo" },
+  { value: "Asus", label: "Asus" },
+  { value: "Microsoft", label: "Microsoft" },
+  { value: "Acer", label: "Acer" },
+  { value: "MSI", label: "MSI" },
+  { value: "Samsung", label: "Samsung" },
+  { value: "Other", label: "Other" }
+];
+
+// Apple Computer Models
+const AppleComputerModels = [
+  { value: "MacBook Air M3", label: "MacBook Air M3" },
+  { value: "MacBook Air M2", label: "MacBook Air M2" },
+  { value: "MacBook Air M1", label: "MacBook Air M1" },
+  { value: "MacBook Pro 14-inch M3", label: "MacBook Pro 14-inch M3" },
+  { value: "MacBook Pro 14-inch M2", label: "MacBook Pro 14-inch M2" },
+  { value: "MacBook Pro 16-inch M3", label: "MacBook Pro 16-inch M3" },
+  { value: "MacBook Pro 16-inch M2", label: "MacBook Pro 16-inch M2" },
+  { value: "Mac Mini M2", label: "Mac Mini M2" },
+  { value: "Mac Mini M1", label: "Mac Mini M1" },
+  { value: "iMac 24-inch M1", label: "iMac 24-inch M1" },
+  { value: "iMac 24-inch M3", label: "iMac 24-inch M3" },
+  { value: "Mac Studio M2", label: "Mac Studio M2" },
+  { value: "Mac Pro", label: "Mac Pro" }
+];
+
+// Dell Computer Models
+const DellComputerModels = [
+  { value: "XPS 13", label: "XPS 13" },
+  { value: "XPS 15", label: "XPS 15" },
+  { value: "XPS 17", label: "XPS 17" },
+  { value: "Inspiron 14", label: "Inspiron 14" },
+  { value: "Inspiron 15", label: "Inspiron 15" },
+  { value: "Inspiron 16", label: "Inspiron 16" },
+  { value: "Latitude 5430", label: "Latitude 5430" },
+  { value: "Latitude 7430", label: "Latitude 7430" },
+  { value: "Precision 5680", label: "Precision 5680" },
+  { value: "Alienware m16", label: "Alienware m16" },
+  { value: "Alienware m18", label: "Alienware m18" },
+  { value: "Alienware x16", label: "Alienware x16" },
+  { value: "OptiPlex Desktop", label: "OptiPlex Desktop" },
+  { value: "Precision Desktop", label: "Precision Desktop" }
+];
+
+// HP Computer Models
+const HPComputerModels = [
+  { value: "Spectre x360", label: "Spectre x360" },
+  { value: "Envy x360", label: "Envy x360" },
+  { value: "Envy 16", label: "Envy 16" },
+  { value: "Pavilion 15", label: "Pavilion 15" },
+  { value: "Pavilion Gaming", label: "Pavilion Gaming" },
+  { value: "Omen 16", label: "Omen 16" },
+  { value: "Omen 17", label: "Omen 17" },
+  { value: "EliteBook 840", label: "EliteBook 840" },
+  { value: "EliteBook 860", label: "EliteBook 860" },
+  { value: "ZBook Studio", label: "ZBook Studio" },
+  { value: "ProBook 450", label: "ProBook 450" },
+  { value: "Victus 15", label: "Victus 15" },
+  { value: "HP All-in-One", label: "HP All-in-One" },
+  { value: "HP Desktop", label: "HP Desktop" }
+];
+
+// Lenovo Computer Models
+const LenovoComputerModels = [
+  { value: "ThinkPad X1 Carbon", label: "ThinkPad X1 Carbon" },
+  { value: "ThinkPad X1 Yoga", label: "ThinkPad X1 Yoga" },
+  { value: "ThinkPad X1 Nano", label: "ThinkPad X1 Nano" },
+  { value: "ThinkPad T14", label: "ThinkPad T14" },
+  { value: "ThinkPad P16", label: "ThinkPad P16" },
+  { value: "Yoga 9i", label: "Yoga 9i" },
+  { value: "Yoga 7i", label: "Yoga 7i" },
+  { value: "IdeaPad Slim 5", label: "IdeaPad Slim 5" },
+  { value: "IdeaPad Gaming 3", label: "IdeaPad Gaming 3" },
+  { value: "Legion 5", label: "Legion 5" },
+  { value: "Legion 7", label: "Legion 7" },
+  { value: "Legion Pro 5", label: "Legion Pro 5" },
+  { value: "ThinkCentre Desktop", label: "ThinkCentre Desktop" },
+  { value: "IdeaCentre Desktop", label: "IdeaCentre Desktop" }
+];
+
+// Asus Computer Models
+const AsusComputerModels = [
+  { value: "ZenBook 14", label: "ZenBook 14" },
+  { value: "ZenBook Pro 16", label: "ZenBook Pro 16" },
+  { value: "VivoBook 15", label: "VivoBook 15" },
+  { value: "VivoBook Pro 16", label: "VivoBook Pro 16" },
+  { value: "ROG Zephyrus G14", label: "ROG Zephyrus G14" },
+  { value: "ROG Zephyrus G16", label: "ROG Zephyrus G16" },
+  { value: "ROG Strix G16", label: "ROG Strix G16" },
+  { value: "ROG Strix SCAR 17", label: "ROG Strix SCAR 17" },
+  { value: "TUF Gaming A15", label: "TUF Gaming A15" },
+  { value: "TUF Gaming F15", label: "TUF Gaming F15" },
+  { value: "ProArt StudioBook 16", label: "ProArt StudioBook 16" },
+  { value: "ExpertBook B9", label: "ExpertBook B9" },
+  { value: "ROG Desktop", label: "ROG Desktop" },
+  { value: "ASUS Desktop", label: "ASUS Desktop" }
+];
+
+// Microsoft Computer Models
+const MicrosoftComputerModels = [
+  { value: "Surface Laptop 5", label: "Surface Laptop 5" },
+  { value: "Surface Laptop 6", label: "Surface Laptop 6" },
+  { value: "Surface Laptop Studio", label: "Surface Laptop Studio" },
+  { value: "Surface Laptop Go 3", label: "Surface Laptop Go 3" },
+  { value: "Surface Pro 9", label: "Surface Pro 9" },
+  { value: "Surface Pro 10", label: "Surface Pro 10" },
+  { value: "Surface Go 3", label: "Surface Go 3" },
+  { value: "Surface Go 4", label: "Surface Go 4" },
+  { value: "Surface Studio", label: "Surface Studio" }
+];
+
+// Acer Computer Models
+const AcerComputerModels = [
+  { value: "Swift 5", label: "Swift 5" },
+  { value: "Swift 3", label: "Swift 3" },
+  { value: "Swift X", label: "Swift X" },
+  { value: "Aspire 5", label: "Aspire 5" },
+  { value: "Aspire 7", label: "Aspire 7" },
+  { value: "Predator Helios 300", label: "Predator Helios 300" },
+  { value: "Predator Helios 500", label: "Predator Helios 500" },
+  { value: "Predator Triton 500", label: "Predator Triton 500" },
+  { value: "Nitro 5", label: "Nitro 5" },
+  { value: "Nitro 7", label: "Nitro 7" },
+  { value: "Chromebook Spin", label: "Chromebook Spin" },
+  { value: "TravelMate", label: "TravelMate" },
+  { value: "Acer Desktop", label: "Acer Desktop" },
+  { value: "Predator Desktop", label: "Predator Desktop" }
+];
+
+// MSI Computer Models
+const MSIComputerModels = [
+  { value: "GS Stealth", label: "GS Stealth" },
+  { value: "GE Raider", label: "GE Raider" },
+  { value: "GF Thin", label: "GF Thin" },
+  { value: "GP Vector", label: "GP Vector" },
+  { value: "Prestige", label: "Prestige" },
+  { value: "Modern", label: "Modern" },
+  { value: "Summit", label: "Summit" },
+  { value: "Katana", label: "Katana" },
+  { value: "Cyborg", label: "Cyborg" },
+  { value: "Pulse", label: "Pulse" },
+  { value: "Crosshair", label: "Crosshair" },
+  { value: "Titan GT", label: "Titan GT" },
+  { value: "MSI Desktop", label: "MSI Desktop" },
+  { value: "MSI All-in-One", label: "MSI All-in-One" }
+];
+
+// Samsung Computer Models
+const SamsungComputerModels = [
+  { value: "Galaxy Book3 Pro", label: "Galaxy Book3 Pro" },
+  { value: "Galaxy Book3 Ultra", label: "Galaxy Book3 Ultra" },
+  { value: "Galaxy Book3 360", label: "Galaxy Book3 360" },
+  { value: "Galaxy Book3", label: "Galaxy Book3" },
+  { value: "Galaxy Book2 Pro", label: "Galaxy Book2 Pro" },
+  { value: "Galaxy Book2 360", label: "Galaxy Book2 360" },
+  { value: "Galaxy Book Flex", label: "Galaxy Book Flex" },
+  { value: "Galaxy Book Ion", label: "Galaxy Book Ion" },
+  { value: "Galaxy Chromebook", label: "Galaxy Chromebook" },
+  { value: "Galaxy Book Go", label: "Galaxy Book Go" }
+];
+
+// Computer RAM options
+const computerRAM = [
+  { value: "4GB", label: "4GB" },
+  { value: "8GB", label: "8GB" },
+  { value: "16GB", label: "16GB" },
+  { value: "24GB", label: "24GB" },
+  { value: "32GB", label: "32GB" },
+  { value: "64GB", label: "64GB" },
+  { value: "128GB", label: "128GB" }
+];
+
+// Computer Storage options
+const computerStorage = [
+  { value: "128GB SSD", label: "128GB SSD" },
+  { value: "256GB SSD", label: "256GB SSD" },
+  { value: "512GB SSD", label: "512GB SSD" },
+  { value: "1TB SSD", label: "1TB SSD" },
+  { value: "2TB SSD", label: "2TB SSD" },
+  { value: "500GB HDD", label: "500GB HDD" },
+  { value: "1TB HDD", label: "1TB HDD" },
+  { value: "2TB HDD", label: "2TB HDD" },
+  { value: "4TB HDD", label: "4TB HDD" },
+  { value: "Dual Storage", label: "Dual Storage" }
+];
+
+// Computer CPU options
+const computerProcessors = [
+  { value: "Intel Core i3", label: "Intel Core i3" },
+  { value: "Intel Core i5", label: "Intel Core i5" },
+  { value: "Intel Core i7", label: "Intel Core i7" },
+  { value: "Intel Core i9", label: "Intel Core i9" },
+  { value: "AMD Ryzen 3", label: "AMD Ryzen 3" },
+  { value: "AMD Ryzen 5", label: "AMD Ryzen 5" },
+  { value: "AMD Ryzen 7", label: "AMD Ryzen 7" },
+  { value: "AMD Ryzen 9", label: "AMD Ryzen 9" },
+  { value: "Apple M1", label: "Apple M1" },
+  { value: "Apple M2", label: "Apple M2" },
+  { value: "Apple M2 Pro", label: "Apple M2 Pro" },
+  { value: "Apple M2 Max", label: "Apple M2 Max" },
+  { value: "Apple M3", label: "Apple M3" },
+  { value: "Apple M3 Pro", label: "Apple M3 Pro" },
+  { value: "Apple M3 Max", label: "Apple M3 Max" }
+];
+
+// Computer Graphics Card options
+const computerGraphicsCards = [
+  { value: "Integrated Graphics", label: "Integrated Graphics" },
+  { value: "NVIDIA GeForce RTX 4090", label: "NVIDIA GeForce RTX 4090" },
+  { value: "NVIDIA GeForce RTX 4080", label: "NVIDIA GeForce RTX 4080" },
+  { value: "NVIDIA GeForce RTX 4070", label: "NVIDIA GeForce RTX 4070" },
+  { value: "NVIDIA GeForce RTX 4060", label: "NVIDIA GeForce RTX 4060" },
+  { value: "NVIDIA GeForce RTX 3090", label: "NVIDIA GeForce RTX 3090" },
+  { value: "NVIDIA GeForce RTX 3080", label: "NVIDIA GeForce RTX 3080" },
+  { value: "NVIDIA GeForce RTX 3070", label: "NVIDIA GeForce RTX 3070" },
+  { value: "NVIDIA GeForce RTX 3060", label: "NVIDIA GeForce RTX 3060" },
+  { value: "AMD Radeon RX 7900", label: "AMD Radeon RX 7900" },
+  { value: "AMD Radeon RX 7800", label: "AMD Radeon RX 7800" },
+  { value: "AMD Radeon RX 7700", label: "AMD Radeon RX 7700" },
+  { value: "AMD Radeon RX 7600", label: "AMD Radeon RX 7600" },
+  { value: "AMD Radeon RX 6900", label: "AMD Radeon RX 6900" },
+  { value: "AMD Radeon RX 6800", label: "AMD Radeon RX 6800" }
+];
+
+// Computer Operating System options
+const computerOS = [
+  { value: "Windows 11", label: "Windows 11" },
+  { value: "Windows 10", label: "Windows 10" },
+  { value: "macOS", label: "macOS" },
+  { value: "Chrome OS", label: "Chrome OS" },
+  { value: "Linux", label: "Linux" },
+  { value: "Ubuntu", label: "Ubuntu" },
+  { value: "No Operating System", label: "No Operating System" }
+];
+
 // Fields to display based on main category
 const categoryFields = computed(() => {
   if (!form.mainCategory) return [];
 
-  switch (form.mainCategory) {
-    case "Electronics":
-      const brand = form.brand;
-      const isApple = brand === 'Apple';
-      const isSamsung = brand === 'Samsung';
-      const isGoogle = brand === 'Google';
-      const isOther = brand === 'Other';
+  // Check if the category path contains "computers" or "laptops"
+  const isComputerCategory = displayCategoryPath.value.toLowerCase().includes("computer") || 
+                            displayCategoryPath.value.toLowerCase().includes("laptop") ||
+                            displayCategoryPath.value.toLowerCase().includes("desktop");
 
-      // Initialize model, storage, color fields
-      let modelField = { 
-        name: "model", 
-        label: "Model", 
+  // Check if the category path contains "mobile phones"
+  const isMobilePhoneCategory = displayCategoryPath.value.toLowerCase().includes("mobile phone") || 
+                               displayCategoryPath.value.toLowerCase().includes("smartphone");
+
+  if (isComputerCategory) {
+    const brand = form.brand;
+    const isApple = brand === 'Apple';
+    const isDell = brand === 'Dell';
+    const isHP = brand === 'HP';
+    const isLenovo = brand === 'Lenovo';
+    const isAsus = brand === 'Asus';
+    const isMicrosoft = brand === 'Microsoft';
+    const isAcer = brand === 'Acer';
+    const isMSI = brand === 'MSI';
+    const isSamsung = brand === 'Samsung';
+    const isOther = brand === 'Other';
+
+    // Initialize model field
+    let modelField = { 
+      name: "model", 
+      label: "Model", 
+      type: "select",
+      options: [],
+      required: true 
+    };
+
+    // Set model options based on selected brand
+    if (isApple) {
+      modelField.options = AppleComputerModels;
+    } else if (isDell) {
+      modelField.options = DellComputerModels;
+    } else if (isHP) {
+      modelField.options = HPComputerModels;
+    } else if (isLenovo) {
+      modelField.options = LenovoComputerModels;
+    } else if (isAsus) {
+      modelField.options = AsusComputerModels;
+    } else if (isMicrosoft) {
+      modelField.options = MicrosoftComputerModels;
+    } else if (isAcer) {
+      modelField.options = AcerComputerModels;
+    } else if (isMSI) {
+      modelField.options = MSIComputerModels;
+    } else if (isSamsung) {
+      modelField.options = SamsungComputerModels;
+    } else if (isOther) {
+      modelField.type = "text";
+      modelField.options = undefined;
+    } else {
+      modelField.required = false;
+    }
+
+    return [
+      { 
+        name: "brand", 
+        label: "Brand", 
         type: "select",
-        options: [],
+        options: computerBrands,
         required: true 
-      };
-
-      let storageField = { 
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      modelField,
+      { 
+        name: "processor", 
+        label: "Processor", 
+        type: "select",
+        options: computerProcessors,
+        required: false 
+      },
+      { 
+        name: "ram", 
+        label: "RAM", 
+        type: "select",
+        options: computerRAM,
+        required: false 
+      },
+      { 
         name: "storage", 
         label: "Storage", 
         type: "select",
-        options: [],
+        options: computerStorage,
         required: false 
-      };
-
-      let colorField = { 
-        name: "color", 
-        label: "Color", 
+      },
+      { 
+        name: "graphicsCard", 
+        label: "Graphics Card", 
         type: "select",
-        options: [],
+        options: computerGraphicsCards,
         required: false 
-      };
+      },
+      { 
+        name: "screenSize", 
+        label: "Screen Size", 
+        type: "text",
+        required: false 
+      },
+      { 
+        name: "operatingSystem", 
+        label: "Operating System", 
+        type: "select",
+        options: computerOS,
+        required: false 
+      },
+      { 
+        name: "condition", 
+        label: "Condition", 
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" }
+        ],
+        required: true 
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      { name: "description", label: "Description", type: "textarea", required: true }
+    ];
+  } else if (isMobilePhoneCategory || form.mainCategory === "Electronics") {
+    const brand = form.brand;
+    const isApple = brand === 'Apple';
+    const isSamsung = brand === 'Samsung';
+    const isGoogle = brand === 'Google';
+    const isOther = brand === 'Other';
 
-      if (isApple) {
-        modelField.options = Object.values(iPhoneModels).flat();
-        storageField.options = iPhoneStorage;
-        storageField.required = true;
-        colorField.options = iPhoneColors;
-        colorField.required = true;
-      } else if (isSamsung) {
-        modelField.options = Object.values(SamsungModels).flat();
-        storageField.options = SamsungStorage;
-        storageField.required = true;
-        colorField.options = SamsungColors;
-        colorField.required = true;
-      } else if (isGoogle) {
-        modelField.options = Object.values(GooglePixelModels).flat();
-        storageField.options = GooglePixelStorage;
-        storageField.required = true;
-        colorField.options = GooglePixelColors;
-        colorField.required = true;
-      } else if (isOther) {
-        // For 'Other' brands, use text inputs
-        modelField.type = "text";
-        modelField.options = undefined;
-        storageField.type = "text";
-        storageField.required = false;
-        colorField.type = "text";
-        colorField.required = false;
-      } else {
-        // Default case, maybe brand not selected yet
-        modelField.required = false;
-        storageField.required = false;
-        colorField.required = false;
-      }
+    // Initialize model, storage, color fields
+    let modelField = { 
+      name: "model", 
+      label: "Model", 
+      type: "select",
+      options: [],
+      required: true 
+    };
 
-      return [
-        { 
-          name: "brand", 
-          label: "Brand", 
-          type: "select",
-          options: [
-            { value: "Apple", label: "Apple" },
-            { value: "Samsung", label: "Samsung" },
-            { value: "Google", label: "Google" },
-            { value: "Xiaomi", label: "Xiaomi" },
-            { value: "Other", label: "Other" }
-          ],
-          required: true 
-        },
-        { name: "title", label: "Title", type: "text", required: true },
-        modelField,
-        storageField,
-        colorField,
-        { 
-          name: "condition", 
-          label: "Condition", 
-          type: "select",
-          options: [
-            { value: "new", label: "New" },
-            { value: "used", label: "Used" },
-            { value: "refurbished", label: "Refurbished" }
-          ],
-          required: true 
-        },
-        { name: "price", label: "Price", type: "number", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true }
-      ];
-    // ... other categories remain the same
+    let storageField = { 
+      name: "storage", 
+      label: "Storage", 
+      type: "select",
+      options: [],
+      required: true 
+    };
+
+    let colorField = { 
+      name: "color", 
+      label: "Color", 
+      type: "select",
+      options: [],
+      required: true 
+    };
+
+    if (isApple) {
+      modelField.options = Object.values(iPhoneModels).flat();
+      storageField.options = iPhoneStorage;
+      colorField.options = iPhoneColors;
+    } else if (isSamsung) {
+      modelField.options = Object.values(SamsungModels).flat();
+      storageField.options = SamsungStorage;
+      colorField.options = SamsungColors;
+    } else if (isGoogle) {
+      modelField.options = Object.values(GooglePixelModels).flat();
+      storageField.options = GooglePixelStorage;
+      colorField.options = GooglePixelColors;
+    } else if (isOther) {
+      // For 'Other' brands, use text inputs
+      modelField.type = "text";
+      modelField.options = undefined;
+      storageField.type = "text";
+      colorField.type = "text";
+    } else {
+      // Default case, maybe brand not selected yet
+      modelField.required = false;
+      storageField.required = false;
+      colorField.required = false;
+    }
+
+    return [
+      { 
+        name: "brand", 
+        label: "Brand", 
+        type: "select",
+        options: [
+          { value: "Apple", label: "Apple" },
+          { value: "Samsung", label: "Samsung" },
+          { value: "Google", label: "Google" },
+          { value: "Other", label: "Other" }
+        ],
+        required: true 
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      modelField,
+      storageField,
+      colorField,
+      { 
+        name: "condition", 
+        label: "Condition", 
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" }
+        ],
+        required: true 
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      { name: "description", label: "Description", type: "textarea", required: true }
+    ];
+  } else if (form.mainCategory === "Vehicles") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "year", label: "Year", type: "number", required: true },
+      { name: "mileage", label: "Mileage (km)", type: "number", required: true },
+      { 
+        name: "transmission", 
+        label: "Transmission", 
+        type: "select",
+        options: [
+          { value: "Automatic", label: "Automatic" },
+          { value: "Manual", label: "Manual" },
+          { value: "Semi-Automatic", label: "Semi-Automatic" }
+        ],
+        required: true 
+      },
+      { 
+        name: "fuelType", 
+        label: "Fuel Type", 
+        type: "select",
+        options: [
+          { value: "Petrol", label: "Petrol" },
+          { value: "Diesel", label: "Diesel" },
+          { value: "Electric", label: "Electric" },
+          { value: "Hybrid", label: "Hybrid" }
+        ],
+        required: true 
+      },
+      { 
+        name: "condition", 
+        label: "Condition", 
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" }
+        ],
+        required: true 
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      { name: "description", label: "Description", type: "textarea", required: true }
+    ];
+  } else if (form.mainCategory === "Real Estate") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "propertySize", label: "Property Size (sq ft)", type: "number", required: true },
+      { name: "bedrooms", label: "Bedrooms", type: "number", required: true },
+      { name: "bathrooms", label: "Bathrooms", type: "number", required: true },
+      { 
+        name: "condition", 
+        label: "Condition", 
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "under construction", label: "Under Construction" }
+        ],
+        required: true 
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      { name: "description", label: "Description", type: "textarea", required: true }
+    ];
+  } else if (form.mainCategory === "Fashion") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "size", label: "Size", type: "text", required: true },
+      { name: "color", label: "Color", type: "text", required: true },
+      { name: "material", label: "Material", type: "text", required: false },
+      { 
+        name: "condition", 
+        label: "Condition", 
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" }
+        ],
+        required: true 
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      { name: "description", label: "Description", type: "textarea", required: true }
+    ];
+  } else if (form.mainCategory === "Furniture") {
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "dimensions", label: "Dimensions", type: "text", required: false },
+      { name: "material", label: "Material", type: "text", required: false },
+      { name: "style", label: "Style", type: "text", required: false },
+      { 
+        name: "condition", 
+        label: "Condition", 
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" }
+        ],
+        required: true 
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      { name: "description", label: "Description", type: "textarea", required: true }
+    ];
+  } else if (form.mainCategory === "Jobs") {
+    return [
+      { name: "title", label: "Job Title", type: "text", required: true },
+      { name: "salary", label: "Salary", type: "text", required: false },
+      { 
+        name: "employmentType", 
+        label: "Employment Type", 
+        type: "select",
+        options: [
+          { value: "Full-time", label: "Full-time" },
+          { value: "Part-time", label: "Part-time" },
+          { value: "Contract", label: "Contract" },
+          { value: "Temporary", label: "Temporary" },
+          { value: "Internship", label: "Internship" }
+        ],
+        required: true 
+      },
+      { 
+        name: "experienceLevel", 
+        label: "Experience Level", 
+        type: "select",
+        options: [
+          { value: "Entry Level", label: "Entry Level" },
+          { value: "Mid Level", label: "Mid Level" },
+          { value: "Senior Level", label: "Senior Level" },
+          { value: "Executive", label: "Executive" }
+        ],
+        required: true 
+      },
+      { name: "description", label: "Job Description", type: "textarea", required: true }
+    ];
+  } else {
+    // Default fields for other categories
+    return [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "price", label: "Price", type: "number", required: true },
+      { name: "description", label: "Description", type: "textarea", required: true }
+    ];
   }
 });
 
