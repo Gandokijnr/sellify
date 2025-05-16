@@ -214,17 +214,18 @@
                 <div class="mt-4 pt-4 border-t border-gray-100">
                   <div class="flex items-center justify-between text-sm mb-2">
                     <span class="text-gray-500">Profile completeness</span>
-                    <span class="text-gray-900 font-medium">75%</span>
+                    <span class="text-gray-900 font-medium">{{ profileCompleteness }}%</span>
                   </div>
                   <div class="w-full bg-gray-200 rounded-full h-2">
                     <div
                       class="bg-teal-600 h-2 rounded-full"
-                      style="width: 75%"
+                      :style="{ width: `${profileCompleteness}%` }"
                     ></div>
                   </div>
                   <div class="mt-4">
                     <router-link
-                      to="/account/profile"
+                      v-if="profileCompleteness < 100"
+                      to="/profile"
                       class="text-sm font-medium text-teal-600 hover:text-teal-700"
                     >
                       Complete your profile →
@@ -293,7 +294,7 @@
                     >
                   </button>
                   <button
-                    @click="$router.push('/messages')"
+                    @click="$router.push('/chats')"
                     class="flex flex-col items-center justify-center p-4 rounded-lg hover:bg-gray-50 transition"
                   >
                     <EnvelopeIcon class="h-8 w-8 text-teal-600 mb-2" />
@@ -302,7 +303,7 @@
                     >
                   </button>
                   <button
-                    @click="$router.push('/account/profile')"
+                    @click="$router.push('/profile')"
                     class="flex flex-col items-center justify-center p-4 rounded-lg hover:bg-gray-50 transition"
                   >
                     <UserCircleIcon class="h-8 w-8 text-teal-600 mb-2" />
@@ -311,7 +312,7 @@
                     >
                   </button>
                   <button
-                    @click="$router.push('/seller/analytics')"
+                    @click="$router.push('/seller/dashboard')"
                     class="flex flex-col items-center justify-center p-4 rounded-lg hover:bg-gray-50 transition"
                   >
                     <ChartBarIcon class="h-8 w-8 text-teal-600 mb-2" />
@@ -389,12 +390,13 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
   orderBy,
   limit,
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import { db } from "@/firebase/config"; // Using the correct import path
+import { db } from "@/firebase/config"; 
 import Navbar from "@/components/common/Navbar.vue";
 import Modal from "@/components/common/Modal.vue";
 import StatsCard from "@/components/dashboard/StatsCard.vue";
@@ -420,15 +422,42 @@ const messages = ref([]);
 
 // Computed property for formatted member since date
 const memberSince = computed(() => {
-  return authStore.user?.metadata?.creationTime
-    ? new Date(authStore.user.metadata.creationTime).toLocaleDateString(
-        "en-US",
-        {
-          month: "long",
-          year: "numeric",
-        }
-      )
-    : "N/A";
+  const firestoreDate = authStore.user?.createdAt;
+  if (firestoreDate) {
+    const date = firestoreDate instanceof Date 
+      ? firestoreDate 
+      : firestoreDate.toDate();
+    
+    return date.toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric",
+      }
+    );
+  }
+
+  const authDate = authStore.user?.metadata?.creationTime;
+  if (authDate) {
+    const date = new Date(authDate);
+    return date.toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        year: "numeric",
+      }
+    );
+  }
+
+  return "N/A";
+});
+
+const profileCompleteness = computed(() => {
+  const user = authStore.user;
+  if (!user) return 0;
+  
+  // Check if user has phone number
+  return user.phoneNumber ? 100 : 75;
 });
 
 const fetchDashboardData = async () => {
@@ -439,6 +468,16 @@ const fetchDashboardData = async () => {
 
     if (!authStore.user?.uid) {
       throw new Error("User not authenticated");
+    }
+
+    // Fetch user profile data
+    const userRef = doc(db, "users", authStore.user.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+
+    // Update authStore with user data
+    if (userData) {
+      authStore.user = { ...authStore.user, ...userData };
     }
 
     // Fetch user listings
