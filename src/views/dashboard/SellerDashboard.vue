@@ -1,204 +1,389 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-gray-50">
     <Navbar />
 
-    <div class="py-10">
+    <!-- Main Content -->
+    <div class="pt-6 pb-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center mb-6">
-          <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <router-link
-            to="/seller/listings/create"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-700 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-jiji-primary"
-          >
-            <PlusIcon class="-ml-1 mr-2 h-5 w-5" />
-            New Listing
-          </router-link>
-        </div>
-
-        <!-- Loading State -->
-        <div v-if="loading" class="flex justify-center py-12">
+        <!-- Page Header -->
+        <div class="mb-8">
           <div
-            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600"
-          ></div>
-        </div>
-
-        <!-- Error State -->
-        <div
-          v-else-if="error"
-          class="bg-red-50 border-l-4 border-red-400 p-4 mb-6"
-        >
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <ExclamationCircleIcon class="h-5 w-5 text-red-400" />
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-red-700">
-                {{ error }}
-                <a
-                  href="#"
-                  @click="fetchDashboardData"
-                  class="font-medium text-red-700 underline"
-                  >Try again</a
-                >
+            class="flex flex-col md:flex-row md:items-center md:justify-between"
+          >
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900">Seller Dashboard</h1>
+              <p class="mt-1 text-sm text-gray-500">
+                Manage your listings and track your performance
               </p>
+            </div>
+            <div class="mt-4 md:mt-0">
+              <button
+                @click="$router.push('/seller/listings/create')"
+                class="inline-flex items-center px-4 py-2 rounded-lg shadow-sm text-white bg-teal-600 hover:bg-teal-700 transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+              >
+                <PlusIcon class="h-5 w-5 mr-2" />
+                <span>Create New Listing</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Success alert -->
-        <div
-          v-if="successMessage"
-          class="bg-teal-50 border-l-4 border-teal-400 p-4 mb-6"
-        >
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <CheckCircleIcon class="h-5 w-5 text-teal-400" />
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-teal-700">
-                {{ successMessage }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dashboard Content -->
-        <template v-else>
-          <!-- Stats Cards -->
+        <!-- Global Alert Container -->
+        <TransitionGroup name="fade">
+          <!-- Loading State -->
           <div
-            class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8"
+            v-if="loading"
+            key="loading-alert"
+            class="flex items-center justify-center p-4 mb-6 bg-white shadow-sm rounded-lg border border-gray-100"
           >
-            <DashboardCard
-              title="Total Listings"
-              :value="stats.totalListings"
-              icon="ChartBarIcon"
-              color="bg-blue-500"
-            />
-            <DashboardCard
-              title="Active Listings"
-              :value="stats.activeListings"
-              icon="CheckCircleIcon"
-              color="bg-teal-500"
-            />
-            <DashboardCard
-              title="Messages"
-              :value="stats.messages"
-              icon="ChatAltIcon"
-              color="bg-teal-500"
-            />
-            <DashboardCard
-              title="Total Views"
-              :value="stats.totalViews"
-              icon="EyeIcon"
-              color="bg-teal-500"
-            />
+            <div
+              class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-teal-600 mr-3"
+            ></div>
+            <p class="text-gray-600 font-medium">
+              Loading your dashboard data...
+            </p>
           </div>
 
-          <!-- Delete Confirmation Modal -->
+          <!-- Error State -->
           <div
-            v-if="showDeleteModal"
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+            v-if="error"
+            key="error-alert"
+            class="p-4 mb-6 bg-white shadow-sm rounded-lg border-l-4 border-red-500"
           >
-            <div class="bg-white rounded-lg p-6 max-w-md w-full">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">
-                Confirm Deletion
-              </h3>
-              <p class="text-gray-500 mb-6">
-                Are you sure you want to delete this listing? This action cannot
-                be undone.
-              </p>
-              <div class="flex justify-end space-x-3">
-                <button
-                  @click="showDeleteModal = false"
-                  class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  @click="confirmDelete"
-                  class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  Delete
-                </button>
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <ExclamationCircleIcon class="h-5 w-5 text-red-500" />
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-gray-900">Error</h3>
+                <p class="mt-1 text-sm text-gray-600">
+                  {{ error }}
+                </p>
+                <div class="mt-2">
+                  <button
+                    @click="fetchDashboardData"
+                    class="text-sm font-medium text-red-600 hover:text-red-500"
+                  >
+                    Try again
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Recent Listings -->
-          <div class="bg-white shadow rounded-lg overflow-auto">
-            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Your Recent Listings
-              </h3>
-              <p class="mt-1 text-sm text-gray-500">
-                Showing your {{ listings.length }} most recent listings
-              </p>
+          <!-- Success Message -->
+          <div
+            v-if="successMessage"
+            key="success-alert"
+            class="p-4 mb-6 bg-white shadow-sm rounded-lg border-l-4 border-teal-500"
+          >
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <CheckCircleIcon class="h-5 w-5 text-teal-500" />
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-gray-900">Success</h3>
+                <p class="mt-1 text-sm text-gray-600">
+                  {{ successMessage }}
+                </p>
+              </div>
             </div>
-            <div v-if="listings.length === 0" class="px-4 py-12 text-center">
-              <p class="text-gray-500">You haven't created any listings yet.</p>
-              <router-link
-                to="/seller/listings/create"
-                class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-700 hover:bg-teal-700"
-              >
-                Create your first listing
-              </router-link>
-            </div>
-            <div v-else class="divide-y divide-gray-200">
-              <ListingItem
-                v-for="listing in listings"
-                :key="listing.id"
-                :listing="listing"
-                @edit="handleEditListing"
-                @delete="openDeleteModal"
+          </div>
+        </TransitionGroup>
+
+        <!-- Dashboard Grid Layout -->
+        <div
+          v-if="!loading && !error"
+          class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        >
+          <!-- Stats and Activity Column -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <StatsCard
+                title="Total Listings"
+                :value="stats.totalListings"
+                icon="DocumentTextIcon"
+                color="bg-blue-600"
+              />
+              <StatsCard
+                title="Active Listings"
+                :value="stats.activeListings"
+                icon="CheckCircleIcon"
+                color="bg-teal-600"
+                valueLabel="Listings"
+              />
+              <StatsCard
+                title="Unread Messages"
+                :value="stats.messages"
+                icon="ChatBubbleLeftIcon"
+                color="bg-indigo-600"
+                valueLabel="Messages"
+              />
+              <StatsCard
+                title="Total Views"
+                :value="stats.totalViews"
+                icon="EyeIcon"
+                color="bg-amber-500"
+                valueLabel="Views"
               />
             </div>
+
+            <!-- Recent Listings Section -->
             <div
-              v-if="listings.length > 0"
-              class="px-4 py-4 sm:px-6 bg-gray-50 text-right"
+              class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
             >
-              <router-link
-                to="/listings"
-                class="text-sm font-medium text-jiji-primary hover:text-teal-700"
+              <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-lg font-semibold text-gray-900">
+                    Recent Listings
+                  </h2>
+                  <router-link
+                    to="/seller/listings"
+                    class="text-sm font-medium text-teal-600 hover:text-teal-700"
+                  >
+                    View All
+                  </router-link>
+                </div>
+              </div>
+
+              <div
+                v-if="listings.length === 0"
+                class="p-12 flex flex-col items-center justify-center"
               >
-                View all listings →
-              </router-link>
+                <div class="h-20 w-20 text-gray-300 mb-4">
+                  <DocumentPlusIcon class="h-full w-full" />
+                </div>
+                <p class="text-gray-500 mb-4 text-center">
+                  You haven't created any listings yet.
+                </p>
+                <router-link
+                  to="/seller/listings/create"
+                  class="px-4 py-2 text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 transition"
+                >
+                  Create your first listing
+                </router-link>
+              </div>
+
+              <div v-else>
+                <div class="px-6">
+                  <ul class="divide-y divide-gray-100">
+                    <ListingRow
+                      v-for="listing in listings"
+                      :key="listing.id"
+                      :listing="listing"
+                      @edit="handleEditListing"
+                      @delete="openDeleteModal"
+                    />
+                  </ul>
+                </div>
+                <div class="p-4 bg-gray-50 text-right">
+                  <router-link
+                    to="/seller/listings"
+                    class="text-sm font-medium text-teal-600 hover:text-teal-700"
+                  >
+                    See all listings →
+                  </router-link>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Recent Messages -->
-          <!-- <div class="mt-8 bg-white shadow rounded-lg overflow-hidden opacity-20">
-            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Recent Messages
-              </h3>
+          <!-- Right Sidebar -->
+          <div class="space-y-6">
+            <!-- Profile Summary -->
+            <div
+              class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+            >
+              <div class="p-6">
+                <div class="flex items-center">
+                  <div
+                    class="h-14 w-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-600"
+                  >
+                    <UserIcon class="h-8 w-8" />
+                  </div>
+                  <div class="ml-4">
+                    <h2 class="text-lg font-semibold text-gray-900">
+                      {{ authStore.user?.displayName || "Seller" }}
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                      Member since {{ memberSince }}
+                    </p>
+                  </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                  <div class="flex items-center justify-between text-sm mb-2">
+                    <span class="text-gray-500">Profile completeness</span>
+                    <span class="text-gray-900 font-medium">75%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      class="bg-teal-600 h-2 rounded-full"
+                      style="width: 75%"
+                    ></div>
+                  </div>
+                  <div class="mt-4">
+                    <router-link
+                      to="/account/profile"
+                      class="text-sm font-medium text-teal-600 hover:text-teal-700"
+                    >
+                      Complete your profile →
+                    </router-link>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div v-if="messages.length === 0" class="px-4 py-12 text-center">
-              <p class="text-gray-500">You don't have any messages yet.</p>
+
+            <!-- Recent Messages -->
+            <div
+              class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+            >
+              <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-lg font-semibold text-gray-900">
+                    Recent Messages
+                  </h2>
+                  <router-link
+                    to="/messages"
+                    class="text-sm font-medium text-teal-600 hover:text-teal-700"
+                  >
+                    View All
+                  </router-link>
+                </div>
+              </div>
+
+              <div
+                v-if="messages.length === 0"
+                class="p-8 flex flex-col items-center justify-center"
+              >
+                <div class="h-16 w-16 text-gray-300 mb-2">
+                  <ChatBubbleLeftRightIcon class="h-full w-full" />
+                </div>
+                <p class="text-gray-500 text-center">No messages yet</p>
+              </div>
+
+              <div v-else class="divide-y divide-gray-100">
+                <MessagePreview
+                  v-for="message in messages"
+                  :key="message.id"
+                  :message="message"
+                  @click="handleMessageClick"
+                />
+              </div>
             </div>
-            <div v-else class="divide-y divide-gray-200">
-              <MessageItem
-                v-for="message in messages"
-                :key="message.id"
-                :message="message"
-                @click="handleMessageClick"
-              />
+
+            <!-- Quick Actions -->
+            <div
+              class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+            >
+              <div class="p-6 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Quick Actions
+                </h2>
+              </div>
+              <div class="p-4">
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    @click="$router.push('/seller/listings/create')"
+                    class="flex flex-col items-center justify-center p-4 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <PlusCircleIcon class="h-8 w-8 text-teal-600 mb-2" />
+                    <span class="text-sm font-medium text-gray-700"
+                      >New Listing</span
+                    >
+                  </button>
+                  <button
+                    @click="$router.push('/messages')"
+                    class="flex flex-col items-center justify-center p-4 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <EnvelopeIcon class="h-8 w-8 text-teal-600 mb-2" />
+                    <span class="text-sm font-medium text-gray-700"
+                      >Messages</span
+                    >
+                  </button>
+                  <button
+                    @click="$router.push('/account/profile')"
+                    class="flex flex-col items-center justify-center p-4 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <UserCircleIcon class="h-8 w-8 text-teal-600 mb-2" />
+                    <span class="text-sm font-medium text-gray-700"
+                      >My Profile</span
+                    >
+                  </button>
+                  <button
+                    @click="$router.push('/seller/analytics')"
+                    class="flex flex-col items-center justify-center p-4 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <ChartBarIcon class="h-8 w-8 text-teal-600 mb-2" />
+                    <span class="text-sm font-medium text-gray-700"
+                      >Analytics</span
+                    >
+                  </button>
+                </div>
+              </div>
             </div>
-          </div> -->
-        </template>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <Modal v-if="showDeleteModal" :visible="showDeleteModal" @close="showDeleteModal = false">
+      <div class="p-6">
+        <div
+          class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4"
+        >
+          <ExclamationTriangleIcon class="h-6 w-6 text-red-600" />
+        </div>
+        <h3 class="text-lg font-medium text-center text-gray-900 mb-2">
+          Delete Listing
+        </h3>
+        <p class="text-sm text-gray-500 text-center mb-6">
+          Are you sure you want to delete this listing? This action cannot be
+          undone.
+        </p>
+        <div class="flex justify-end space-x-3">
+          <button
+            @click="showDeleteModal = false"
+            class="px-4 py-2 text-sm font-medium rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            @click="confirmDelete"
+            class="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700"
+          >
+            Delete Listing
+          </button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import {
   PlusIcon,
   ExclamationCircleIcon,
   CheckCircleIcon,
-} from "@heroicons/vue/24/solid";
+  UserIcon,
+  DocumentTextIcon,
+  EyeIcon,
+  ChatBubbleLeftIcon,
+  ChatBubbleLeftRightIcon,
+  DocumentPlusIcon,
+  PlusCircleIcon,
+  EnvelopeIcon,
+  UserCircleIcon,
+  ChartBarIcon,
+  ExclamationTriangleIcon,
+  PencilIcon,
+  TrashIcon,
+  PhotoIcon,
+} from "@heroicons/vue/24/outline";
 import {
   collection,
   query,
@@ -209,11 +394,12 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import { db } from "@/firebase";
+import { db } from "@/firebase/config"; // Using the correct import path
 import Navbar from "@/components/common/Navbar.vue";
-import DashboardCard from "@/components/dashboard/DashboardCard.vue";
-import ListingItem from "@/components/listings/ListingItem.vue";
-import MessageItem from "@/components/messages/MessageItem.vue";
+import Modal from "@/components/common/Modal.vue";
+import StatsCard from "@/components/dashboard/StatsCard.vue";
+import ListingRow from "@/components/dashboard/ListingRow.vue";
+import MessagePreview from "@/components/dashboard/MessagePreview.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -231,6 +417,19 @@ const stats = ref({
 });
 const listings = ref([]);
 const messages = ref([]);
+
+// Computed property for formatted member since date
+const memberSince = computed(() => {
+  return authStore.user?.metadata?.creationTime
+    ? new Date(authStore.user.metadata.creationTime).toLocaleDateString(
+        "en-US",
+        {
+          month: "long",
+          year: "numeric",
+        }
+      )
+    : "N/A";
+});
 
 const fetchDashboardData = async () => {
   try {
@@ -259,6 +458,9 @@ const fetchDashboardData = async () => {
           ? doc.data().images[0]
           : "",
       date: doc.data().createdAt?.toDate().toLocaleDateString() || "N/A",
+      // Add additional formatted properties for the new UI
+      price: formatPrice(doc.data().price),
+      statusBadgeColor: getStatusColor(doc.data().status),
     }));
 
     // Calculate stats
@@ -271,6 +473,7 @@ const fetchDashboardData = async () => {
       0
     );
 
+    // Sample messages data
     messages.value = [
       {
         id: 1,
@@ -279,6 +482,7 @@ const fetchDashboardData = async () => {
         preview: "Is this still available? I can pay ₦400,000 cash...",
         date: "2 hours ago",
         read: false,
+        avatar: null, // Will use initial fallback
       },
       {
         id: 2,
@@ -287,9 +491,10 @@ const fetchDashboardData = async () => {
         preview: "Can you send me more pictures of the laptop?",
         date: "1 day ago",
         read: true,
+        avatar: null,
       },
     ];
-    stats.value.messages = messages.value.length;
+    stats.value.messages = messages.value.filter((m) => !m.read).length;
   } catch (err) {
     console.error("Dashboard error:", err);
     error.value = err.message || "Failed to load dashboard data";
@@ -298,8 +503,37 @@ const fetchDashboardData = async () => {
   }
 };
 
+// Helper functions for formatting
+const formatPrice = (price) => {
+  if (!price) return "N/A";
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    maximumFractionDigits: 0,
+  }).format(price);
+};
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case "active":
+      return "bg-green-100 text-green-800";
+    case "pending":
+      return "bg-yellow-100 text-yellow-800";
+    case "sold":
+      return "bg-blue-100 text-blue-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 const handleEditListing = (id) => {
   router.push(`/seller/listings/edit/${id}`);
+};
+
+const closeModal = () => {
+  showDeleteModal.value = false;
+  pendingDeleteId.value = null;
+  error.value = null;
 };
 
 const openDeleteModal = (id) => {
@@ -314,9 +548,8 @@ const confirmDelete = async () => {
     await deleteListing(pendingDeleteId.value);
     successMessage.value = "Listing deleted successfully!";
 
-    // Hide modal after successful deletion
-    showDeleteModal.value = false;
-    pendingDeleteId.value = null;
+    // Close modal after successful deletion
+    closeModal();
 
     // Wait a moment and refresh data
     setTimeout(() => {
@@ -327,41 +560,54 @@ const confirmDelete = async () => {
     console.error("Delete error:", err);
     error.value =
       "Failed to delete listing: " + (err.message || "Unknown error");
-    showDeleteModal.value = false;
+    closeModal();
   }
 };
 
 const deleteListing = async (id) => {
-  // Reference to the specific document to delete
-  const listingRef = doc(db, "listings", id);
+  try {
+    // Reference to the specific document to delete
+    const listingRef = doc(db, "listings", id);
 
-  // Delete the document from Firestore
-  await deleteDoc(listingRef);
+    // Delete the document from Firestore
+    await deleteDoc(listingRef);
 
-  // Update local state
-  listings.value = listings.value.filter((listing) => listing.id !== id);
-  stats.value.totalListings -= 1;
+    // Update local state
+    listings.value = listings.value.filter((listing) => listing.id !== id);
+    stats.value.totalListings -= 1;
 
-  // If the deleted listing was active, update active listings count
-  const deletedListing = listings.value.find((listing) => listing.id === id);
-  if (deletedListing && deletedListing.status === "active") {
-    stats.value.activeListings -= 1;
+    // If the deleted listing was active, update active listings count
+    const deletedListing = listings.value.find((listing) => listing.id === id);
+    if (deletedListing && deletedListing.status === "active") {
+      stats.value.activeListings -= 1;
+    }
+
+    console.log(`Successfully deleted listing with ID: ${id}`);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting listing with ID ${id}:`, error);
+    throw error;
   }
 };
 
 const handleMessageClick = (message) => {
   console.log("Message clicked:", message);
-};
-
-// Clear success message after a few seconds
-const showSuccessMessage = (message) => {
-  successMessage.value = message;
-  setTimeout(() => {
-    successMessage.value = "";
-  }, 3000);
+  router.push(`/messages/${message.id}`);
 };
 
 onMounted(() => {
   fetchDashboardData();
 });
 </script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
