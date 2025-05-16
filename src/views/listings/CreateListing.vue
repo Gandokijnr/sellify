@@ -778,7 +778,7 @@ const submitForm = async () => {
 
 const goToStep = (step) => {
   // Only allow going to details if a leaf category is selected
-  if (step === "details") {
+  if (step === "details" && !isLeafCategorySelected.value) {
     toast.warning("Please select a specific category before continuing", {
       timeout: 3000,
     });
@@ -819,6 +819,8 @@ const handleCategoryChange = (categoryPath) => {
   // Reset the category structure
   categoryStructure.mainCategory = parts[0] || "";
   categoryStructure.subCategory = parts[1] || "";
+  categoryStructure.subSubCategory = parts[2] || "";
+  categoryStructure.leafCategory = parts[3] || "";
 };
 
 onMounted(() => {
