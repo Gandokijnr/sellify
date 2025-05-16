@@ -612,13 +612,12 @@ const showConditionField = computed(() => {
   ];
 
   // Check if the main category or any subcategory contains these terms
-  return conditionCategories.some(
-    (category) =>
-      form.mainCategory.includes(category) ||
-      form.subCategory.includes(category) ||
-      form.subSubCategory.includes(category) ||
-      form.leafCategory.includes(category)
-  );
+  return conditionCategories.some((category) => {
+    return (
+      form.mainCategory?.includes(category) ||
+      form.subCategory?.includes(category)
+    );
+  });
 });
 
 // Update form location when any location selection changes
@@ -725,8 +724,6 @@ const submitForm = async () => {
       price: parseFloat(form.price),
       mainCategory: form.mainCategory,
       subCategory: form.subCategory,
-      subSubCategory: form.subSubCategory,
-      leafCategory: form.leafCategory,
       // Include full category path for easier querying/filtering
       categoryPath: displayCategoryPath.value,
       condition: form.condition,
@@ -781,7 +778,7 @@ const submitForm = async () => {
 
 const goToStep = (step) => {
   // Only allow going to details if a leaf category is selected
-  if (step === "details" && !isLeafCategorySelected.value) {
+  if (step === "details") {
     toast.warning("Please select a specific category before continuing", {
       timeout: 3000,
     });
@@ -822,8 +819,6 @@ const handleCategoryChange = (categoryPath) => {
   // Reset the category structure
   categoryStructure.mainCategory = parts[0] || "";
   categoryStructure.subCategory = parts[1] || "";
-  categoryStructure.subSubCategory = parts[2] || "";
-  categoryStructure.leafCategory = parts[3] || "";
 };
 
 onMounted(() => {

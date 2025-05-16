@@ -98,7 +98,6 @@ const handleEmailRegister = async () => {
       lastName: form.value.lastName,
     });
 
-    // toast.success("Welcome to selify!");
 
     router.push("/");
   } catch (error) {
@@ -121,7 +120,6 @@ const handleGoogleSignIn = async () => {
   googleLoading.value = true;
   try {
     await authStore.handleGoogleSignIn();
-    toast.success("Welcome to selify!");
     router.push("/");
   } catch (error) {
     let errorMessage = "Google sign-in failed. Please try again.";
