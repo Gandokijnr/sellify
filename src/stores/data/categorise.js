@@ -24,10 +24,11 @@ export default {
       Types: ["Laptops", "Desktops", "Tablets"],
       Accessories: ["Keyboards", "Mice", "Cables", "Chargers", "Other"],
     },
-    "TV & Audio": {
+    TV: {
       Types: ["Televisions", "Home Theater Systems", "Speakers", "Soundbars"],
       Accessories: ["Remote Controls", "Mounts", "Cables", "Other"],
     },
+    Audio: {},
     Cameras: {
       Types: ["Digital Cameras", "DSLR Cameras", "Video Cameras"],
       Accessories: ["Lenses", "Tripods", "Batteries", "Memory Cards", "Other"],
