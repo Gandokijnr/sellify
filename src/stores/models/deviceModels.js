@@ -444,3 +444,68 @@ export const audioTypes = [
   { value: "Gold", label: "Gold" },
   { value: "Silver", label: "Silver" },
 ];
+
+// Home appliance models
+
+export const homeApplianceBrands = [
+  { value: "LG", label: "LG" },
+  { value: "Samsung", label: "Samsung" },
+  { value: "Whirlpool", label: "Whirlpool" },
+  { value: "Other", label: "Other" },
+];
+
+export const homeApplianceModels = {
+  LG: [
+    { value: "Washing Machine", label: "Washing Machine" },
+    { value: "Refrigerator", label: "Refrigerator" },
+    { value: "Air Conditioner", label: "Air Conditioner" },
+    { value: "Microwave Oven", label: "Microwave Oven" },
+    { value: "Dishwasher", label: "Dishwasher" },
+    { value: "Toaster", label: "Toaster" },
+    { value: "Blender", label: "Blender" },
+    { value: "Grill", label: "Grill" },
+  ],
+  Samsung: [
+    { value: "Washing Machine", label: "Washing Machine" },
+    { value: "Refrigerator", label: "Refrigerator" },
+    { value: "Air Conditioner", label: "Air Conditioner" },
+    { value: "Microwave Oven", label: "Microwave Oven" },
+    { value: "Dishwasher", label: "Dishwasher" },
+    { value: "Toaster", label: "Toaster" },
+    { value: "Blender", label: "Blender" },
+    { value: "Grill", label: "Grill" },
+  ],
+  Whirlpool: [
+    { value: "Washing Machine", label: "Washing Machine" },
+    { value: "Refrigerator", label: "Refrigerator" },
+    { value: "Air Conditioner", label: "Air Conditioner" },
+    { value: "Microwave Oven", label: "Microwave Oven" },
+    { value: "Dishwasher", label: "Dishwasher" },
+    { value: "Toaster", label: "Toaster" },
+    { value: "Blender", label: "Blender" },
+    { value: "Grill", label: "Grill" },
+  ],
+  Beko: [
+    { value: "Washing Machine", label: "Washing Machine" },
+    { value: "Refrigerator", label: "Refrigerator" },
+    { value: "Air Conditioner", label: "Air Conditioner" },
+    { value: "Microwave Oven", label: "Microwave Oven" },
+    { value: "Dishwasher", label: "Dishwasher" },
+    { value: "Toaster", label: "Toaster" },
+    { value: "Blender", label: "Blender" },
+    { value: "Grill", label: "Grill" },
+  ],
+  Other: [
+    { value: "Washing Machine", label: "Washing Machine" },
+    { value: "Refrigerator", label: "Refrigerator" },
+    { value: "Air Conditioner", label: "Air Conditioner" },
+    { value: "Microwave Oven", label: "Microwave Oven" },
+    { value: "Dishwasher", label: "Dishwasher" },
+    { value: "Toaster", label: "Toaster" },
+    { value: "Blender", label: "Blender" },
+    { value: "Grill", label: "Grill" },
+  ],
+};
+    
+
+

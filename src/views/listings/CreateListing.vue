@@ -37,6 +37,8 @@ import {
   computerStorage,
   computerProcessors,
   computerGraphicsCards,
+  homeApplianceModels,
+  homeApplianceBrands,
   computerOS,
   tvBrands,
   tvModels,
@@ -209,12 +211,17 @@ const categoryFields = computed(() => {
     displayCategoryPath.value.toLowerCase().includes("tv") ||
     displayCategoryPath.value.toLowerCase().includes("audio");
 
+  const isHomeApplianceCategory =
+    displayCategoryPath.value.toLowerCase().includes("home appliance");
+
   // Check if the category path contains "TV"
   const isTVCategory = displayCategoryPath.value.toLowerCase().includes("tv");
   // Check if the category path contains "Audio"
   const isAudioCategory = displayCategoryPath.value
     .toLowerCase()
     .includes("audio");
+    
+  
 
   if (isTVCategory) {
     // TV-specific fields
@@ -306,6 +313,46 @@ const categoryFields = computed(() => {
     ];
   }
 
+  if(isHomeApplianceCategory){
+    const brand = form.brand;
+    const isOther = brand === "Other";
+
+    return [
+      {
+        name: "brand",
+        label: "Brand",
+        type: "select",
+        options: homeApplianceBrands,
+        required: true,
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      {
+        name: "model",
+        label: "Model",
+        type: isOther ? "text" : "select",
+        options: brand ? homeApplianceModels[brand] || [] : [],
+        required: true,
+      },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  }
   if (isComputerCategory) {
     const brand = form.brand;
     const isApple = brand === "Apple";
