@@ -14,6 +14,8 @@ import nigeriaLocations from "@/stores/location";
 import CategorySelector from "@/components/categories/CategorySelector.vue";
 import categoriesData from "@/stores/data/categorise";
 import {
+  //phone models
+
   iPhoneModels,
   iPhoneStorage,
   iPhoneColors,
@@ -23,6 +25,8 @@ import {
   GooglePixelModels,
   GooglePixelStorage,
   GooglePixelColors,
+
+  //computer models
   computerBrands,
   AppleComputerModels,
   DellComputerModels,
@@ -37,15 +41,33 @@ import {
   computerStorage,
   computerProcessors,
   computerGraphicsCards,
+  computerOS,
+
+  //home appliance models
   homeApplianceModels,
   homeApplianceBrands,
-  computerOS,
+
+  //tv models
   tvBrands,
   tvModels,
   tvScreenSizes,
+
+  //audio models
   audioBrands,
   audioModels,
   audioTypes,
+
+  //camera models
+  cameraBrands,
+  cameraModels,
+
+  //camera fields
+  cameraMegapixels,
+  cameraSensorSize,
+  cameraLensType,
+  cameraAutofocusType,
+  cameraVideoResolution,
+  cameraBatteryLife,
 } from "@/stores/models/deviceModels";
 
 const router = useRouter();
@@ -149,6 +171,16 @@ const form = reactive({
   screenSize: "",
   operatingSystem: "",
 
+  // Camera-specific fields
+  megapixels: "",
+  sensorSize: "",
+  lensType: "",
+  autofocusType: "",
+  videoResolution: "",
+  batteryLife: "",
+  weight: "",
+  dimensions: "",
+
   // Real Estate
   propertySize: "",
   bedrooms: "",
@@ -211,8 +243,13 @@ const categoryFields = computed(() => {
     displayCategoryPath.value.toLowerCase().includes("tv") ||
     displayCategoryPath.value.toLowerCase().includes("audio");
 
-  const isHomeApplianceCategory =
-    displayCategoryPath.value.toLowerCase().includes("home appliance");
+  const isHomeApplianceCategory = displayCategoryPath.value
+    .toLowerCase()
+    .includes("home appliance");
+
+  const isCameraCategory = displayCategoryPath.value
+    .toLowerCase()
+    .includes("camera");
 
   // Check if the category path contains "TV"
   const isTVCategory = displayCategoryPath.value.toLowerCase().includes("tv");
@@ -220,9 +257,88 @@ const categoryFields = computed(() => {
   const isAudioCategory = displayCategoryPath.value
     .toLowerCase()
     .includes("audio");
-    
-  
 
+  if (isCameraCategory) {
+    const brand = form.brand;
+    const isOther = brand === "Other";
+
+    return [
+      {
+        name: "brand",
+        label: "Brand",
+        type: "select",
+        options: cameraBrands,
+        required: true,
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      {
+        name: "model",
+        label: "Model",
+        type: "select",
+        other: "text",
+        options: form.brand ? cameraModels[form.brand] || [] : [],
+        required: true,
+      },
+      {
+        name: "megapixels",
+        label: "Megapixels",
+        type: "select",
+        options: cameraMegapixels,
+      },
+      {
+        name: "sensorSize",
+        label: "Sensor Size",
+        type: "select",
+        options: cameraSensorSize,
+      },
+      {
+        name: "lensType",
+        label: "Lens Type",
+        type: "select",
+        options: cameraLensType,
+      },
+      {
+        name: "autofocusType",
+        label: "Autofocus Type",
+        type: "select",
+        options: cameraAutofocusType,
+      },
+      {
+        name: "videoResolution",
+        label: "Video Resolution",
+        type: "select",
+        options: cameraVideoResolution,
+      },
+      {
+        name: "batteryLife",
+        label: "Battery Life (hours)",
+        type: "select",
+        options: cameraBatteryLife,
+      },
+      { name: "weight", label: "Weight (grams)", type: "number" },
+      { name: "dimensions", label: "Dimensions (mm)", type: "text" },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  }
+
+  //TV
   if (isTVCategory) {
     // TV-specific fields
     return [
@@ -313,7 +429,8 @@ const categoryFields = computed(() => {
     ];
   }
 
-  if(isHomeApplianceCategory){
+  //home appliance
+  if (isHomeApplianceCategory) {
     const brand = form.brand;
     const isOther = brand === "Other";
 
@@ -329,7 +446,7 @@ const categoryFields = computed(() => {
       {
         name: "type",
         label: "Type",
-        type: isOther ? "text" : "select",
+        type: "select",
         options: brand ? homeApplianceModels[brand] || [] : [],
         required: true,
       },
@@ -353,6 +470,8 @@ const categoryFields = computed(() => {
       },
     ];
   }
+
+  //computer
   if (isComputerCategory) {
     const brand = form.brand;
     const isApple = brand === "Apple";
@@ -468,6 +587,66 @@ const categoryFields = computed(() => {
         name: "description",
         label: "Description",
         type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (isCameraCategory) {
+    return [
+      {
+        name: "brand",
+        label: "Brand",
+        type: "select",
+        options: cameraBrands,
+        required: true,
+      },
+      {
+        name: "model",
+        label: "Model",
+        type: "select",
+        options: cameraModels,
+        required: true,
+      },
+      {
+        name: "megapixels",
+        label: "Megapixels",
+        type: "number",
+        required: true,
+      },
+      {
+        name: "sensorSize",
+        label: "Sensor Size",
+        type: "text",
+        required: true,
+      },
+      { name: "lensType", label: "Lens Type", type: "text", required: true },
+      {
+        name: "autofocusType",
+        label: "Autofocus Type",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "videoResolution",
+        label: "Video Resolution",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "batteryLife",
+        label: "Battery Life (hours)",
+        type: "number",
+        required: true,
+      },
+      {
+        name: "weight",
+        label: "Weight (grams)",
+        type: "number",
+        required: true,
+      },
+      {
+        name: "dimensions",
+        label: "Dimensions (mm)",
+        type: "text",
         required: true,
       },
     ];
@@ -1013,7 +1192,7 @@ onMounted(() => {
           </button>
           <button
             type="button"
-            @click="goToStep('location')"
+            @click="goToStep('details')"
             class="px-6 py-2 bg-green-900 text-white rounded-lg hover:bg-jiji-primary-dark transition-colors"
           >
             Continue

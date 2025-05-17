@@ -439,10 +439,6 @@ export const audioTypes = [
   { value: "Speaker", label: "Speaker" },
   { value: "Home Audio", label: "Home Audio" },
   { value: "Car Audio", label: "Car Audio" },
-  { value: "Green", label: "Green" },
-  { value: "teal", label: "teal" },
-  { value: "Gold", label: "Gold" },
-  { value: "Silver", label: "Silver" },
 ];
 
 // Home appliance models
@@ -507,6 +503,99 @@ export const homeApplianceModels = {
   ],
 };
     
+//camera models
 
+export const cameraBrands = [
+  { value: "Sony", label: "Sony" },
+  { value: "Canon", label: "Canon" },
+  { value: "Nikon", label: "Nikon" },
+  { value: "Other", label: "Other" },
+];
+
+export const cameraModels = {
+  Sony: [
+    { value: "Alpha 1", label: "Alpha 1" },
+    { value: "Alpha 7 IV", label: "Alpha 7 IV" },
+    { value: "Alpha 7 III", label: "Alpha 7 III" },
+    { value: "Alpha 7 II", label: "Alpha 7 II" },
+    { value: "Alpha 6 IV", label: "Alpha 6 IV" },
+    { value: "Alpha 6 III", label: "Alpha 6 III" },
+    { value: "Alpha 6 II", label: "Alpha 6 II" },
+    { value: "Alpha 5 IV", label: "Alpha 5 IV" },
+    { value: "Alpha 5 III", label: "Alpha 5 III" },
+    { value: "Others", label: "Others" },
+  ],
+  Canon: [
+    { value: "EOS R5", label: "EOS R5" },
+    { value: "EOS R6", label: "EOS R6" },
+    { value: "EOS R7", label: "EOS R7" },
+    { value: "EOS R8", label: "EOS R8" },
+    { value: "Others", label: "Others" },
+  ],
+  Nikon: [
+    { value: "Z7", label: "Z7" },
+    { value: "Z6", label: "Z6" },
+    { value: "Z5", label: "Z5" },
+    { value: "Z4", label: "Z4" },
+    { value: "Others", label: "Others" },
+  ],
+}
+
+export const cameraMegapixels = [
+  { value: "12MP", label: "12MP" },
+  { value: "24MP", label: "24MP" },
+  { value: "48MP", label: "48MP" },
+  { value: "64MP", label: "64MP" },
+  { value: "108MP", label: "108MP" },
+  { value: "128MP", label: "128MP" },
+  { value: "200MP", label: "200MP" },
+  { value: "256MP", label: "256MP" },
+  { value: "500MP", label: "500MP" },
+  { value: "1000MP", label: "1000MP" },
+  { value: "Other", label: "Other" },
+];
+
+export const cameraSensorSize = [
+  { value: "Full Frame", label: "Full Frame" },
+  { value: "APS-C", label: "APS-C" },
+  { value: "Other", label: "Other" },
+];
+
+export const cameraLensType = [
+  { value: "Prime", label: "Prime" },
+  { value: "Zoom", label: "Zoom" },
+  { value: "Other", label: "Other" },
+];
+
+export const cameraAutofocusType = [
+  { value: "Single Point", label: "Single Point" },
+  { value: "Area", label: "Area" },
+  { value: "Other", label: "Other" },
+];
+
+export const cameraVideoResolution = [
+  { value: "4K", label: "4K" },
+  { value: "1080p", label: "1080p" },
+  { value: "720p", label: "720p" },
+  { value: "Other", label: "Other" },
+];
+
+export const cameraBatteryLife = [
+  { value: "1 hour", label: "1 hour" },
+  { value: "2 hours", label: "2 hours" },
+  { value: "3 hours", label: "3 hours" },
+  { value: "4 hours", label: "4 hours" },
+  { value: "5 hours", label: "5 hours" },
+  { value: "6 hours", label: "6 hours" },
+  { value: "7 hours", label: "7 hours" },
+  { value: "8 hours", label: "8 hours" },
+  { value: "9 hours", label: "9 hours" },
+  { value: "10 hours", label: "10 hours" },
+  { value: "Other", label: "Other" },
+];
+
+
+  
+  
 
 
