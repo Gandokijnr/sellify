@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeMount, onUnmounted } from "vue";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
-import { MessageSquareIcon } from "lucide-vue-next";
+import { MessageSquareIcon, UserIcon } from "lucide-vue-next";
 
 import { useAuthStore } from "@/stores/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -121,7 +121,9 @@ onUnmounted(() => {
             :to="authStore.isAuthenticated ? '/chats' : '/login'"
             class="flex-col items-center text-gray-600 hover:text-teal-600 relative"
           >
-            <MessageSquareIcon class="h-6 w-6 text-gray-600 hover:text-teal-600" />
+            <MessageSquareIcon
+              class="h-6 w-6 text-gray-600 hover:text-teal-600"
+            />
             <span
               v-if="unreadCount > 0"
               class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs"
@@ -175,20 +177,7 @@ onUnmounted(() => {
                             : 'border-teal-100'
                         "
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="w-5 h-5 text-gray-500"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                          />
-                        </svg>
+                        <UserIcon class="h-6 w-6 text-gray-400" />
                       </div>
 
                       <!-- Verification Badge -->
@@ -404,7 +393,7 @@ onUnmounted(() => {
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
             >My Ads</router-link
           > -->
-          
+
           <router-link
             to="/subscription"
             class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50"
