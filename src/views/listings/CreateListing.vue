@@ -327,8 +327,8 @@ const categoryFields = computed(() => {
       },
       { name: "title", label: "Title", type: "text", required: true },
       {
-        name: "model",
-        label: "Model",
+        name: "type",
+        label: "Type",
         type: isOther ? "text" : "select",
         options: brand ? homeApplianceModels[brand] || [] : [],
         required: true,
