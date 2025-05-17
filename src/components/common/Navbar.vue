@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeMount, onUnmounted } from "vue";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { MessageSquareIcon } from "lucide-vue-next";
 
 import { useAuthStore } from "@/stores/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -113,38 +114,14 @@ onUnmounted(() => {
             class="flex-col items-center text-gray-400 cursor-not-allowed pointer-events-none"
             aria-disabled="true"
           >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
+            <MessageSquareIcon class="h-6 w-6 text-gray-400" />
           </router-link> -->
 
           <router-link
             :to="authStore.isAuthenticated ? '/chats' : '/login'"
             class="flex-col items-center text-gray-600 hover:text-teal-600 relative"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              class="size-5"
-            >
-              <path
-                d="M3.505 2.365A41.369 41.369 0 0 1 9 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 0 0-.577-.069 43.141 43.141 0 0 0-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 0 1 5 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914Z"
-              />
-              <path
-                d="M14 6c-.762 0-1.52.02-2.271.062C10.157 6.148 9 7.472 9 8.998v2.24c0 1.519 1.147 2.839 2.71 2.935.214.013.428.024.642.034.2.009.385.09.518.224l2.35 2.35a.75.75 0 0 0 1.28-.531v-2.07c1.453-.195 2.5-1.463 2.5-2.915V8.998c0-1.526-1.157-2.85-2.729-2.936A41.645 41.645 0 0 0 14 6Z"
-              />
-            </svg>
+            <MessageSquareIcon class="h-6 w-6 text-gray-600 hover:text-teal-600" />
             <span
               v-if="unreadCount > 0"
               class="absolute -top-1 -right-2 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs"
@@ -344,20 +321,7 @@ onUnmounted(() => {
                     : 'border-teal-100'
                 "
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="size-6 text-gray-500"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                  />
-                </svg>
+                <MessageSquareIcon class="h-6 w-6 text-gray-400" />
               </div>
               <!-- Mobile verification indicator -->
               <div
