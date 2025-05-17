@@ -38,6 +38,12 @@ import {
   computerProcessors,
   computerGraphicsCards,
   computerOS,
+  tvBrands,
+  tvModels,
+  tvScreenSizes,
+  audioBrands,
+  audioModels,
+  audioTypes,
 } from "@/stores/models/deviceModels";
 
 const router = useRouter();
@@ -198,6 +204,107 @@ const categoryFields = computed(() => {
   const isMobilePhoneCategory =
     displayCategoryPath.value.toLowerCase().includes("mobile phone") ||
     displayCategoryPath.value.toLowerCase().includes("smartphone");
+
+  const isTVAudioCategory =
+    displayCategoryPath.value.toLowerCase().includes("tv") ||
+    displayCategoryPath.value.toLowerCase().includes("audio");
+
+  // Check if the category path contains "TV"
+  const isTVCategory = displayCategoryPath.value.toLowerCase().includes("tv");
+  // Check if the category path contains "Audio"
+  const isAudioCategory = displayCategoryPath.value
+    .toLowerCase()
+    .includes("audio");
+
+  if (isTVCategory) {
+    // TV-specific fields
+    return [
+      {
+        name: "brand",
+        label: "Brand",
+        type: "select",
+        options: tvBrands,
+        required: true,
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      {
+        name: "model",
+        label: "Model",
+        type: "select",
+        options: form.brand ? tvModels[form.brand] || [] : [],
+        required: true,
+      },
+      {
+        name: "screenSize",
+        label: "Screen Size",
+        type: "select",
+        options: tvScreenSizes,
+        required: true,
+      },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  } else if (isAudioCategory) {
+    // Audio-specific fields
+    return [
+      {
+        name: "brand",
+        label: "Brand",
+        type: "select",
+        options: audioBrands,
+        required: true,
+      },
+      { name: "title", label: "Title", type: "text", required: true },
+      {
+        name: "model",
+        label: "Model",
+        type: "select",
+        options: form.brand ? audioModels[form.brand] || [] : [],
+        required: true,
+      },
+      {
+        name: "audioType",
+        label: "Audio Type",
+        type: "select",
+        options: audioTypes,
+        required: true,
+      },
+      {
+        name: "condition",
+        label: "Condition",
+        type: "select",
+        options: [
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          { value: "refurbished", label: "Refurbished" },
+        ],
+        required: true,
+      },
+      { name: "price", label: "Price", type: "number", required: true },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+    ];
+  }
 
   if (isComputerCategory) {
     const brand = form.brand;
@@ -849,6 +956,22 @@ onMounted(() => {
     <Navbar />
     <div class="container mx-auto px-4 py-8">
       <div class="max-w-3xl mx-auto bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between mb-8">
+          <button
+            type="button"
+            @click="goToStep('category')"
+            class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            @click="goToStep('location')"
+            class="px-6 py-2 bg-green-900 text-white rounded-lg hover:bg-jiji-primary-dark transition-colors"
+          >
+            Continue
+          </button>
+        </div>
         <h1 class="text-2xl font-bold mb-6">Add New Product</h1>
 
         <!-- Progress Steps -->

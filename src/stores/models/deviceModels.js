@@ -29,10 +29,6 @@ export const iPhoneColors = [
   { value: "White", label: "White" },
   { value: "Blue", label: "Blue" },
   { value: "Red", label: "Red" },
-  { value: "Green", label: "Green" },
-  { value: "teal", label: "teal" },
-  { value: "Gold", label: "Gold" },
-  { value: "Silver", label: "Silver" },
 ];
 
 // Samsung models and specifications data
@@ -346,4 +342,105 @@ export const computerOS = [
   { value: "Linux", label: "Linux" },
   { value: "Ubuntu", label: "Ubuntu" },
   { value: "No Operating System", label: "No Operating System" },
+];
+
+// TV & Audio models and specifications data
+export const tvBrands = [
+  { value: "Samsung", label: "Samsung" },
+  { value: "LG", label: "LG" },
+  { value: "Sony", label: "Sony" },
+  { value: "TCL", label: "TCL" },
+  { value: "Hisense", label: "Hisense" },
+  { value: "Other", label: "Other" },
+];
+
+export const tvModels = {
+  Samsung: [
+    { value: "QLED QN900C", label: "QLED QN900C" },
+    { value: "Neo QLED 8K", label: "Neo QLED 8K" },
+    { value: "Crystal UHD", label: "Crystal UHD" },
+    { value: "Smart TV", label: "Smart TV" },
+  ],
+  LG: [
+    { value: "OLED Evo", label: "OLED Evo" },
+    { value: "NanoCell", label: "NanoCell" },
+    { value: "UHD", label: "UHD" },
+    { value: "Smart TV", label: "Smart TV" },
+  ],
+  Sony: [
+    { value: "Bravia XR", label: "Bravia XR" },
+    { value: "OLED", label: "OLED" },
+    { value: "LED", label: "LED" },
+    { value: "Smart TV", label: "Smart TV" },
+  ],
+  TCL: [
+    { value: "6-Series", label: "6-Series" },
+    { value: "4-Series", label: "4-Series" },
+    { value: "3-Series", label: "3-Series" },
+    { value: "Smart TV", label: "Smart TV" },
+  ],
+  Hisense: [
+    { value: "ULED", label: "ULED" },
+    { value: "Smart TV", label: "Smart TV" },
+    { value: "LED", label: "LED" },
+    { value: "4K", label: "4K" },
+  ],
+};
+
+export const audioBrands = [
+  { value: "Sony", label: "Sony" },
+  { value: "Bose", label: "Bose" },
+  { value: "JBL", label: "JBL" },
+  { value: "Sennheiser", label: "Sennheiser" },
+  { value: "Other", label: "Other" },
+];
+
+export const audioModels = {
+  Sony: [
+    { value: "WH-1000XM5", label: "WH-1000XM5" },
+    { value: "WF-1000XM5", label: "WF-1000XM5" },
+    { value: "EXTRA BASS", label: "EXTRA BASS" },
+    { value: "Wireless", label: "Wireless" },
+  ],
+  Bose: [
+    { value: "QuietComfort 45", label: "QuietComfort 45" },
+    { value: "SoundLink Revolve", label: "SoundLink Revolve" },
+    { value: "QuietComfort Earbuds", label: "QuietComfort Earbuds" },
+    { value: "Smart Speaker", label: "Smart Speaker" },
+  ],
+  JBL: [
+    { value: "Flip 5", label: "Flip 5" },
+    { value: "Charge 5", label: "Charge 5" },
+    { value: "Tune 750BTNC", label: "Tune 750BTNC" },
+    { value: "Pulse 4", label: "Pulse 4" },
+  ],
+  Sennheiser: [
+    { value: "Momentum 4", label: "Momentum 4" },
+    { value: "HD 450BT", label: "HD 450BT" },
+    { value: "CX 400BT", label: "CX 400BT" },
+    { value: "True Wireless 2", label: "True Wireless 2" },
+  ],
+};
+
+export const tvScreenSizes = [
+  { value: "32", label: "32 inches" },
+  { value: "40", label: "40 inches" },
+  { value: "43", label: "43 inches" },
+  { value: "50", label: "50 inches" },
+  { value: "55", label: "55 inches" },
+  { value: "65", label: "65 inches" },
+  { value: "75", label: "75 inches" },
+  { value: "85", label: "85 inches" },
+];
+
+export const audioTypes = [
+  { value: "Headphones", label: "Headphones" },
+  { value: "Earbuds", label: "Earbuds" },
+  { value: "Speaker", label: "Speaker" },
+  { value: "Home Audio", label: "Home Audio" },
+  { value: "Car Audio", label: "Car Audio" },
+  { value: "Green", label: "Green" },
+  { value: "teal", label: "teal" },
+  { value: "Gold", label: "Gold" },
+  { value: "Silver", label: "Silver" },
 ];
