@@ -28,6 +28,22 @@ const handleNavigate = () => {
     markAsRead(props.chat.id, authStore.user.uid);
   }
 };
+
+// Helper function to get the text of the last message in different possible formats
+const getLastMessageText = (chat) => {
+  if (!chat.lastMessage) return "No messages yet";
+  
+  // Handle different formats of lastMessage
+  if (typeof chat.lastMessage === 'string') {
+    // If lastMessage is a direct string
+    return truncateText(chat.lastMessage);
+  } else if (typeof chat.lastMessage === 'object') {
+    // If lastMessage is an object with text property
+    return truncateText(chat.lastMessage.text || "") || "No messages yet";
+  }
+  
+  return "No messages yet";
+};
 </script>
 
 <template>
@@ -105,7 +121,7 @@ const handleNavigate = () => {
         class="text-sm mt-1 text-gray-600 dark:text-gray-300 line-clamp-1"
         :class="{ 'font-medium': getUnreadCount(chat, authStore.user?.uid) > 0 }"
       >
-        {{ truncateText(chat.lastMessage?.text) || "No messages yet" }}
+        {{ getLastMessageText(chat) }}
       </p>
     </div>
 

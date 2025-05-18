@@ -344,7 +344,7 @@ export const chatService = {
       await updateDoc(chatRef, {
         lastMessage: { text: messageData.text },
         lastUpdated: serverTimestamp(),
-        unreadCount: increment(1),
+        [`unread_${receiverId}`]: increment(1) // Increment the recipient-specific unread count
       });
 
       return true;
@@ -357,11 +357,11 @@ export const chatService = {
   /**
    * Mark messages as read
    * @param {string} chatId - Chat ID
-   * @param {string} userId - User ID
-   * @param {string} senderId - Sender ID (messages from this user will be marked as read)
+   * @param {string} userId - Current user ID (the one viewing the messages)
+   * @param {string} otherUserId - Other user ID (the one who sent the messages)
    * @returns {Promise<boolean>} - Success status
    */
-  async markMessagesAsRead(chatId, userId, senderId) {
+  async markMessagesAsRead(chatId, userId, otherUserId) {
     try {
       // Update the chat document to clear unread count
       const chatRef = doc(db, "chats", chatId);
@@ -370,21 +370,28 @@ export const chatService = {
       });
 
       // Mark individual messages as read
+      // Find messages FROM the other user (they're the sender) TO the current user (they're the receiver)
       const messagesRef = collection(db, "chats", chatId, "messages");
       const q = query(
         messagesRef,
-        where("senderId", "==", senderId),
-        where("read", "==", false)
+        where("senderId", "==", otherUserId), // Messages sent BY the other user
+        where("receiverId", "==", userId)     // Messages received BY the current user
       );
 
       const querySnapshot = await getDocs(q);
 
-      // If there are unread messages, batch update them
+      // If there are messages, update the ones that don't have userId in readBy array
       if (!querySnapshot.empty) {
         const batch = writeBatch(db);
 
-        querySnapshot.forEach((doc) => {
-          batch.update(doc.ref, { read: true });
+        querySnapshot.forEach((docSnapshot) => {
+          const messageData = docSnapshot.data();
+          // Check if current user is already in the readBy array
+          if (!messageData.readBy || !messageData.readBy.includes(userId)) {
+            // Add the current user to the readBy array
+            const updatedReadBy = messageData.readBy ? [...messageData.readBy, userId] : [userId];
+            batch.update(docSnapshot.ref, { readBy: updatedReadBy });
+          }
         });
 
         await batch.commit();

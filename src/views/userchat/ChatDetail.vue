@@ -185,11 +185,14 @@ const subscribeToMessages = (convId) => {
 
     // Set up new subscription
     const unsubscribe = chatService.getChatMessages(convId, (newMessages) => {
-      messages.value = newMessages.map(msg => ({
-        ...msg,
-        content: msg.text, // Map text to content for display
-        timestamp: msg.timestamp?.toDate() // Convert timestamp
-      }));
+      messages.value = newMessages.map(msg => {
+        // Convert timestamp if it exists and has toDate method
+        const timestamp = msg.timestamp?.toDate ? msg.timestamp.toDate() : msg.timestamp;
+        return {
+          ...msg,
+          timestamp
+        };
+      });
       loading.value = false;
       scrollToBottom();
     });
@@ -304,7 +307,18 @@ watch(messages, () => {
 
 // Auto-mark messages as read when otherUserId changes
 watch(otherUserId, () => {
-  if (otherUserId.value) {
+  if (otherUserId.value && currentUserId.value && route.params.conversationId) {
+    // Add console log for debugging
+    console.log('Marking messages as read due to otherUserId change');
+    markMessagesAsRead();
+  }
+});
+
+// Also mark messages as read when messages are loaded
+watch(messages, () => {
+  if (messages.value.length > 0 && otherUserId.value && currentUserId.value) {
+    // Add console log for debugging
+    console.log('Marking messages as read due to messages update');
     markMessagesAsRead();
   }
 });
@@ -609,7 +623,7 @@ onUnmounted(() => {
                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
                 ]"
               >
-                <p class="break-words">{{ message.content }}</p>
+                <p class="break-words">{{ message.text || message.content }}</p>
                 <div class="flex justify-between items-end mt-1">
                   <p class="text-xs opacity-70">
                     {{ formatTimestamp(message.timestamp) }}
@@ -618,9 +632,10 @@ onUnmounted(() => {
                     v-if="message.senderId === currentUserId"
                     class="text-xs ml-2"
                   >
-                    <span v-if="message.read">✓✓</span>
-                    <span v-else>✓</span>
+                    <span v-if="message.readBy && Array.isArray(message.readBy) && message.readBy.includes(otherUserId.value)" title="Read by recipient">✓✓</span>
+                    <span v-else :title="'Not yet read by ' + otherUserId.value">✓</span>
                   </span>
+                  <!-- Debug info: <pre>{{ JSON.stringify({ readBy: message.readBy, otherUserId: otherUserId.value }, null, 2) }}</pre> -->
                 </div>
               </div>
             </div>

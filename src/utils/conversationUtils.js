@@ -53,7 +53,7 @@ export const getUnreadCount = (conversation, userId) => {
 export const markAsRead = (conversationId, userId) => {
   if (!conversationId || !userId) return;
 
-  const conversationRef = doc(db, "conversations", conversationId);
+  const conversationRef = doc(db, "chats", conversationId);
 
   // Update the readBy field for this user
   updateDoc(conversationRef, {
