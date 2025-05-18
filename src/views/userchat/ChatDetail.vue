@@ -635,7 +635,6 @@ onUnmounted(() => {
                     <span v-if="message.readBy && Array.isArray(message.readBy) && message.readBy.includes(otherUserId.value)" title="Read by recipient">✓✓</span>
                     <span v-else :title="'Not yet read by ' + otherUserId.value">✓</span>
                   </span>
-                  <!-- Debug info: <pre>{{ JSON.stringify({ readBy: message.readBy, otherUserId: otherUserId.value }, null, 2) }}</pre> -->
                 </div>
               </div>
             </div>
