@@ -441,10 +441,6 @@ const calculateCounts = () => {
       brandCount['all'] = (brandCount['all'] || 0) + 1;
     }
   });
-  
-  console.log('Category counts:', categoryCount);
-  console.log('Subcategory counts:', subcategoryCount);
-  console.log('Brand counts:', brandCount);
 };
 
 // Filter handlers

@@ -214,12 +214,6 @@ const sendMessageDirectly = async () => {
     const buyerInfo = chatResult.buyerInfo;
     const listingInfo = chatResult.listingInfo;
 
-    console.log('Chat created with verified users:', {
-      seller: sellerInfo.displayName,
-      buyer: buyerInfo.displayName,
-      listing: listingInfo.title
-    });
-
     // Send the message with all proper information
     await chatStore.sendMessage(conversationId, authStore.user.uid, {
       content: message.value.trim(),

@@ -80,7 +80,6 @@ const fetchUserInfo = async (userId) => {
       return;
     }
     
-    console.log("Fetching user info for:", userId);
 
     // Try to fetch from listings first if it matches a listing pattern
     // (This is to handle the case where a listing ID is mistakenly passed)
@@ -95,13 +94,11 @@ const fetchUserInfo = async (userId) => {
             const sellerDoc = await getDoc(doc(db, "users", listingData.userId));
             if (sellerDoc.exists()) {
               otherUser.value = sellerDoc.data();
-              console.log("Seller data fetched via listing:", otherUser.value);
               return;
             }
           }
         }
       } catch (err) {
-        console.log("Not a listing ID or couldn't fetch seller", err);
         // Continue with normal user fetch
       }
     }
@@ -110,9 +107,7 @@ const fetchUserInfo = async (userId) => {
     const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
       otherUser.value = userDoc.data();
-      console.log("User data fetched:", otherUser.value);
     } else {
-      console.info("User document doesn't exist for ID:", userId);
       // Set a placeholder user object instead of null
       otherUser.value = { displayName: "Unknown User", photoURL: null };
     }
@@ -129,18 +124,14 @@ const fetchUserInfo = async (userId) => {
 const fetchListingInfo = async (listingId) => {
   try {
     if (!listingId) {
-      console.warn("No listingId available to fetch listing info");
       return;
     }
 
-    console.log("Fetching listing info for:", listingId);
     const listingDoc = await getDoc(doc(db, "listings", listingId));
 
     if (listingDoc.exists()) {
       listingInfo.value = listingDoc.data();
-      console.log("Listing data fetched:", listingInfo.value);
     } else {
-      console.warn("Listing document doesn't exist for ID:", listingId);
       listingInfo.value = null;
     }
   } catch (error) {
@@ -153,20 +144,16 @@ const fetchListingInfo = async (listingId) => {
 const subscribeToConversation = (convId) => {
   if (!convId) return null;
 
-  console.log("Subscribing to conversation:", convId);
   return onSnapshot(
     doc(db, "conversations", convId),
     (docSnap) => {
       if (docSnap.exists()) {
         conversation.value = docSnap.data();
-        console.log("Conversation data received:", conversation.value);
       } else {
-        console.warn("Conversation doesn't exist");
         error.value = "Conversation not found";
       }
     },
     (err) => {
-      console.error("Error subscribing to conversation:", err);
       error.value = "Failed to load conversation";
     }
   );
@@ -286,7 +273,6 @@ const scrollToBottom = () => {
 // Watch for changes in otherUserId and fetch user data accordingly
 watch(otherUserId, async (newUserId, oldUserId) => {
   if (newUserId && newUserId !== oldUserId) {
-    console.log("otherUserId changed, fetching user data:", newUserId);
     await fetchUserInfo(newUserId);
   }
 });
@@ -309,7 +295,6 @@ watch(messages, () => {
 watch(otherUserId, () => {
   if (otherUserId.value && currentUserId.value && route.params.conversationId) {
     // Add console log for debugging
-    console.log('Marking messages as read due to otherUserId change');
     markMessagesAsRead();
   }
 });
@@ -318,7 +303,6 @@ watch(otherUserId, () => {
 watch(messages, () => {
   if (messages.value.length > 0 && otherUserId.value && currentUserId.value) {
     // Add console log for debugging
-    console.log('Marking messages as read due to messages update');
     markMessagesAsRead();
   }
 });
@@ -414,7 +398,6 @@ const initialize = async () => {
     return;
   }
 
-  console.log(`Initializing chat ${route.params.conversationId} for user ${currentUserId.value}`);
   loading.value = true;
   error.value = null;
   
@@ -435,7 +418,6 @@ onMounted(initialize);
 // Cleanup listeners
 onUnmounted(() => {
   if (unsubscribeMessages.value && typeof unsubscribeMessages.value === 'function') {
-    console.log("Unsubscribing from messages");
     unsubscribeMessages.value();
     unsubscribeMessages.value = null;
   }

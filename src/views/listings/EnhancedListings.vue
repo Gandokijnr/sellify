@@ -379,14 +379,11 @@ function initializeScrollAnimations() {
 
 // Lifecycle hooks
 onMounted(async () => {
-  console.log('EnhancedListings component mounted');
   filterStore.loading = true;
   await fetchAllListings();
   await fetchUserProfile();
   
   // Log what's happening with the listings
-  console.log('All listings fetched:', allListings.value.length);
-  console.log('Filter store listings:', filterStore.listings.length);
   
   // Initialize from URL if needed
   const { query: searchQuery, category, subcategory, price, condition, location, sort } = route.query;
@@ -401,7 +398,6 @@ onMounted(async () => {
   
   // Make sure we actually have listings in the filter store
   if (filterStore.listings.length === 0 && allListings.value.length > 0) {
-    console.log('Setting filterStore.listings directly');
     filterStore.listings = [...allListings.value];
   }
   

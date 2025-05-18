@@ -621,7 +621,6 @@ const deleteListing = async (id) => {
       stats.value.activeListings -= 1;
     }
 
-    console.log(`Successfully deleted listing with ID: ${id}`);
     return true;
   } catch (error) {
     console.error(`Error deleting listing with ID ${id}:`, error);

@@ -124,10 +124,6 @@ const fetchAllCategoryCounts = () => {
       // Get the correct database value for this category
       const categoryValue = categoryMapping[category.name];
 
-      console.log(
-        `Setting up listener for category: ${category.name} → ${categoryValue}`
-      );
-
       // Create a combined query handler that avoids double-counting
       const handleCategoryCounts = () => {
         const uniqueIds = new Set();
@@ -168,7 +164,6 @@ const fetchAllCategoryCounts = () => {
         // Update the count based on the unique document IDs
         const updateCount = () => {
           const count = uniqueIds.size;
-          console.log(`${category.name} total unique count: ${count}`);
           categories.value[index].count = count;
         };
 

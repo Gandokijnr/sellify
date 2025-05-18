@@ -360,7 +360,6 @@ export const useFilterStore = defineStore('filter', () => {
       
       // If initialListings are provided, use them instead of querying Firestore
       if (initialListings) {
-        console.log('Using provided listings:', initialListings.length);
         // Apply client-side filtering
         let results = [...initialListings];
         
@@ -430,7 +429,6 @@ export const useFilterStore = defineStore('filter', () => {
         }
         
         listings.value = results;
-        console.log('Filtered to', results.length, 'listings');
         loading.value = false;
         return;
       }
