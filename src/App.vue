@@ -1,5 +1,10 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <router-view />
+    <router-view class="md:pb-0 pb-[70px]" />
+    <MobileNavBar />
   </div>
 </template>
+
+<script setup>
+import MobileNavBar from '@/components/common/MobileNavBar.vue';
+</script>
