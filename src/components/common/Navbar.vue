@@ -2,9 +2,9 @@
 import { ref, onMounted, onBeforeMount, onUnmounted } from "vue";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { MessageSquareIcon, UserIcon } from "lucide-vue-next";
-
 import { useAuthStore } from "@/stores/auth";
 import { doc, getDoc } from "firebase/firestore";
+import chatService from "@/utils/chatService";
 import { db } from "@/firebase";
 import { useToast } from "vue-toastification";
 
@@ -44,11 +44,23 @@ onMounted(() => {
       where("participants", "array-contains", authStore.user.uid)
     );
 
-    unsubscribeUnread = onSnapshot(q, (snapshot) => {
-      unreadCount.value = snapshot.docs.reduce((acc, doc) => {
-        const data = doc.data();
-        return acc + (data[`unread_${authStore.user.uid}`] || 0);
-      }, 0);
+    unsubscribeUnread = onSnapshot(q, async (snapshot) => {
+      try {
+        const userId = authStore.user.uid;
+        const unreadCountPromises = snapshot.docs.map(doc => {
+          const chatId = doc.id;
+          return chatService.getUnreadChatsCount(userId).then(count => ({
+            chatId,
+            unreadCount: count
+          }));
+        });
+
+        const results = await Promise.all(unreadCountPromises);
+        unreadCount.value = results.reduce((acc, result) => acc + result.unreadCount, 0);
+      } catch (error) {
+        console.error('Error updating unread count:', error);
+        toast.error('Failed to update unread count');
+      }
     });
   }
 });

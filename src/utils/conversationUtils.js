@@ -6,7 +6,11 @@ const db = getFirestore();
 export const getRelativeTime = (timestamp) => {
   if (!timestamp) return "";
 
-  const date = timestamp.toDate();
+  // Handle both Firestore Timestamp objects and regular Date objects
+  const date = timestamp instanceof Date
+    ? timestamp
+    : (typeof timestamp.toDate === 'function' ? timestamp.toDate() : new Date(timestamp));
+    
   const now = new Date();
   const diffInSeconds = Math.floor((now - date) / 1000);
 

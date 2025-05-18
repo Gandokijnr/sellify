@@ -145,6 +145,18 @@ router.beforeEach(async (to, from, next) => {
     return;
   }
 
+  // Handle guest-only routes (like login/register) for authenticated users
+  if (to.meta.guestOnly && isAuthenticated) {
+    next("/seller/dashboard");
+    return;
+  }
+  
+  // Double-check auth requirement (this seems redundant with the first check)
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next("/");
+    return;
+  }
+  
   // Check if user needs subscription for create-listing route
   if (isAuthenticated && to.name === "create-listing") {
     try {
@@ -177,27 +189,20 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  next();
-
-  if (to.meta.guestOnly && isAuthenticated) {
-    next("/seller/dashboard");
-    return;
-  }
-
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next("/");
-    return;
-  }
-
-  if (to.meta.requiresPhoneNumber) {
-    const userDoc = await getDoc(doc(db, "users", authStore.user.uid));
-    if (!userDoc.data()?.phoneNumber) {
-      next("/profile");
-      return;
+  // Check if route requires phone number verification
+  if (isAuthenticated && to.meta.requiresPhoneNumber) {
+    try {
+      const userDoc = await getDoc(doc(db, "users", authStore.user.uid));
+      if (!userDoc.data()?.phoneNumber) {
+        next("/profile");
+        return;
+      }
+    } catch (error) {
+      console.error("Phone number check failed:", error);
     }
   }
 
-  // Allow navigation in all other cases
+  // Allow navigation in all other cases - only call next() once at the end
   next();
 });
 

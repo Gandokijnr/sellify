@@ -200,14 +200,27 @@ const sendMessageDirectly = async () => {
       return;
     }
 
-    // Create or get existing chat conversation
-    const conversationId = await chatStore.startNewChat(
+      // Create or get existing chat conversation with enhanced user information
+    const chatResult = await chatStore.startNewChat(
       listing.value.id,
       listing.value.userId, // seller ID
       authStore.user.uid // buyer ID
     );
 
-    // Send the message
+    // Extract the chat ID and chat information
+    const conversationId = chatResult.chatId;
+    const chatData = chatResult.chatData;
+    const sellerInfo = chatResult.sellerInfo;
+    const buyerInfo = chatResult.buyerInfo;
+    const listingInfo = chatResult.listingInfo;
+
+    console.log('Chat created with verified users:', {
+      seller: sellerInfo.displayName,
+      buyer: buyerInfo.displayName,
+      listing: listingInfo.title
+    });
+
+    // Send the message with all proper information
     await chatStore.sendMessage(conversationId, authStore.user.uid, {
       content: message.value.trim(),
       type: "text",
@@ -216,6 +229,18 @@ const sendMessageDirectly = async () => {
     toast("Message sent successfully", "success");
     showChatModal.value = false;
     message.value = "";
+
+    // Store the complete chat information in localStorage for quick reference
+    try {
+      localStorage.setItem(`chat_${conversationId}_info`, JSON.stringify({
+        sellerName: sellerInfo.displayName,
+        buyerName: buyerInfo.displayName,
+        listingTitle: listingInfo.title,
+        timestamp: new Date().toISOString()
+      }));
+    } catch (e) {
+      console.warn('Could not save chat info to localStorage', e);
+    }
 
     // Navigate to the chat page with the conversation ID
     router.push({

@@ -2,14 +2,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  orderBy,
-  getFirestore,
-} from "firebase/firestore";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
 import SearchBar from "@/components/chat/SearchBar.vue";
@@ -18,8 +10,8 @@ import ConversationList from "@/components/chat/ConversationList.vue";
 import LoadingState from "@/components/chat/LoadingState.vue";
 import EmptyState from "@/components/chat/EmptyState.vue";
 import { MessageSquare } from "lucide-vue-next";
+import chatService from "@/utils/chatService";
 
-const db = getFirestore();
 const authStore = useAuthStore();
 const chats = ref([]);
 const unsubscribeChats = ref(null);
@@ -58,8 +50,11 @@ const filteredChats = computed(() => {
   }
 
   return filtered.sort((a, b) => {
-    const dateA = a.lastUpdated?.toDate() || new Date(0);
-    const dateB = b.lastUpdated?.toDate() || new Date(0);
+    // Check if lastUpdated already is a Date or needs conversion
+    const dateA = a.lastUpdated instanceof Date ? a.lastUpdated : 
+              (typeof a.lastUpdated?.toDate === 'function' ? a.lastUpdated.toDate() : new Date(0));
+    const dateB = b.lastUpdated instanceof Date ? b.lastUpdated : 
+              (typeof b.lastUpdated?.toDate === 'function' ? b.lastUpdated.toDate() : new Date(0));
     return dateB - dateA; // Newest first
   });
 });
@@ -76,76 +71,11 @@ const getOtherUser = (chat) => {
 const subscribeToConversations = (userId) => {
   if (!userId) return null;
 
-  // Query for conversations where user is either buyer or seller
-  const conversationsRef = collection(db, "conversations");
-  const buyerQuery = query(
-    conversationsRef,
-    where("participants.buyerId", "==", userId),
-    orderBy("lastUpdated", "desc")
-  );
-
-  const sellerQuery = query(
-    conversationsRef,
-    where("participants.sellerId", "==", userId),
-    orderBy("lastUpdated", "desc")
-  );
-
-  // Use two separate subscriptions and merge results
-  const unsubscribeBuyer = onSnapshot(buyerQuery, (buyerSnapshot) => {
-    const buyerChats = buyerSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    // Only update if seller data is also loaded (after first load)
-    if (!isLoading.value || chats.value.length > 0) {
-      // Merge and deduplicate with existing seller chats
-      const existingSellerChats = chats.value.filter(
-        (chat) => chat.participants?.sellerId === userId
-      );
-      const merged = [...buyerChats, ...existingSellerChats];
-      // Remove duplicates by conversation ID
-      const uniqueChats = Array.from(
-        new Map(merged.map((chat) => [chat.id, chat])).values()
-      );
-      chats.value = uniqueChats;
-    } else {
-      // First load - save buyer chats
-      chats.value = buyerChats;
-    }
+  // Use getUserChats as the correct method from chatService
+  return chatService.getUserChats(userId, (chatsData) => {
+    chats.value = chatsData;
     isLoading.value = false;
   });
-
-  const unsubscribeSeller = onSnapshot(sellerQuery, (sellerSnapshot) => {
-    const sellerChats = sellerSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    // Only update if buyer data is also loaded (after first load)
-    if (!isLoading.value || chats.value.length > 0) {
-      // Merge and deduplicate with existing buyer chats
-      const existingBuyerChats = chats.value.filter(
-        (chat) => chat.participants?.buyerId === userId
-      );
-      const merged = [...sellerChats, ...existingBuyerChats];
-      // Remove duplicates by conversation ID
-      const uniqueChats = Array.from(
-        new Map(merged.map((chat) => [chat.id, chat])).values()
-      );
-      chats.value = uniqueChats;
-    } else {
-      // First load - save seller chats
-      chats.value = sellerChats;
-    }
-    isLoading.value = false;
-  });
-
-  // Return combined unsubscribe function
-  return () => {
-    unsubscribeBuyer();
-    unsubscribeSeller();
-  };
 };
 
 const updateSearchQuery = (query) => {

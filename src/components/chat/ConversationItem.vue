@@ -105,7 +105,7 @@ const handleNavigate = () => {
         class="text-sm mt-1 text-gray-600 dark:text-gray-300 line-clamp-1"
         :class="{ 'font-medium': getUnreadCount(chat, authStore.user?.uid) > 0 }"
       >
-        {{ truncateText(chat.lastMessage) || "No messages yet" }}
+        {{ truncateText(chat.lastMessage?.text) || "No messages yet" }}
       </p>
     </div>
 
