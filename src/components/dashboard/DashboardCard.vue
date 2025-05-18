@@ -22,7 +22,7 @@
     <div class="bg-gray-50 px-5 py-3">
       <div class="text-sm">
         <router-link
-          :to="link || '#'"
+          :to="link || '/browse'"
           class="font-medium text-jiji-primary hover:text-teal-700"
         >
           View all

@@ -3,49 +3,14 @@
     <Navbar />
 
     <main>
-      <!-- Hero Section -->
-      <div class="bg-teal-700 text-white">
-        <div class="container mx-auto px-4 py-12 md:py-16">
-          <div class="max-w-4xl mx-auto">
-            <div class="relative max-w-xl">
-              <h1 class="text-3xl md:text-4xl font-bold mb-4">
-                {{ pageTitle }}
-              </h1>
-              <p class="text-lg text-teal-100 mb-6">
-                {{ pageDescription }}
-              </p>
-              <div class="relative">
-                <input
-                  v-model="filterStore.searchQuery"
-                  type="text"
-                  placeholder="Search listings..."
-                  class="bg-white w-full p-4 pr-12 rounded-lg border-0 shadow-md focus:ring-2 focus:ring-teal-400 text-gray-800"
-                  @keyup.enter="handleSearch"
-                />
-                <button
-                  @click="handleSearch"
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-teal-600"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Hero Section with SearchHeader Component -->
+      <SearchHeader
+        :title="pageTitle"
+        :description="pageDescription"
+        :search-query="filterStore.searchQuery"
+        @update:search-query="(val) => filterStore.searchQuery = val"
+        @search="handleSearch"
+      />
 
       <!-- Main Content -->
       <div class="container mx-auto px-4 py-8">
@@ -189,6 +154,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'firebase/firestore';
+import SearchHeader from '@/components/listings/SearchHeader.vue';
 import { db } from '@/firebase';
 import { useToast } from 'vue-toastification';
 import { useAuthStore } from '@/stores/auth';
@@ -218,9 +184,6 @@ const sellerInfo = ref(null);
 
 // Computed properties
 const pageTitle = computed(() => {
-  if (filterStore.searchQuery) {
-    return `Search results for "${filterStore.searchQuery}"`;
-  }
   
   if (filterStore.selectedMainCategory === 'all') {
     return 'Browse All Listings';

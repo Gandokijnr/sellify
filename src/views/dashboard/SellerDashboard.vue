@@ -139,7 +139,7 @@
                     Recent Listings
                   </h2>
                   <router-link
-                    to="/seller/listings"
+                    to="/browse"
                     class="text-sm font-medium text-teal-600 hover:text-teal-700"
                   >
                     View All
@@ -245,7 +245,7 @@
                     Recent Messages
                   </h2>
                   <router-link
-                    to="/messages"
+                    to="/chats"
                     class="text-sm font-medium text-teal-600 hover:text-teal-700"
                   >
                     View All

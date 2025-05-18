@@ -137,7 +137,7 @@ function initializeScrollAnimations() {
             </h2>
 
             <router-link
-              :to="{ name: 'listings' }"
+              :to="{ name: 'enhanced-listings' }"
               class="flex items-center text-teal-600 hover:text-teal-700 cursor-pointer animate-on-scroll delay-1"
             >
               <span class="font-medium">View all</span>
