@@ -41,7 +41,7 @@ const categories = ref([
     icon: "📱",
     count: 0,
     isValid: true,
-    url: "/listings?subcategory=Mobile phones",
+    url: "/listings?subcategory=Mobile Phones",
   },
   {
     id: 2,
@@ -57,7 +57,7 @@ const categories = ref([
     icon: "🏞️",
     count: 0,
     isValid: true,
-    url: "/listings?subcategory=Land for sale",
+    url: "/listings?subcategory=Land For Sale",
   },
   {
     id: 4,
@@ -65,7 +65,7 @@ const categories = ref([
     icon: "🏠",
     count: 0,
     isValid: true,
-    url: "/listings?subcategory=House for rent",
+    url: "/listings?subcategory=House For Rent",
   },
   {
     id: 5,
@@ -114,8 +114,8 @@ const fetchAllCategoryCounts = () => {
       const categoryMapping = {
         "Mobile Phones": "Mobile Phones",
         Laptops: "Laptops",
-        "Land For Sale": "land for sale",
-        "House For Rent": "house for rent",
+        "Land For Sale": "Land For Sale",
+        "House For Rent": "House For Rent",
         Jobs: "Jobs",
         Vehicles: "Vehicles",
         Clothing: "Clothing",

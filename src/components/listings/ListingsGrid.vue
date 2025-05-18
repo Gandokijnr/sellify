@@ -20,6 +20,14 @@ const props = defineProps({
     type: String,
     default: "All",
   },
+  selectedSubcategory: {
+    type: String,
+    default: "all",
+  },
+  selectedBrand: {
+    type: String,
+    default: "all",
+  },
   showHeader: {
     type: Boolean,
     default: true,
@@ -73,18 +81,45 @@ const filteredListings = computed(() => {
 
   if (props.searchQuery) {
     result = result.filter((listing) =>
-      listing.title.toLowerCase().includes(props.searchQuery.toLowerCase())
+      (listing.title?.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
+        listing.description?.toLowerCase().includes(props.searchQuery.toLowerCase())) ||
+      (listing.images?.[0]?.toLowerCase().includes(props.searchQuery.toLowerCase()))
     );
   }
+  // Handle category filtering
   if (
     props.selectedCategory &&
     props.selectedCategory !== "all" &&
     props.selectedCategory !== "All"
   ) {
+    // First filter by main category
     result = result.filter(
       (listing) =>
-        listing.category.toLowerCase() === props.selectedCategory.toLowerCase()
+        (listing.category?.toLowerCase() === props.selectedCategory.toLowerCase()) ||
+        (listing.mainCategory?.toLowerCase() === props.selectedCategory.toLowerCase())
     );
+
+    // If a subcategory is specified, further filter the results
+    if (props.selectedSubcategory && props.selectedSubcategory !== 'all') {
+      result = result.filter(
+        (listing) =>
+          (listing.subcategory?.toLowerCase() === props.selectedSubcategory.toLowerCase()) ||
+          (listing.subCategory?.toLowerCase() === props.selectedSubcategory.toLowerCase())
+      );
+    }
+    
+    // If a brand is specified, filter by brand
+    if (props.selectedBrand && props.selectedBrand !== 'all') {
+      result = result.filter(
+        (listing) => {
+          // Check for brand in multiple possible fields
+          const listingBrand = listing.brand || listing.brandName;
+          if (!listingBrand) return false;
+          
+          return listingBrand.toLowerCase() === props.selectedBrand.toLowerCase();
+        }
+      );
+    }
   }
 
   const sorted = [...result];

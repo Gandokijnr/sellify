@@ -36,6 +36,11 @@ const routes = [
     component: () => import("@/views/listings/AllListings.vue"),
   },
   {
+    path: "/browse",
+    name: "enhanced-listings",
+    component: () => import("@/views/listings/EnhancedListings.vue"),
+  },
+  {
     path: "/listings/:id",
     name: "listing-details",
     component: () => import("@/views/listings/ListingDetails.vue"),
