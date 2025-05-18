@@ -487,11 +487,10 @@ onUnmounted(() => {
                   {{ chatTitle }}
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ isSeller ? "Buyer" : "Seller" }}:
-                  {{
+                  <!-- {{
                     otherUser?.displayName ||
                     (userLoading ? "Loading..." : "Unknown User")
-                  }}
+                  }} -->
                 </p>
               </div>
             </div>
