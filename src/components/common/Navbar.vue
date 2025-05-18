@@ -310,7 +310,7 @@ onUnmounted(() => {
                     : 'border-teal-100'
                 "
               >
-                <MessageSquareIcon class="h-6 w-6 text-gray-400" />
+                <UserIcon class="h-6 w-6 text-gray-400" />
               </div>
               <!-- Mobile verification indicator -->
               <div
