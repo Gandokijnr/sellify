@@ -126,7 +126,7 @@ const addStylesheet = () => {
     @keyframes floatteal {
       0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
       25% { transform: translateY(-30px) translateX(15px) rotate(5deg); }
-      50% { transform: translateY(10px) translateX(-20px) rotate(-5deg); }
+      50% { transform: translateY(5px) translateX(-20px) rotate(-5deg); }
       75% { transform: translateY(-15px) translateX(25px) rotate(3deg); }
     }
   `;

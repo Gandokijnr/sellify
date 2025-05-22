@@ -176,7 +176,7 @@ const cancelNotifications = () => {
   align-items: center;
   background-color: #0D9488;
   color: white;
-  padding: 10px 20px;
+  padding: 5px 20px;
   border-radius: 8px;
   font-weight: 500;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
