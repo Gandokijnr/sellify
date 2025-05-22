@@ -8,23 +8,13 @@ const toast = useToast();
 const deferredPrompt = ref(null);
 const showInstallButton = ref(false);
 const showNotificationButton = ref(false);
-const isIOS = ref(false);
 const isDesktop = ref(false);
 const dismissedInstall = ref(false);
 const dismissedNotification = ref(false);
 
 onMounted(async () => {
   // Detect if the app can be installed (not already installed)
-  isIOS.value = checkIfIOS();
   isDesktop.value = checkIfDesktop();
-  
-  // For iOS, we'll show different instructions
-  if (isIOS.value) {
-    // Check if the app is already in standalone mode
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
-      showInstallButton.value = true;
-    }
-  }
   
   // For desktop, we'll show the install button if not in standalone mode
   if (isDesktop.value) {
@@ -52,12 +42,6 @@ onMounted(async () => {
     showInstallButton.value = false;
   });
 });
-
-// Function to check if the app is running on iOS
-const checkIfIOS = () => {
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  return /iphone|ipad|ipod/.test(userAgent);
-};
 
 // Function to check if the app is running on desktop
 const checkIfDesktop = () => {
@@ -129,7 +113,7 @@ const cancelNotifications = () => {
       >
         <ArrowDownCircle class="h-5 w-5 mr-2" />
         <span>
-          {{ isIOS ? 'Install on iOS' : isDesktop ? 'Install on Desktop' : 'Install App' }}
+          {{  isDesktop ? 'Install on Desktop' : 'Install App' }}
         </span>
       </button>
       <button
