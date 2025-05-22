@@ -1,21 +1,27 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
 import ListingsGrid from "../listings/ListingsGrid.vue";
 import CategoryGrid from "@/components/categories/CategoryGrid.vue";
 import { Search, ArrowRight, Check, Shield, Phone, MessageSquare, Truck, Users, Lock, Award, Clock, ThumbsUp, Star } from 'lucide-vue-next';
 import { db } from "@/firebase";
 import Navbar from "@/components/common/Navbar.vue";
 import Footer from "@/components/common/Footer.vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { useToast } from "vue-toastification";
 
 const router = useRouter();
+const route = useRoute();
+const toast = useToast();
 const listings = ref([]);
 const loading = ref(true);
 const searchQuery = ref("");
 const favorites = ref([]);
+const showCallSeller = ref(true);
 const authStore = useAuthStore();
+const userProfile = ref(null);
+const sellerInfo = ref(null);
 let unsubscribe = null;
 
 const fetchProducts = () => {
@@ -43,6 +49,59 @@ function viewListing(id) {
   router.push({ name: "listing-details", params: { id } });
 }
 
+async function callSeller(listingId) {
+  try {
+    if (!authStore.user) {
+      router.push({ name: 'login', query: { redirect: route.fullPath } });
+      return;
+    }
+
+    // Check if user has a phone number
+    if (!userProfile.value) {
+      const userDoc = await getDoc(doc(db, 'users', authStore.user.uid));
+      if (userDoc.exists()) {
+        userProfile.value = { id: userDoc.id, ...userDoc.data() };
+      }
+    }
+
+    if (!userProfile.value?.phoneNumber) {
+      toast.warning('Please update your phone number in your profile before contacting sellers.');
+      router.push({ name: 'profile' });
+      return;
+    }
+
+    // Get listing details
+    const listingDoc = await getDoc(doc(db, 'listings', listingId));
+    if (!listingDoc.exists()) {
+      toast.error('Listing details not found');
+      return;
+    }
+
+    // Get seller details
+    const listingData = listingDoc.data();
+    const userDoc = await getDoc(doc(db, 'users', listingData.userId));
+
+    if (!userDoc.exists()) {
+      toast.warning('Seller information not available');
+      return;
+    }
+
+    sellerInfo.value = { id: userDoc.id, ...userDoc.data() };
+    
+    if (!sellerInfo.value.phoneNumber) {
+      toast.warning('Seller\'s phone number is not available');
+      return;
+    }
+
+    // Format phone number and initiate call
+    const formattedNumber = formatPhoneNumber(sellerInfo.value.phoneNumber);
+    window.location.href = `tel:${formattedNumber}`;
+  } catch (error) {
+    console.error('Error fetching seller info:', error);
+    toast.error('Failed to fetch seller information');
+  }
+}
+
 onMounted(() => {
   fetchProducts();
   initializeScrollAnimations();
@@ -58,6 +117,24 @@ onUnmounted(() => {
 // Utility functions
 function formatNumber(num) {
   return num.toLocaleString();
+}
+
+function formatPhoneNumber(phoneNumber) {
+  if (!phoneNumber) return '';
+  
+  // Remove any non-numeric characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  
+  // Check if the number starts with country code (assuming Nigeria +234)
+  if (cleaned.startsWith('234')) {
+    return `+${cleaned}`;
+  } else if (cleaned.startsWith('0')) {
+    // If it starts with 0, replace with +234
+    return `+234${cleaned.substring(1)}`;
+  } else {
+    // Otherwise, assume it's a local number and add +234
+    return `+234${cleaned}`;
+  }
 }
 
 // Scroll animation functions
@@ -151,9 +228,10 @@ function initializeScrollAnimations() {
             :loading="loading"
             v-model:searchQuery="searchQuery"
             @viewListing="viewListing"
+            @callSeller="callSeller"
             :showSort="false"
             :showHeader="false"
-            :showCallSeller="false"
+            :showCallSeller="true"
           />
         </div>
       </div>
