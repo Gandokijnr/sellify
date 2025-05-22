@@ -8,13 +8,21 @@ const toast = useToast();
 const deferredPrompt = ref(null);
 const showInstallButton = ref(false);
 const showNotificationButton = ref(false);
+const isIOS = ref(false);
 const isDesktop = ref(false);
 const dismissedInstall = ref(false);
 const dismissedNotification = ref(false);
 
 onMounted(async () => {
   // Detect if the app can be installed (not already installed)
+  isIOS.value = checkIfIOS();
   isDesktop.value = checkIfDesktop();
+  
+  // For iOS, we'll hide the button since we have a dedicated popup
+  if (isIOS.value) {
+    // Don't show the install button for iOS - using dedicated popup instead
+    showInstallButton.value = false;
+  }
   
   // For desktop, we'll show the install button if not in standalone mode
   if (isDesktop.value) {
@@ -42,6 +50,12 @@ onMounted(async () => {
     showInstallButton.value = false;
   });
 });
+
+// Function to check if the app is running on iOS
+const checkIfIOS = () => {
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(userAgent);
+};
 
 // Function to check if the app is running on desktop
 const checkIfDesktop = () => {
@@ -106,14 +120,14 @@ const cancelNotifications = () => {
 
 <template>
   <div class="fixed bottom-4 right-4 z-50 space-y-4">
-    <div v-if="showInstallButton" class="flex space-x-2 items-center bg-teal-500 rounded">
+    <div v-if="showInstallButton && !isIOS" class="flex space-x-2 items-center bg-teal-500 rounded">
       <button
         @click="installPWA"
         class="text-white px-4 py-3 rounded-lg shadow-lg hover:bg-teal-600 transition-colors flex items-center flex-1"
       >
         <ArrowDownCircle class="h-5 w-5 mr-2" />
         <span>
-          {{  isDesktop ? 'Install on Desktop' : 'Install App' }}
+          {{ isIOS ? 'Install on iOS' : isDesktop ? 'Install on Desktop' : 'Install App' }}
         </span>
       </button>
       <button
