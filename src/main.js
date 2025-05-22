@@ -10,6 +10,19 @@ import SelifyLoader from "@/components/common/SelifyLoader.vue"; // Adjust path 
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 
+// Manual service worker registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('Service Worker registered successfully:', registration.scope);
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  });
+}
+
 // Create the app
 const app = createApp(App);
 
