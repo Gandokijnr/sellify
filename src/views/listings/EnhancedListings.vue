@@ -334,7 +334,7 @@ const callSeller = async (listingId) => {
 
     // Format phone number
     const formattedNumber = formatPhoneNumber(sellerInfo.value.phoneNumber);
-    window.open(`tel:${formattedNumber}`);
+    window.location.href = `tel:${formattedNumber}`;
   } catch (error) {
     console.error('Error fetching seller info:', error);
     toast.error('Failed to fetch seller information');
