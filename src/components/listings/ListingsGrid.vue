@@ -327,7 +327,7 @@ const handleSortChange = (event) => {
             <button
               v-if="showCallSeller"
               class="bg-teal-100 hover:bg-teal-200 text-teal-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center transition-colors text-xs sm:text-sm"
-              @click.stop="emit('callSeller', formatPhoneNumber(listing.phoneNumber))"
+              @click.stop="emit('callSeller', listing.id)"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
