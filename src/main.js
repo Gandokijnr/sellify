@@ -17,16 +17,62 @@ import "vue-toastification/dist/index.css";
 import SEO from "@/seo";
 import { setupSeoRouterGuard, injectOrganizationSchema } from "@/seo";
 
-// Manual service worker registration
+// Manual service worker registration with update handling
+let refreshing = false;
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    // Register the service worker
     navigator.serviceWorker.register('/sw.js')
       .then(registration => {
         console.log('Service Worker registered successfully:', registration.scope);
+        
+        // Check for updates immediately on page load
+        registration.update();
+        
+        // Set up periodic checks for updates (every hour)
+        setInterval(() => {
+          registration.update();
+          console.log('Checking for service worker updates...');
+        }, 60 * 60 * 1000);
+        
+        // Listen for updates waiting to be installed
+        registration.addEventListener('updatefound', () => {
+          // Get the installing worker
+          const newWorker = registration.installing;
+          
+          // Listen for state changes
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New version is ready to take over
+              console.log('New version available!');
+              // Trigger a custom event that the app can listen for
+              window.dispatchEvent(new CustomEvent('appUpdateAvailable'));
+            }
+          });
+        });
       })
       .catch(error => {
         console.error('Service Worker registration failed:', error);
       });
+      
+    // Listen for controller change to refresh the page
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        console.log('New service worker activated, reloading for fresh content...');
+        window.location.reload();
+      }
+    });
+    
+    // Listen for messages from the service worker
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+        console.log(`Update available! New version: ${event.data.version}`);
+        window.dispatchEvent(new CustomEvent('appUpdateAvailable', { 
+          detail: { version: event.data.version } 
+        }));
+      }
+    });
   });
 }
 

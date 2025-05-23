@@ -1,7 +1,10 @@
 // This is a custom service worker that extends the default PWA plugin functionality
 
-// Cache names
-const CACHE_NAME = 'selify-cache-v1';
+// App version - IMPORTANT: Update this with each new deployment
+const APP_VERSION = '1.0.0';
+
+// Cache names with versioning
+const CACHE_NAME = `selify-cache-${APP_VERSION}`;
 const OFFLINE_URL = '/offline.html';
 
 // Assets to precache
@@ -26,7 +29,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and notify clients of update
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -38,7 +41,22 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    })
+    .then(() => {
+      // Take control of all clients immediately
+      return self.clients.claim();
+    })
+    .then(() => {
+      // Notify all clients that an update is available
+      return self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'UPDATE_AVAILABLE',
+            version: APP_VERSION
+          });
+        });
+      });
+    })
   );
 });
 
@@ -87,6 +105,13 @@ self.addEventListener('fetch', (event) => {
         }
       })
   );
+});
+
+// Message event for communication with clients
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Handle message-related requests
