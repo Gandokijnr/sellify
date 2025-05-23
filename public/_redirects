@@ -1,2 +1,5 @@
-/sitemap.xml  /sitemaps/sitemap.xml  200
+# Serve sitemap.xml directly, do not redirect through SPA
+/sitemap.xml  /sitemap.xml  200
+
+# Send all other requests to the SPA
 /*    /index.html   200

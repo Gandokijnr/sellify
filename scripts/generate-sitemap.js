@@ -79,9 +79,19 @@ async function generateSitemap() {
 
     sitemapContent += '\n</urlset>';
 
-    // Write to file
-    const outputPath = resolve(__dirname, '../public/sitemap.xml');
-    await writeFile(outputPath, sitemapContent);
+    // Write the sitemap to multiple locations to ensure it's available
+    // Main location in public folder for development
+    const publicOutputPath = resolve(__dirname, '../public/sitemap.xml');
+    await writeFile(publicOutputPath, sitemapContent, 'utf8');
+    
+    // Also try to write directly to dist if it exists (for build process)
+    try {
+      const distOutputPath = resolve(__dirname, '../dist/sitemap.xml');
+      await writeFile(distOutputPath, sitemapContent, 'utf8');
+      console.log('Sitemap written to dist folder');
+    } catch (e) {
+      console.log('Note: dist folder not available yet, sitemap will be copied during build');
+    }
     console.log('Sitemap generated successfully!');
   } catch (error) {
     console.error('Error generating sitemap:', error);
