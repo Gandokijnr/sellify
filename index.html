@@ -153,19 +153,26 @@
     </script>
   </head>
 
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JH4WRYZ0EN"></script>
+  <!-- Google tag (gtag.js) - deferred to improve page load performance -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JH4WRYZ0EN" fetchpriority="low"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-JH4WRYZ0EN');
+  window.addEventListener('load', function() {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-JH4WRYZ0EN');
+  });
 </script>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-    <script src="/desktop-shortcuts.js" defer></script>
-    <script src="/ios-install-popup.js" defer></script>
+    <!-- Use preload for critical resources -->
+    <link rel="preload" href="/src/main.js" as="script" type="module" crossorigin>
+    
+    <!-- Load main JS file with higher priority -->
+    <script type="module" src="/src/main.js" fetchpriority="high"></script>
+    
+    <!-- Defer non-critical scripts -->
+    <script src="/desktop-shortcuts.js" defer fetchpriority="low"></script>
+    <script src="/ios-install-popup.js" defer fetchpriority="low"></script>
   </body>
 </html>

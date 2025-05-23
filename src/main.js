@@ -7,6 +7,9 @@ import "./assets/main.css";
 import "animate.css";
 import SelifyLoader from "@/components/common/SelifyLoader.vue"; // Adjust path as needed
 
+// Import custom directives
+import vImgDimensions from "./directives/v-img-dimensions.js";
+
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 
@@ -63,6 +66,9 @@ setupSeoRouterGuard(router);
 
 // Inject organization schema after app is mounted
 injectOrganizationSchema();
+
+// Register global directives
+app.directive('img-dimensions', vImgDimensions);
 
 // Mount the app
 app.mount("#app");
