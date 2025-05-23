@@ -30,7 +30,6 @@ export const iPhoneModels = {
     { value: "iPhone 11", label: "iPhone 11" },
     { value: "iPhone 11 Pro", label: "iPhone 11 Pro" },
     { value: "iPhone 11 Pro Max", label: "iPhone 11 Pro Max" },
-    { value: "iPhone 11 Pro Max", label: "iPhone 11 Pro Max" },
   ],
   "Iphone X": [
     { value: "iPhone X", label: "iPhone X" },
