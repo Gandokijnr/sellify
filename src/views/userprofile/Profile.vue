@@ -157,6 +157,28 @@
                 {{ formatDate(authStore.user?.createdAt) }}
               </div>
 
+              <!-- Verification Countdown Timer -->
+              <div v-if="isVerificationInProgress" class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                <div class="flex items-start">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-blue-700 font-medium">
+                      Verification in progress
+                    </p>
+                    <p class="text-sm text-blue-700 mt-1">
+                      Time remaining: {{ formatTime(countdownTime) }}
+                    </p>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                      <div class="bg-blue-600 h-2.5 rounded-full" :style="{ width: progressPercentage + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="flex gap-4">
                 <button
                   @click="editMode = true"
@@ -180,6 +202,21 @@
                     Cancel
                   </button>
                 </div>
+
+                <!-- Verification Button (disabled if user already has phone number) -->
+                <button
+                  v-if="!isVerificationInProgress && !profileData.isVerified"
+                  @click="startVerificationProcess"
+                  :disabled="!!profileData.phoneNumber"
+                  :class="[
+                    'px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2',
+                    !!profileData.phoneNumber 
+                      ? 'text-gray-400 bg-gray-200 cursor-not-allowed' 
+                      : 'text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                  ]"
+                >
+                  Start Verification
+                </button>
               </div>
             </div>
           </div>
@@ -590,7 +627,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onBeforeMount, computed, watch } from "vue";
+import { ref, reactive, onBeforeMount, computed, watch, onUnmounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import PageSeo from "@/components/seo/PageSeo.vue";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
@@ -610,6 +647,11 @@ import router from "@/router";
 
 const authStore = useAuthStore();
 const loading = ref(true);
+const isVerificationInProgress = ref(false);
+const countdownTime = ref(0);
+const maxCountdownTime = 5 * 60; // 5 minutes in seconds
+const progressPercentage = computed(() => (1 - countdownTime.value / maxCountdownTime) * 100);
+let countdownInterval = null;
 const editMode = ref(false);
 const showChangePasswordModal = ref(false);
 const previewImage = ref(null);
@@ -631,6 +673,8 @@ const profileData = reactive({
   emailNotifications: false,
   publicProfile: false,
   isProfileComplete: false,
+  isVerified: false,
+  needsVerification: false,
   subscription: {
     plan: "free",
     startDate: null,
@@ -718,8 +762,17 @@ const showNotification = (message, type = "success") => {
 onBeforeMount(async () => {
   if (authStore.isAuthenticated && authStore.user) {
     await fetchUserProfile();
+    
+    // Check localStorage for ongoing verification
+    checkAndRestoreVerificationState();
   }
   loading.value = false;
+});
+
+onUnmounted(() => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
 });
 
 const fetchUserProfile = async () => {
@@ -852,6 +905,138 @@ const changePassword = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const startVerificationProcess = async () => {
+  try {
+    // Update the profile to indicate it needs verification
+    profileData.needsVerification = true;
+    
+    // Save the change to the database
+    const userId = authStore.user.uid;
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      needsVerification: true
+    });
+    
+    // Start the countdown
+    startVerificationCountdown();
+    
+    showNotification('Verification process started', 'success');
+  } catch (error) {
+    console.error('Error starting verification:', error);
+    showNotification('Failed to start verification process', 'error');
+  }
+};
+
+// Helper function to check and restore verification state from localStorage
+const checkAndRestoreVerificationState = () => {
+  if (profileData.isVerified) {
+    // If already verified, remove any stale localStorage data
+    localStorage.removeItem('verificationEndTime');
+    localStorage.removeItem('verificationUserId');
+    return;
+  }
+  
+  // Check if there's an ongoing verification process in localStorage
+  const storedEndTime = localStorage.getItem('verificationEndTime');
+  const storedUserId = localStorage.getItem('verificationUserId');
+  
+  if (storedEndTime && storedUserId === authStore.user.uid) {
+    const endTime = parseInt(storedEndTime, 10);
+    const currentTime = Date.now();
+    
+    // Calculate remaining time
+    let remainingMs = endTime - currentTime;
+    
+    if (remainingMs > 0) {
+      // There's still time left, initialize the countdown with the remaining time
+      const remainingSecs = Math.floor(remainingMs / 1000);
+      countdownTime.value = remainingSecs;
+      profileData.needsVerification = true;
+      isVerificationInProgress.value = true;
+      
+      // Start the countdown
+      startCountdownTimer();
+    } else {
+      // Verification time has passed while away, check status directly
+      checkVerificationStatus();
+    }
+  }
+};
+
+const startVerificationCountdown = () => {
+  // Set the countdown time to 5 minutes (300 seconds)
+  countdownTime.value = maxCountdownTime;
+  isVerificationInProgress.value = true;
+  
+  // Calculate and store the end time in localStorage
+  const endTime = Date.now() + (maxCountdownTime * 1000);
+  localStorage.setItem('verificationEndTime', endTime.toString());
+  localStorage.setItem('verificationUserId', authStore.user.uid);
+  
+  // Start the countdown interval
+  startCountdownTimer();
+};
+
+// Separated timer logic to allow reuse from restoration
+const startCountdownTimer = () => {
+  // Clear any existing interval
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+  
+  countdownInterval = setInterval(() => {
+    if (countdownTime.value > 0) {
+      countdownTime.value -= 1;
+    } else {
+      // Countdown finished
+      clearInterval(countdownInterval);
+      isVerificationInProgress.value = false;
+      
+      // Clear localStorage
+      localStorage.removeItem('verificationEndTime');
+      localStorage.removeItem('verificationUserId');
+      
+      // Trigger verification completion actions
+      checkVerificationStatus();
+    }
+  }, 1000);
+};
+
+const checkVerificationStatus = async () => {
+  try {
+    // This would typically be an API call to check verification status
+    // For demonstration purposes, we'll just update the database directly
+    
+    const userId = authStore.user.uid;
+    const userRef = doc(db, "users", userId);
+    
+    await updateDoc(userRef, {
+      isVerified: true,
+      needsVerification: false
+    });
+    
+    // Update local state
+    profileData.isVerified = true;
+    profileData.needsVerification = false;
+    isVerificationInProgress.value = false;
+    
+    // Clear localStorage
+    localStorage.removeItem('verificationEndTime');
+    localStorage.removeItem('verificationUserId');
+    
+    showNotification('Verification process completed!', 'success');
+  } catch (error) {
+    console.error('Error checking verification status:', error);
+    showNotification('Failed to verify your profile. Please try again.', 'error');
+  }
+};
+
+const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
 const formatDate = (dateString) => {

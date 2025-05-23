@@ -14,6 +14,48 @@ export const iPhoneModels = {
     { value: "iPhone 14 Pro", label: "iPhone 14 Pro" },
     { value: "iPhone 14 Pro Max", label: "iPhone 14 Pro Max" },
   ],
+  "Iphone 13": [
+    { value: "iPhone 13", label: "iPhone 13" },
+    { value: "iPhone 13 Mini", label: "iPhone 13 Mini" },
+    { value: "iPhone 13 Pro", label: "iPhone 13 Pro" },
+    { value: "iPhone 13 Pro Max", label: "iPhone 13 Pro Max" },
+  ],
+  "Iphone 12": [
+    { value: "iPhone 12", label: "iPhone 12" },
+    { value: "iPhone 12 Mini", label: "iPhone 12 Mini" },
+    { value: "iPhone 12 Pro", label: "iPhone 12 Pro" },
+    { value: "iPhone 12 Pro Max", label: "iPhone 12 Pro Max" },
+  ],
+  "Iphone 11": [
+    { value: "iPhone 11", label: "iPhone 11" },
+    { value: "iPhone 11 Pro", label: "iPhone 11 Pro" },
+    { value: "iPhone 11 Pro Max", label: "iPhone 11 Pro Max" },
+    { value: "iPhone 11 Pro Max", label: "iPhone 11 Pro Max" },
+  ],
+  "Iphone X": [
+    { value: "iPhone X", label: "iPhone X" },
+    { value: "iPhone XS", label: "iPhone XS" },
+    { value: "iPhone XS Max", label: "iPhone XS Max" },
+    { value: "iPhone XR", label: "iPhone XR" },
+  ],
+  "Iphone 8": [
+    { value: "iPhone 8", label: "iPhone 8" },
+    { value: "iPhone 8 Plus", label: "iPhone 8 Plus" },
+    { value: "iPhone 8 Pro", label: "iPhone 8 Pro" },
+    { value: "iPhone 8 Pro Max", label: "iPhone 8 Pro Max" },
+  ],
+  "Iphone 7": [
+    { value: "iPhone 7", label: "iPhone 7" },
+    { value: "iPhone 7 Plus", label: "iPhone 7 Plus" },
+    { value: "iPhone 7 Pro", label: "iPhone 7 Pro" },
+    { value: "iPhone 7 Pro Max", label: "iPhone 7 Pro Max" },
+  ],
+  "Iphone 6": [
+    { value: "iPhone 6", label: "iPhone 6" },
+    { value: "iPhone 6 Plus", label: "iPhone 6 Plus" },
+    { value: "iPhone 6s", label: "iPhone 6s" },
+    { value: "iPhone 6s Plus", label: "iPhone 6s Plus" },
+  ],
 };
 
 export const iPhoneStorage = [
