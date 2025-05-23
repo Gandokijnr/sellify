@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://selliffy.com/sitemap.xml
+Sitemap: https://selify.com/sitemap.xml
