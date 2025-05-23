@@ -3,28 +3,23 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
-import vueDevTools from "vite-plugin-vue-devtools";
-import { splitVendorChunkPlugin } from 'vite';
+// import vueDevTools from "vite-plugin-vue-devtools";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(), 
     // Only include devTools in development mode
-    process.env.NODE_ENV === 'development' ? vueDevTools() : null,
-    tailwindcss(),
-    splitVendorChunkPlugin()
+    // process.env.NODE_ENV === 'development' ? vueDevTools() : null,
+    tailwindcss()
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
-    // Fix for Firebase v11.6.0 package resolution
-    dedupe: ['firebase']
+    }
   },
   optimizeDeps: {
-    // Force include problematic dependencies
-    include: ['firebase']
+    exclude: ['firebase']
   },
   build: {
     // Enable minification

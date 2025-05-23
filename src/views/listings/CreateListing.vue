@@ -1,10 +1,12 @@
 <script setup>
 import { ref, computed, watch, reactive } from "vue";
 import { onMounted } from "vue";
+import { Zap } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import Navbar from "@/components/common/Navbar.vue";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase";
+import { generateListingDescription } from "@/firebase/ai";
 import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
@@ -72,6 +74,7 @@ import {
 
 const router = useRouter();
 const isLoading = ref(false);
+const isGeneratingDescription = ref(false);
 const errorMessage = ref("");
 const authStore = useAuthStore();
 const subscriptionStore = useSubscriptionStore();
@@ -930,6 +933,11 @@ const categoryFields = computed(() => {
   }
 });
 
+// Computed property to determine if we have enough details to generate an AI description
+const canGenerateDescription = computed(() => {
+  return form.title && (form.brand || form.title.length > 3);
+});
+
 // Add a computed property to determine if we should show the condition field
 const showConditionField = computed(() => {
   // Categories where condition makes sense
@@ -1122,8 +1130,96 @@ const goToStep = (step) => {
 };
 
 const cancel = () => {
-  router.push("/seller/dashboard");
+  router.go(-1);
 };
+
+// The generateDescriptionWithTone function is already defined below
+
+const generateProgressWidth = () => {
+  return currentStepIndex.value * 33;
+};
+
+// Add variables for tone selection
+const showToneSelector = ref(false);
+const selectedTone = ref(""); // Selected tone for AI description
+const availableTones = [
+  { value: 'professional', label: 'Professional' },
+  { value: 'enthusiastic', label: 'Excited' },
+  { value: 'casual', label: 'Casual' },
+  { value: 'technical', label: 'Technical' },
+  { value: 'luxurious', label: 'Luxury' },
+  { value: 'minimalist', label: 'Minimalist' },
+];
+
+/**
+ * Generate an AI-powered description for the listing with a specific tone
+ * @param {string} tone - The tone to use for the description (optional)
+ */
+async function generateDescriptionWithTone(tone = '') {
+  // Don't generate if already in progress
+  if (isGeneratingDescription.value) return;
+  
+  try {
+    showToneSelector.value = false; // Hide the tone selector
+    isGeneratingDescription.value = true;
+    
+    // Check if we have enough information to generate a good description
+    if (!form.title) {
+      toast.warning("Please add a title before generating a description");
+      isGeneratingDescription.value = false;
+      return;
+    }
+    
+    // Collect all the relevant details for a better description
+    const listingDetails = {
+      title: form.title,
+      brand: form.brand || '',
+      model: form.model || '',
+      condition: form.condition || 'used',
+      specifications: form.specifications || '',
+      features: [],
+      tone: tone // Add the selected tone
+    };
+    
+    // Add category-specific details as features
+    if (form.storage) listingDetails.features.push(`${form.storage} storage`);
+    if (form.ram) listingDetails.features.push(`${form.ram} RAM`);
+    if (form.processor) listingDetails.features.push(form.processor);
+    if (form.screenSize) listingDetails.features.push(`${form.screenSize} screen`);
+    if (form.color) listingDetails.features.push(`${form.color} color`);
+    if (form.operatingSystem) listingDetails.features.push(form.operatingSystem);
+    
+    // Call the AI service to generate the description
+    const generatedDescription = await generateListingDescription(listingDetails);
+    
+    // Update the form with the generated description
+    form.description = generatedDescription;
+    
+    // toast.success(`${tone ? capitalize(tone) + ' d' : 'D'}escription generated successfully!`);
+  } catch (error) {
+    console.error("Error generating AI description:", error);
+    toast.error("Could not generate description. Please try again or write your own.");
+  } finally {
+    isGeneratingDescription.value = false;
+  }
+}
+
+/**
+ * Helper function to capitalize the first letter of a string
+ */
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * Generate an AI-powered description for the listing
+ * Uses Firebase AI to create a compelling product description based on the provided details
+ */
+async function generateAIDescription() {
+  // We don't need this function anymore since we're using the select dropdown directly
+  // Keep it for backwards compatibility
+  generateDescriptionWithTone(selectedTone.value || '');
+}
 
 const dragover = (e) => {
   e.preventDefault();
@@ -1400,36 +1496,103 @@ onMounted(() => {
                   :required="field.required"
                 />
 
-                <!-- Textarea -->
-                <textarea
-                  v-else-if="field.type === 'textarea'"
-                  :id="field.name"
-                  v-model="form[field.name]"
-                  rows="3"
-                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-                  :placeholder="`Enter ${field.label.toLowerCase()}`"
-                  :required="field.required"
-                ></textarea>
+                <!-- Textarea with AI description generator for description field -->
+                <div v-else-if="field.type === 'textarea'" class="space-y-2">
+                  <div class="relative">
+                    
+                    <!-- <label for="description" class="block text-sm font-medium text-neutral-700 mb-1">Description</label> -->
+                    <div class="flex gap-2 flex-col bg-gray-50 p-2 rounded-lg">
+                      
+                      <textarea
+                        id="description"
+                        v-model="form[field.name]"
+                        rows="4"
+                        class="block w-full text-sm border-neutral-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 placeholder-neutral-400"
+                        :placeholder="`Enter ${field.label.toLowerCase()}`"
+                        :required="field.required"
+                        :disabled="isGeneratingDescription"
+                      ></textarea>
+                      <div class="flex gap-4 items-center mt-3">
+                        <!-- Tone selector with select dropdown -->
+                        <div class="flex-1 relative">
+                          <div class="relative">
+                            <select
+                              id="tone-selector"
+                              v-model="selectedTone"
+                              class="block w-full px-4 py-2 pr-8 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                              :disabled="isGeneratingDescription"
+                            >
+                              <option value="" selected>Select Tone (or Random)</option>
+                              <option
+                                v-for="tone in availableTones"
+                                :key="tone.value"
+                                :value="tone.value"
+                              >
+                                {{ tone.label }}
+                              </option>
+                            </select>
+                            <!-- Custom dropdown arrow -->
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Generate button -->
+                        <button
+                          @click="generateDescriptionWithTone(selectedTone)"
+                          type="button"
+                          :disabled="isGeneratingDescription"
+                          class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        >
+                          <span v-if="isGeneratingDescription" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Generating...
+                          </span>
+                          <span v-else class="flex items-center">
+                            <Zap class="h-4 w-4 mr-1 text-white" />
+                            Generate
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+          
+                  </div>
+                </div>
 
-                <!-- Select dropdown -->
-                <select
-                  v-else-if="field.type === 'select'"
-                  :id="field.name"
-                  v-model="form[field.name]"
-                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-jiji-primary"
-                  :required="field.required"
-                >
-                  <option value="" disabled selected>
-                    Select {{ field.label }}
-                  </option>
-                  <option
-                    v-for="option in field.options"
-                    :key="option.value"
-                    :value="option.value"
-                  >
-                    {{ option.label }}
-                  </option>
-                </select>
+                <!-- Select dropdown with improved styling -->
+                <div v-else-if="field.type === 'select'" class="relative">
+                  <div class="relative">
+                    <select
+                      :id="field.name"
+                      v-model="form[field.name]"
+                      class="block w-full px-4 py-2 pr-8 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                      :required="field.required"
+                    >
+                      <option value="" disabled selected>
+                        {{ `Select ${field.label}` }}
+                      </option>
+                      <option
+                        v-for="option in field.options"
+                        :key="option.value"
+                        :value="option.value"
+                      >
+                        {{ option.label }}
+                      </option>
+                    </select>
+                    <!-- Custom dropdown arrow -->
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
