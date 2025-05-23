@@ -1,5 +1,13 @@
 <template>
   <div class="min-h-screen bg-gray-50 text-gray-800">
+    <PageSeo
+      pageName="listings"
+      :category="filterStore.selectedCategory !== 'All' ? filterStore.selectedCategory : null"
+      structuredDataType="category"
+      :structuredData="{
+        category: filterStore.selectedCategory !== 'All' ? filterStore.selectedCategory : 'All Products'
+      }"
+    />
     <Navbar />
 
     <main>
@@ -153,6 +161,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import PageSeo from '@/components/seo/PageSeo.vue';
 import { collection, getDocs, query, where, orderBy, limit, doc, getDoc } from 'firebase/firestore';
 import SearchHeader from '@/components/listings/SearchHeader.vue';
 import { db } from '@/firebase';

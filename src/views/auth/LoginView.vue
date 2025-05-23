@@ -1,4 +1,7 @@
 <template>
+  <PageSeo
+    pageName="login"
+  />
   <Navbar />
   <div
     class="flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
@@ -135,6 +138,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import PageSeo from "@/components/seo/PageSeo.vue";
 import Navbar from "@/components/common/Navbar.vue";
 import { useToast } from "vue-toastification";
 import { useAuthStore } from "@/stores/auth";

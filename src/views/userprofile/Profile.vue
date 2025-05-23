@@ -1,4 +1,8 @@
 <template>
+  <PageSeo
+    pageName="profile"
+    :title="profileData && profileData.displayName ? `${profileData.displayName}'s Profile | Selify Nigeria` : 'Your Seller Profile | Selify Marketplace'"
+  />
   <Navbar />
   <div class="bg-gray-50 min-h-screen py-8">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -588,6 +592,7 @@
 <script setup>
 import { ref, reactive, onBeforeMount, computed, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import PageSeo from "@/components/seo/PageSeo.vue";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db, auth } from "@/firebase";
 import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";

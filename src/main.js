@@ -10,6 +10,10 @@ import SelifyLoader from "@/components/common/SelifyLoader.vue"; // Adjust path 
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 
+// Import SEO module
+import SEO from "@/seo";
+import { setupSeoRouterGuard, injectOrganizationSchema } from "@/seo";
+
 // Manual service worker registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -53,6 +57,12 @@ authStore.initAuth();
 // Register router
 app.use(router);
 app.component("SelifyLoader", SelifyLoader);
+
+// Setup SEO
+setupSeoRouterGuard(router);
+
+// Inject organization schema after app is mounted
+injectOrganizationSchema();
 
 // Mount the app
 app.mount("#app");

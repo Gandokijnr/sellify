@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import PageSeo from "@/components/seo/PageSeo.vue";
 import Navbar from "@/components/common/Navbar.vue";
 import { useToast } from "vue-toastification";
 import { validateEmail, validatePassword } from "@/utils/validators";
@@ -155,6 +156,9 @@ const togglePasswordVisibility = () => {
 </script>
 
 <template>
+  <PageSeo
+    pageName="register"
+  />
   <nav>
     <Navbar />
   </nav>

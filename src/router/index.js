@@ -33,12 +33,12 @@ const routes = [
   {
     path: "/listings",
     name: "listings",
-    component: () => import("@/views/listings/AllListings.vue"),
+    component: () => import("@/views/listings/EnhancedListings.vue"),
   },
   {
     path: "/browse",
     name: "enhanced-listings",
-    component: () => import("@/views/listings/EnhancedListings.vue"),
+    redirect: { name: "listings" },
   },
   {
     path: "/listings/:id",

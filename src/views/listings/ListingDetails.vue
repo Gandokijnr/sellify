@@ -19,6 +19,7 @@ import Footer from "@/components/common/Footer.vue";
 // Import chat store functions
 import { useChatStore } from "@/stores/chat.store";
 import { useToast } from "vue-toastification";
+import PageSeo from "@/components/seo/PageSeo.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -262,6 +263,22 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-gray-50 text-gray-800">
+    <PageSeo
+      v-if="listing"
+      pageName="listingDetail"
+      :itemName="listing.title"
+      :itemDetails="listing.description"
+      :image="listing.images && listing.images.length > 0 ? listing.images[0] : null"
+      :category="listing.category"
+      structuredDataType="product"
+      :structuredData="{
+        name: listing.title,
+        description: listing.description,
+        price: listing.price ? listing.price.toString() : '',
+        imageUrl: listing.images && listing.images.length > 0 ? listing.images[0] : '',
+        sellerName: sellerInfo ? sellerInfo.displayName : 'Selify Seller'
+      }"
+    />
     <Navbar />
 
     <main class="container mx-auto px-4 py-8">

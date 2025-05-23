@@ -1,4 +1,10 @@
 <template>
+  <PageSeo
+    pageName="subscription"
+    title="Premium Seller Plans | Boost Your Sales on Selify Nigeria"
+    description="Upgrade your selling experience with Selify premium plans. Get featured listings, priority placement, and more visibility for your products in Nigeria's marketplace."
+    structuredDataType="organization"
+  />
   <Navbar />
   <div class="bg-gradient-to-b from-teal-50 to-white min-h-screen pb-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
@@ -370,6 +376,7 @@
 <script setup>
 import { onMounted, computed, ref, watch } from "vue";
 import { useSubscriptionStore } from "@/stores/subscription.store";
+import PageSeo from "@/components/seo/PageSeo.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import Navbar from "@/components/common/Navbar.vue";
