@@ -1,8 +1,8 @@
 <template>
-  <div class="product-analyzer-container">
-    <h2 class="analyzer-title">Product Image Analysis</h2>
+  <div class="max-w-3xl mx-auto p-5">
+    <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">Product Image Analysis</h2>
     
-    <p class="analyzer-description">
+    <p class="text-center text-gray-600 mb-6">
       Take a photo or upload an image of your product, and our AI will help identify and describe it.
     </p>
     
@@ -13,64 +13,71 @@
     />
     
     <!-- Results Editor (appears when editing) -->
-    <div v-if="isEditing" class="results-editor">
-      <h3>Edit Product Details</h3>
+    <div v-if="isEditing" class="mt-8 bg-gray-100 p-5 rounded-lg shadow-sm">
+      <h3 class="text-xl font-medium mb-4">Edit Product Details</h3>
       <form @submit.prevent="saveEditedResults">
-        <div class="form-group">
-          <label for="title">Title</label>
+        <div class="mb-4">
+          <label for="title" class="block font-medium mb-1.5 text-gray-700">Title</label>
           <input 
             id="title" 
             v-model="editingResults.title" 
             type="text" 
-            class="form-control"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>
         
-        <div class="form-group">
-          <label for="category">Category</label>
+        <div class="mb-4">
+          <label for="category" class="block font-medium mb-1.5 text-gray-700">Category</label>
           <input 
             id="category" 
             v-model="editingResults.category" 
             type="text" 
-            class="form-control"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>
         
-        <div class="form-group">
-          <label for="subCategory">Sub-Category</label>
+        <div class="mb-4">
+          <label for="subCategory" class="block font-medium mb-1.5 text-gray-700">Sub-Category</label>
           <input 
             id="subCategory" 
             v-model="editingResults.subCategory" 
             type="text" 
-            class="form-control"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>
         
-        <div class="form-group">
-          <label for="color">Color</label>
+        <div class="mb-4">
+          <label for="color" class="block font-medium mb-1.5 text-gray-700">Color</label>
           <input 
             id="color" 
             v-model="editingResults.color" 
             type="text" 
-            class="form-control"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>
         
-        <div class="form-group">
-          <label for="description">Description</label>
+        <div class="mb-4">
+          <label for="description" class="block font-medium mb-1.5 text-gray-700">Description</label>
           <textarea 
             id="description" 
             v-model="editingResults.description" 
-            class="form-control"
             rows="5"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-y"
           ></textarea>
         </div>
         
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" @click="cancelEditing">
+        <div class="flex justify-end gap-3 mt-5">
+          <button 
+            type="button" 
+            class="px-5 py-2.5 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400" 
+            @click="cancelEditing"
+          >
             Cancel
           </button>
-          <button type="submit" class="btn-primary">
+          <button 
+            type="submit" 
+            class="px-5 py-2.5 bg-green-500 text-white font-medium rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
             Save Changes
           </button>
         </div>
