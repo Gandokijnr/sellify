@@ -1,10 +1,14 @@
 // src/firebase/ai.js
-// Standalone AI service for generating product descriptions
-// This implementation doesn't rely on Firebase to avoid dependency issues
+// AI services for product descriptions and image recognition
+// This implementation uses Firebase's Vertex AI for image recognition
+
+import axios from 'axios';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { db } from '@/firebase';
 
 /**
- * This service provides AI-powered description generation for listings
- * Standalone implementation that works without external API dependencies
+ * This service provides AI-powered description generation and image recognition
+ * for product listings
  */
 
 /**
@@ -210,5 +214,37 @@ export async function generateListingDescription(listingDetails) {
   } catch (error) {
     console.error("Error generating description:", error);
     return "An error occurred while generating the description. Please try writing your own.";
+  }
+}
+
+/**
+ * Analyze a product image and extract details using Google's Gemini API via Firebase Functions
+ * @param {string} imageBase64 - The base64 encoded image data
+ * @returns {Promise<Object>} - Product details extracted from the image
+ */
+export async function analyzeProductImage(imageBase64) {
+  try {
+    console.log('Analyzing product image with Gemini API...');
+    
+    // Remove the data:image/jpeg;base64, prefix if present
+    const base64Data = imageBase64.includes('base64,') 
+      ? imageBase64.split('base64,')[1] 
+      : imageBase64;
+    
+    // Create a callable function reference
+    const functions = getFunctions();
+    const analyzeImage = httpsCallable(functions, 'analyzeProductImage');
+    
+    // Call the Cloud Function with the image data
+    const result = await analyzeImage({ imageBase64: base64Data });
+    
+    // The result comes back as data property from callable functions
+    const productData = result.data;
+    
+    console.log('Product data extracted:', productData);
+    return productData;
+  } catch (error) {
+    console.error('Error analyzing product image:', error);
+    return { error: error.message || 'Failed to analyze image' };
   }
 }
