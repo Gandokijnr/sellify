@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 import Navbar from "@/components/common/Navbar.vue";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase";
-import { generateListingDescription, analyzeProductImage } from "@/firebase/ai";
+import { generateListingDescription } from "@/firebase/ai";
 import cloudinaryConfig from "@/cloudinary/cloudinaryConfig";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth";
@@ -981,83 +981,6 @@ const handleImageUpload = (e) => {
   }
 };
 
-// Loading state for image analysis
-const isAnalyzingImage = ref(false);
-
-// Analyze the first uploaded image to extract product details
-const analyzeImage = async (imageIndex = 0) => {
-  if (previewImages.value.length === 0) {
-    toast.error('Please upload an image first');
-    return;
-  }
-  
-  try {
-    isAnalyzingImage.value = true;
-    toast.info('Analyzing image... This may take a few seconds');
-    
-    // Get the base64 image data from the first preview image
-    const imageData = previewImages.value[imageIndex];
-    
-    // Call the AI vision API to analyze the image
-    const productDetails = await analyzeProductImage(imageData);
-    
-    if (productDetails.error) {
-      toast.error(`Analysis failed: ${productDetails.error}`);
-      return;
-    }
-    
-    // Success! Auto-fill the form with detected details
-    toast.success('Image analyzed successfully!');
-    
-    // Map the detected product details to the form fields
-    if (productDetails.title) form.title = productDetails.title;
-    if (productDetails.description) form.description = productDetails.description;
-    if (productDetails.price) form.price = productDetails.approxPrice || productDetails.price;
-    if (productDetails.condition) form.condition = productDetails.condition.toLowerCase();
-    if (productDetails.brand) form.brand = productDetails.brand;
-    if (productDetails.model) form.model = productDetails.model;
-    
-    // Handle category mapping
-    if (productDetails.mainCategory) {
-      console.log('AI detected mainCategory:', productDetails.mainCategory);
-      
-      // Direct assignment - the AI should return exact keys that match our categoriesData
-      form.mainCategory = productDetails.mainCategory;
-      
-      if (productDetails.subCategory) {
-        console.log('AI detected subCategory:', productDetails.subCategory);
-        form.subCategory = productDetails.subCategory;
-        
-        // Create a structured category for the CategorySelector component
-        const structuredCategory = {
-          main: productDetails.mainCategory,
-          sub: productDetails.subCategory,
-          subsub: null
-        };
-        
-        // Log and update the category structure
-        console.log('Updating category structure:', structuredCategory);
-        updateCategoryStructure(structuredCategory);
-      }
-    }
-    
-    // Handle other detected specifications
-    if (productDetails.color) form.color = productDetails.color;
-    if (productDetails.storage) form.storage = productDetails.storage;
-    if (productDetails.size) form.size = productDetails.size;
-    
-    // If we detected enough details, move to the details step
-    if (form.title && form.mainCategory) {
-      goToStep('details');
-    }
-    
-  } catch (error) {
-    console.error('Error analyzing image:', error);
-    toast.error('Failed to analyze image. Please fill in the details manually.');
-  } finally {
-    isAnalyzingImage.value = false;
-  }
-};
 
 const removeImage = (index) => {
   previewImages.value.splice(index, 1);
@@ -1815,18 +1738,7 @@ onMounted(() => {
               <p class="text-gray-600 mb-4">
                 Add photos of your item (maximum 10 images)
               </p>
-              <div class="mb-4 p-3 bg-indigo-50 rounded-lg">
-                <div class="flex items-center">
-                  <div class="mr-3 text-indigo-500">
-                    <Zap class="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 class="font-medium text-indigo-700">AI Product Recognition</h3>
-                    <p class="text-sm text-indigo-600">Upload an image and let AI identify your product and fill in the details automatically!</p>
-                  </div>
-                </div>
-              </div>
-
+             
               <div
                 @dragover.prevent="dragover"
                 @dragleave.prevent="dragleave"
@@ -1865,30 +1777,6 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- Auto-Detect Button -->
-              <div v-if="previewImages.length > 0" class="mt-6 mb-4">
-                <button
-                  type="button"
-                  @click="analyzeImage(0)"
-                  class="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
-                  :disabled="isAnalyzingImage"
-                >
-                  <span v-if="isAnalyzingImage" class="flex items-center">
-                    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Analyzing Image...
-                  </span>
-                  <span v-else class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                    Auto-Detect Product with AI
-                  </span>
-                </button>
-                <p class="text-sm text-gray-600 mt-2 text-center">Let AI analyze your product image and fill in the details automatically.</p>
-              </div>
               
               <!-- Image Preview -->
               <div class="mt-4">
@@ -1901,20 +1789,10 @@ onMounted(() => {
                     <img
                       :src="image"
                       alt="Preview"
-                      class="h-32 w-full object-cover rounded-lg"
+                      class="h-18 w-18 object-cover rounded-lg"
                     />
                     <div class="absolute top-1 right-1 flex space-x-1">
-                      <button
-                        type="button"
-                        @click="analyzeImage(index)"
-                        class="bg-indigo-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        :disabled="isAnalyzingImage"
-                      >
-                        <span class="sr-only">Analyze with AI</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                      </button>
+                      
                       <button
                         type="button"
                         @click="removeImage(index)"
