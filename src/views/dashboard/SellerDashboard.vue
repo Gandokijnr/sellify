@@ -396,7 +396,7 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import { db } from "@/firebase/config"; 
+import { db } from "@/firebase"; 
 import Navbar from "@/components/common/Navbar.vue";
 import Modal from "@/components/common/Modal.vue";
 import StatsCard from "@/components/dashboard/StatsCard.vue";
